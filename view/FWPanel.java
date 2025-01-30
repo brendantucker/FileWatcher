@@ -3,9 +3,9 @@ package view;
 import java.awt.Color;
 import javax.swing.JPanel;
 
-public class FileWatcherPanel extends JPanel {
+public class FWPanel extends JPanel {
 
-    public FileWatcherPanel() {
+    public FWPanel() {
         super();
         setBackground(Color.WHITE);
     }

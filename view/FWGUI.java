@@ -10,14 +10,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 
-public class FileWatcherGUI implements ActionListener {
+public class FWGUI implements ActionListener {
 
     private JFrame myFrame;
     private JMenuBar myMenuBar;
 
-    public FileWatcherGUI() {
+    public FWGUI() {
         super();
-        myFrame = new FileWatcherFrame().frameOutline();
+        myFrame = new FWFrame().frameOutline();
         createMenuBar();
 
         myFrame.setVisible(true);

@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 
-public class FileWatcherFrame extends JFrame {
+public class FWFrame extends JFrame {
 
     /** Auto generated serial version UUID. */
     private static final long serialVersionUID = 5497889472015611168L;
