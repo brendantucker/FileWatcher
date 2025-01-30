@@ -16,20 +16,21 @@ public class FileWatcherFrame extends JFrame {
     private static final int SCREEN_WIDTH = SCREEN_SIZE.width;
     /** The height of the screen. */
     private static final int SCREEN_HEIGHT = SCREEN_SIZE.height;
-    /** A Factor for scaling the size of the GUI relative to the current screen size. */
+    /**
+     * A Factor for scaling the size of the GUI relative to the current screen size.
+     */
     private static final double SCALE = 0.7;
 
-    public JFrame frameOutline()
-    {
-        //Setting up the frame and adjusting it to be 70% of the screens dimensions.
+    public JFrame frameOutline() {
+        // Setting up the frame and adjusting it to be 70% of the screens dimensions.
         final JFrame fileFrame = new JFrame("TCSS 360 - File Watcher");
         fileFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        fileFrame.setSize((int)(SCREEN_WIDTH * SCALE), (int)(SCREEN_HEIGHT * SCALE));
+        fileFrame.setSize((int) (SCREEN_WIDTH * SCALE), (int) (SCREEN_HEIGHT * SCALE));
 
-        //Centering the frame on program start.
+        // Centering the frame on program start.
         fileFrame.setLocationRelativeTo(null);
-        
+
         return fileFrame;
     }
-    
+
 }
