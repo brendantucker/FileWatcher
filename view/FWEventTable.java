@@ -25,6 +25,9 @@ public class FWEventTable extends JPanel{
     /** ArrayList to hold the data for the JTable. */
     private ArrayList<FileEvent> myData;
 
+    /**
+     * Constructor for the FWEventTable. This will create the table and set up the panel.
+     */
     public FWEventTable() {
         super(new BorderLayout()); // Ensure that the panel is using a BorderLayout.
         myColumnNames = new String[] { "File Name", "File Path", "Event Type", "File Extension", "Time", };
@@ -44,15 +47,28 @@ public class FWEventTable extends JPanel{
     }
 
 
+    /**
+     * Adds a FileEvent to the table.
+     * 
+     * @param theEvent The FileEvent to add to the table.
+     */
     public void addEvent(FileEvent theEvent) {
         myData.add(theEvent);
         myTableModel.addRow(new Object[] { theEvent.getFileName(), theEvent.getFilePath(), theEvent.getEventType(), theEvent.getExtension(), theEvent.getEventTime() });
     }
 
+    /**
+     * Returns the data in the table.
+     * 
+     * @return The data in the table.
+     */
     public ArrayList<FileEvent> getData() {
         return myData;
     }
 
+    /**
+     * Updates the table with the current data.
+     */
     public void updateTable() {
         myTableModel.setRowCount(0);
         for (FileEvent event : myData) {
@@ -60,6 +76,9 @@ public class FWEventTable extends JPanel{
         }
     }
 
+    /**
+     * Clears the table of all data and empties the myData array of FileEvents.
+     */
     public void clearTable() {
         myData.clear();
         myTableModel.setRowCount(0);
