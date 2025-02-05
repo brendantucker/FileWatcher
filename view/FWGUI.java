@@ -2,8 +2,12 @@ package view;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -11,6 +15,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.Timer;
 
 public class FWGUI implements ActionListener {
@@ -22,6 +27,8 @@ public class FWGUI implements ActionListener {
     private JLabel myTimeLabel;
     private JMenuItem myStartButton;
     private JMenuItem myStopButton;
+    private String[] EXTENSION_TYPES = {"","DOCX", "PDF", "TXT", "PNG", "JPG", "JPEG", "GIF", "MP3", "MP4", "WAV", "AVI", "MOV"};
+    private JComboBox<String> myExtensionComboBox;
 
     /*
      * Constructor for the GUI. This will create the GUI and set up the menu bar.
@@ -31,6 +38,7 @@ public class FWGUI implements ActionListener {
         myFrame = new FWFrame().frameOutline();
         // Create the menu bar and start the timer when necessary.
         createMenuBar();
+        dropDownMenus();
         timeKeeper();
         // Create a panel for the time label
         JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -38,6 +46,25 @@ public class FWGUI implements ActionListener {
         // Add the time panel to the frame.
         myFrame.add(timePanel, BorderLayout.SOUTH);
         myFrame.setVisible(true);
+    }
+
+    private void dropDownMenus(){
+        myExtensionComboBox= new JComboBox<>(EXTENSION_TYPES);
+        myExtensionComboBox.addActionListener(this);
+
+        JLabel monitorField = new JLabel("Select a file extension, a directory, and click Watch to begin File System Monitor.");
+
+        JPanel monitorPanel = new JPanel();
+        monitorPanel.setLayout(new BoxLayout(monitorPanel, BoxLayout.Y_AXIS));
+
+        JPanel containPanel = new JPanel();
+        containPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        containPanel.add(monitorPanel);
+        
+        monitorPanel.add(monitorField);
+        monitorPanel.add(myExtensionComboBox);
+        
+        myFrame.add(containPanel, BorderLayout.NORTH);
     }
 
     /*
@@ -137,6 +164,8 @@ public class FWGUI implements ActionListener {
                             "Developer: Manjinder Ghuman, Ryder Deback",
                     "About",
                     JOptionPane.INFORMATION_MESSAGE);
+        } else if (theEvent.getSource().equals(myExtensionComboBox) && myExtensionComboBox.getSelectedIndex() != 0) {
+            JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
         }
     }
 
