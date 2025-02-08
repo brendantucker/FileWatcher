@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -38,6 +39,8 @@ public class FWGUI implements ActionListener {
     private JTextField myDirectoryField;
     private JButton myDirectoryButton;
     private JButton myClearDirectoryButton;
+    private JButton myImgStartButton;
+    private JButton myImgStopButton;
     //New field
     private FWEventTable myEventTable;
 
@@ -49,6 +52,7 @@ public class FWGUI implements ActionListener {
         myFrame = new FWFrame().frameOutline();
         // Create the menu bar and start the timer when necessary.
         createMenuBar();
+        imageButtons();
         dropDownMenus();
         timeKeeper();
         // Create a panel for the time label
@@ -67,6 +71,27 @@ public class FWGUI implements ActionListener {
         }
 
         myFrame.setVisible(true);
+    }
+
+    private void imageButtons() {
+        // Create a panel for the image buttons
+        JPanel imagePanel = new JPanel();
+        imagePanel.setLayout(new BoxLayout(imagePanel, BoxLayout.Y_AXIS));
+
+        // Load the images
+        ImageIcon startImgIcon = new ImageIcon("files/startWatching.png");
+        myImgStartButton = new JButton(startImgIcon);
+        myImgStartButton.addActionListener(this);
+        ImageIcon stopImageIcon = new ImageIcon("files/stopWatching.png");
+        myImgStopButton = new JButton(stopImageIcon);
+        myImgStopButton.addActionListener(this);
+
+        // Add the image buttons to the panel
+        imagePanel.add(myImgStartButton);
+        imagePanel.add(myImgStopButton);
+
+        // Add the image panel to the frame
+        myFrame.add(imagePanel, BorderLayout.WEST);
     }
 
     private void dropDownMenus(){
@@ -180,13 +205,13 @@ public class FWGUI implements ActionListener {
      * different actions will be taken depending on the menu item clicked.
      */
     public void actionPerformed(final ActionEvent theEvent) {
-        if (theEvent.getSource().equals(myStartButton)) {
+        if (theEvent.getSource().equals(myStartButton) || theEvent.getSource().equals(myImgStartButton)) {
             runningTime = 0;
             myTimeLabel.setText("Time not started.");
             myTimer.start();
             myStartButton.setEnabled(false);
             myStopButton.setEnabled(true);
-        } else if (theEvent.getSource().equals(myStopButton)) {
+        } else if (theEvent.getSource().equals(myStopButton) || theEvent.getSource().equals(myImgStopButton)) {
             myTimer.stop();
             myStartButton.setEnabled(true);
             myStopButton.setEnabled(false);
