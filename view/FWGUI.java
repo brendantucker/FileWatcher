@@ -2,12 +2,12 @@ package view;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -29,6 +29,9 @@ public class FWGUI implements ActionListener {
     private JMenuItem myStopButton;
     private String[] EXTENSION_TYPES = {"","DOCX", "PDF", "TXT", "PNG", "JPG", "JPEG", "GIF", "MP3", "MP4", "WAV", "AVI", "MOV"};
     private JComboBox<String> myExtensionComboBox;
+    private JTextField myDirectoryField;
+    private JButton myDirectoryButton;
+    private JButton myClearDirectoryButton;
 
     /*
      * Constructor for the GUI. This will create the GUI and set up the menu bar.
@@ -50,19 +53,33 @@ public class FWGUI implements ActionListener {
 
     private void dropDownMenus(){
         myExtensionComboBox= new JComboBox<>(EXTENSION_TYPES);
+        myExtensionComboBox.setEditable(true);
         myExtensionComboBox.addActionListener(this);
 
-        JLabel monitorField = new JLabel("Select a file extension, a directory, and click Watch to begin File System Monitor.");
+        JLabel extensionLable = new JLabel("Select a file extension, a directory, and click Watch to begin File System Monitor.");
+        JPanel dropDownPanels = new JPanel();
+        dropDownPanels.setLayout(new BoxLayout(dropDownPanels, BoxLayout.Y_AXIS));
 
-        JPanel monitorPanel = new JPanel();
-        monitorPanel.setLayout(new BoxLayout(monitorPanel, BoxLayout.Y_AXIS));
+        JLabel directLabel = new JLabel("Directory to monitor:");
+        myDirectoryField = new JTextField();
+        myDirectoryButton = new JButton("Browse Directory");
+        myDirectoryButton.addActionListener(this);
+        myClearDirectoryButton = new JButton("Clear Directory");
+        myClearDirectoryButton.addActionListener(this);
+
+        JPanel directoryPanel = new JPanel();
+        directoryPanel.add(myDirectoryButton);
+        directoryPanel.add(myClearDirectoryButton);
+        
+        dropDownPanels.add(extensionLable);
+        dropDownPanels.add(myExtensionComboBox);
+        dropDownPanels.add(directLabel);
+        dropDownPanels.add(myDirectoryField);
+        dropDownPanels.add(directoryPanel);
 
         JPanel containPanel = new JPanel();
         containPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        containPanel.add(monitorPanel);
-        
-        monitorPanel.add(monitorField);
-        monitorPanel.add(myExtensionComboBox);
+        containPanel.add(dropDownPanels);
         
         myFrame.add(containPanel, BorderLayout.NORTH);
     }
@@ -164,8 +181,19 @@ public class FWGUI implements ActionListener {
                             "Developer: Manjinder Ghuman, Ryder Deback",
                     "About",
                     JOptionPane.INFORMATION_MESSAGE);
-        } else if (theEvent.getSource().equals(myExtensionComboBox) && myExtensionComboBox.getSelectedIndex() != 0) {
+        } else if (theEvent.getSource().equals(myExtensionComboBox) && myExtensionComboBox.getSelectedItem() != "") {
             JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
+        } else if (theEvent.getSource().equals(myDirectoryButton)) {
+            JFileChooser direcChooser = new JFileChooser();
+            direcChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            direcChooser.setAcceptAllFileFilterUsed(false); //Disabling the ability to select all files.
+
+            int directoryValue = direcChooser.showOpenDialog(null);
+            if(directoryValue == JFileChooser.APPROVE_OPTION){
+                myDirectoryField.setText(direcChooser.getSelectedFile().getAbsolutePath());
+            }
+        } else if(theEvent.getSource().equals(myClearDirectoryButton)){
+            myDirectoryField.setText("");
         }
     }
 
