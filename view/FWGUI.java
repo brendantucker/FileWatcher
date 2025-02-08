@@ -1,6 +1,7 @@
 package view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,6 +9,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import java.time.LocalDateTime;
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -17,6 +20,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Timer;
+
+import model.FileEvent;
+import model.EventType;
 
 public class FWGUI implements ActionListener {
 
@@ -32,6 +38,8 @@ public class FWGUI implements ActionListener {
     private JTextField myDirectoryField;
     private JButton myDirectoryButton;
     private JButton myClearDirectoryButton;
+    //New field
+    private FWEventTable myEventTable;
 
     /*
      * Constructor for the GUI. This will create the GUI and set up the menu bar.
@@ -48,6 +56,16 @@ public class FWGUI implements ActionListener {
         timePanel.add(myTimeLabel);
         // Add the time panel to the frame.
         myFrame.add(timePanel, BorderLayout.SOUTH);
+
+        //Setup and add FileEvent table to GUI
+        myEventTable = new FWEventTable();
+        myFrame.add(myEventTable, BorderLayout.CENTER); //Set to CENTER to prevent the table covering other GUI elements
+
+        //Add 100 test events to the table to test scrolling
+        for (int i = 0; i < 100; i++) {
+            myEventTable.addEvent(new FileEvent("TestFile.txt", "C:/path/to/TestFile.txt", EventType.FILECREATED, "txt", LocalDateTime.of(2025, 2, 2, 12, 27)));
+        }
+
         myFrame.setVisible(true);
     }
 
@@ -178,7 +196,7 @@ public class FWGUI implements ActionListener {
             JOptionPane.showMessageDialog(myFrame,
                     "Program Usage: This application watches file system changes.\n" +
                             "Version: 1.0\n" +
-                            "Developer: Manjinder Ghuman, Ryder Deback",
+                            "Developers: Manjinder Ghuman, Ryder Deback, Brendan Tucker",
                     "About",
                     JOptionPane.INFORMATION_MESSAGE);
         } else if (theEvent.getSource().equals(myExtensionComboBox) && myExtensionComboBox.getSelectedItem() != "") {
