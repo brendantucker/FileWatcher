@@ -25,7 +25,8 @@ public class FWFrame extends JFrame {
         // Setting up the frame and adjusting it to be 70% of the screens dimensions.
         final JFrame fileFrame = new JFrame("TCSS 360 - File Watcher");
         fileFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        fileFrame.setSize((int) (SCREEN_WIDTH * SCALE), (int) (SCREEN_HEIGHT * SCALE));
+        //fileFrame.setSize((int) (SCREEN_WIDTH * SCALE), (int) (SCREEN_HEIGHT * SCALE));
+        fileFrame.setSize(600, 600); 
 
         // Centering the frame on program start.
         fileFrame.setLocationRelativeTo(null);
