@@ -14,6 +14,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.Timer;
 
 import model.FileEvent;
@@ -27,6 +28,7 @@ public class FWGUI implements ActionListener {
     private JLabel myTimeLabel;
     private JMenuItem myStartButton;
     private JMenuItem myStopButton;
+    private double splitPaneResizeWeight = 0.2;
     //New field
     private FWEventTable myEventTable;
 
@@ -38,14 +40,25 @@ public class FWGUI implements ActionListener {
         myFrame.setLayout(new BorderLayout());
         createMenuBar();
         timeKeeper();
+        
+        // Create a panel for the time label
+        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        timePanel.add(myTimeLabel);
+        myFrame.add(timePanel, BorderLayout.SOUTH);
+
+        // Create the main panel and event table
         JPanel mainPanel = new FWPanel();
-        myFrame.add(mainPanel, BorderLayout.CENTER);
-
-        //Setup and add FileEvent table to GUI
         myEventTable = new FWEventTable();
-        myFrame.add(myEventTable, BorderLayout.CENTER); //Set to CENTER to prevent the table covering other GUI elements
 
-        //Add 100 test events to the table to test scrolling
+        // Create a JSplitPane to divide the space between the main panel and the event table
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, mainPanel, myEventTable);
+        splitPane.setResizeWeight(splitPaneResizeWeight);
+        splitPane.setDividerSize(0);
+
+        // Add the JSplitPane to the frame
+        myFrame.add(splitPane, BorderLayout.CENTER);
+
+        // Add 100 test events to the table to test scrolling
         for (int i = 0; i < 100; i++) {
             myEventTable.addEvent(new FileEvent("TestFile.txt", "C:/path/to/TestFile.txt", EventType.FILECREATED, "txt", LocalDateTime.of(2025, 2, 2, 12, 27)));
         }

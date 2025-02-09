@@ -10,8 +10,6 @@ public class FWPanel extends JPanel {
     private JComboBox<String> queryExtensionDropdown;
     private JTextField databaseField;
     private JButton writeDbButton, queryButton, clearButton;
-    private JTextArea eventLog;
-    private JLabel myTimeLabel;
     
     public FWPanel() {
         setLayout(new BorderLayout());
@@ -70,21 +68,9 @@ public class FWPanel extends JPanel {
         mainPanel.add(queryButton, gbc);
         gbc.gridx = 2;
         mainPanel.add(clearButton, gbc);
-
-        eventLog = new JTextArea(10, 30);
-        eventLog.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(eventLog);
-        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 3;
-        gbc.fill = GridBagConstraints.BOTH;
-        mainPanel.add(scrollPane, gbc);
         
         add(mainPanel, BorderLayout.CENTER);
         
-        // Bottom-right aligned time label
-        myTimeLabel = new JLabel("Time not started.");
-        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        timePanel.add(myTimeLabel);
-        add(timePanel, BorderLayout.SOUTH);
     }
     
     private JButton createModernButton(String text) {
