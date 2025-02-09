@@ -6,102 +6,141 @@ import javax.swing.*;
 public class FWPanel extends JPanel {
     private JComboBox<String> extensionDropdown;
     private JTextField directoryField;
-    private JButton startButton, stopButton;
     private JComboBox<String> queryExtensionDropdown;
     private JTextField databaseField;
-    private JButton writeDbButton, queryButton, clearButton, browseButton;
-    
+    private JButton myWriteDbButton, myQueryButton, myClearButton, myBrowseButton, myStartButton, myStopButton;
+    private GridBagConstraints myGBC;
+    private JPanel myMainPanel;
+
     public FWPanel() {
         setLayout(new BorderLayout());
 
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        myMainPanel = new JPanel(new GridBagLayout());
+        myGBC = new GridBagConstraints();
+        myGBC.insets = new Insets(5, 5, 5, 5);
+        myGBC.fill = GridBagConstraints.HORIZONTAL;
 
+        setUpExtensionBox();
+        setUpDirectoryBox();
+        setUpDirectoryButtons();
+        setUpDatabaseBox();
+
+        add(myMainPanel, BorderLayout.CENTER);
+    }
+
+    private void setUpExtensionBox() {
         JLabel monitorLabel = new JLabel("Monitor by extension");
-        gbc.gridx = 0; gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        mainPanel.add(monitorLabel, gbc);
+        adjustGridBagConstraints(0, 0, 1);
+        myMainPanel.add(monitorLabel, myGBC);
 
-        extensionDropdown = new JComboBox<>(new String[]{"DOCX", "PDF", "TXT", "PNG", "JPG", "JPEG", "GIF", "MP3", "MP4", "WAV", "log", "csv"});
-        gbc.gridx = 1; gbc.gridy = 0;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        mainPanel.add(extensionDropdown, gbc);
+        extensionDropdown = new JComboBox<>(
+                new String[] { "", "DOCX", "PDF", "TXT", "PNG", "JPG", "JPEG", "GIF", "MP3", "MP4", "WAV",
+                        "AVI", "MOV", "CSV" });
+        adjustGridBagConstraints(1, 0, GridBagConstraints.REMAINDER);
+        myMainPanel.add(extensionDropdown, myGBC);
+    }
 
+    public JComboBox<String> getExtensionBox() {
+        return extensionDropdown;
+    }
+
+    private void setUpDirectoryBox() {
         JLabel directoryLabel = new JLabel("Directory to monitor");
-        gbc.gridx = 0; gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        mainPanel.add(directoryLabel, gbc);
+        adjustGridBagConstraints(0, 1, 1);
+        myMainPanel.add(directoryLabel, myGBC);
 
         directoryField = new JTextField(0); // Increase the size of the text field
-        gbc.gridx = 1; gbc.gridy = 1;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.weightx = 1.0; // Allow the text field to expand
-        gbc.fill = GridBagConstraints.HORIZONTAL; // Make the text field fill the available space
-        mainPanel.add(directoryField, gbc);
+        adjustGridBagConstraints(1, 1, GridBagConstraints.REMAINDER, 1.0);
+        myGBC.fill = GridBagConstraints.HORIZONTAL; // Make the text field fill the available space
+        myMainPanel.add(directoryField, myGBC);
+    }
 
-        startButton = createModernButton("Start");
-        stopButton = createModernButton("Stop");
-        browseButton = createModernButton("Browse");
+    public JTextField getDirectoryField() {
+        return directoryField;
+    }
 
-        stopButton.setEnabled(false);
-        gbc.gridx = 0; gbc.gridy = 2;
-        gbc.gridwidth = 1;
-        gbc.weightx = 1/3; // Reset weightx
-        gbc.fill = GridBagConstraints.HORIZONTAL; 
-        mainPanel.add(startButton, gbc);
+    private void setUpDirectoryButtons() {
+        myStartButton = createModernButton("Start");
+        myStopButton = createModernButton("Stop");
+        myBrowseButton = createModernButton("Browse");
 
-        gbc.gridx = 1; gbc.gridy = 2;
-        gbc.gridwidth = GridBagConstraints.RELATIVE;
-        gbc.weightx = 1/3; // Reset weightx
-        mainPanel.add(stopButton, gbc);
+        myStopButton.setEnabled(false);
+        adjustGridBagConstraints(0, 2, 1, 1 / 3);
+        myGBC.fill = GridBagConstraints.HORIZONTAL;
+        myMainPanel.add(myStartButton, myGBC);
+        adjustGridBagConstraints(1, 2, GridBagConstraints.RELATIVE, 1 / 3);
+        myMainPanel.add(myStopButton, myGBC);
+        adjustGridBagConstraints(3, 2, GridBagConstraints.REMAINDER, 1 / 3);
+        myMainPanel.add(myBrowseButton, myGBC);
 
-        gbc.gridx = 3; gbc.gridy = 2;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.weightx = 1/3; // Reset weightx
-        mainPanel.add(browseButton, gbc);
+    }
 
+    public JButton getStartButton() {
+        return myStartButton;
+    }
+
+    public JButton getStopButton() {
+        return myStopButton;
+    }
+
+    public JButton getBrowseButton() {
+        return myBrowseButton;
+    }
+
+    public JButton getClearButton() {
+        return myClearButton;
+    }
+
+    private void setUpDatabaseBox() {
         JLabel queryLabel = new JLabel("Query or Write by extension");
-        gbc.gridx = 0; gbc.gridy = 3;
-        gbc.gridwidth = 1;
-        mainPanel.add(queryLabel, gbc);
+        adjustGridBagConstraints(0, 3, 1);
+        myMainPanel.add(queryLabel, myGBC);
 
-        queryExtensionDropdown = new JComboBox<>(new String[]{"txt", "log", "csv"});
-        gbc.gridx = 1; gbc.gridy = 3;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        mainPanel.add(queryExtensionDropdown, gbc);
+        queryExtensionDropdown = new JComboBox<>(new String[] { "txt", "log", "csv" });
+        adjustGridBagConstraints(1, 3, GridBagConstraints.REMAINDER);
+        myMainPanel.add(queryExtensionDropdown, myGBC);
 
         JLabel databaseLabel = new JLabel("Database");
-        gbc.gridx = 0; gbc.gridy = 4;
-        gbc.gridwidth = 1;
-        mainPanel.add(databaseLabel, gbc);
+        adjustGridBagConstraints(0, 4, 1);
+        myMainPanel.add(databaseLabel, myGBC);
 
         databaseField = new JTextField(30); // Increase the size of the text field
-        gbc.gridx = 1; gbc.gridy = 4;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.weightx = 1.0; // Allow the text field to expand
-        gbc.fill = GridBagConstraints.HORIZONTAL; // Make the text field fill the available space
-        mainPanel.add(databaseField, gbc);
+        adjustGridBagConstraints(1, 4, GridBagConstraints.REMAINDER, 1.0);
+        myGBC.fill = GridBagConstraints.HORIZONTAL; // Make the text field fill the available space
+        myMainPanel.add(databaseField, myGBC);
 
-        writeDbButton = createModernButton("Write to database");
-        queryButton = createModernButton("Query");
-        clearButton = createModernButton("Clear");
-        gbc.gridx = 0; gbc.gridy = 5;
-        gbc.gridwidth = 2;
-        gbc.weightx = .5; 
-        gbc.fill = GridBagConstraints.HORIZONTAL; // Reset fill
-        mainPanel.add(writeDbButton, gbc);
-        gbc.gridx = 2; gbc.gridy = 5;
-        mainPanel.add(queryButton, gbc);
-        gbc.gridx = 0; gbc.gridy = 6;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        mainPanel.add(clearButton, gbc);
-
-        add(mainPanel, BorderLayout.CENTER);
+        myWriteDbButton = createModernButton("Write to database");
+        myQueryButton = createModernButton("Query");
+        myClearButton = createModernButton("Clear");
+        adjustGridBagConstraints(0, 5, 2, .5);
+        myGBC.fill = GridBagConstraints.HORIZONTAL; // Reset fill
+        myMainPanel.add(myWriteDbButton, myGBC);
+        adjustGridBagConstraints(2, 5);
+        myMainPanel.add(myQueryButton, myGBC);
+        adjustGridBagConstraints(0, 6);
+        myGBC.fill = GridBagConstraints.HORIZONTAL;
+        myGBC.gridwidth = GridBagConstraints.REMAINDER;
+        myMainPanel.add(myClearButton, myGBC);
     }
-    
+
+    private void adjustGridBagConstraints(int theX, int theY) {
+        myGBC.gridx = theX;
+        myGBC.gridy = theY;
+    }
+
+    private void adjustGridBagConstraints(int theX, int theY, int theWidth) {
+        myGBC.gridx = theX;
+        myGBC.gridy = theY;
+        myGBC.gridwidth = theWidth;
+    }
+
+    private void adjustGridBagConstraints(int theX, int theY, int theWidth, double theWeightx) {
+        myGBC.gridx = theX;
+        myGBC.gridy = theY;
+        myGBC.gridwidth = theWidth;
+        myGBC.weightx = theWeightx;
+    }
+
     private JButton createModernButton(String text) {
         JButton button = new JButton(text);
         button.setFocusPainted(false);
