@@ -56,9 +56,13 @@ public class FWGUI implements ActionListener {
         createMenuBar();
 
         //Create topPanel and add components to it.
-        myTopPanel = new JPanel();
-        imageButtons();
-        dropDownMenus();
+        myTopPanel = new JPanel(new BorderLayout());
+        JPanel imageButtons = imageButtons();
+        JPanel dropDownMenus = dropDownMenus();
+
+        myTopPanel.add(imageButtons, BorderLayout.NORTH);
+        myTopPanel.add(dropDownMenus, BorderLayout.CENTER);
+
         timeKeeper();
         // Create a panel for the time label
         JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -83,7 +87,7 @@ public class FWGUI implements ActionListener {
         myFrame.setVisible(true);
     }
 
-    private void imageButtons() {
+    private JPanel imageButtons() {
         // Create a panel for the image buttons
         JPanel imagePanel = new JPanel();
         imagePanel.setLayout(new BoxLayout(imagePanel, BoxLayout.Y_AXIS));
@@ -101,10 +105,11 @@ public class FWGUI implements ActionListener {
         imagePanel.add(myImgStopButton);
 
         // Add the image panel to the frame
-        myTopPanel.add(imagePanel, BorderLayout.SOUTH);
+        return imagePanel;
+
     }
 
-    private void dropDownMenus(){
+    private JPanel dropDownMenus(){
         myExtensionComboBox= new JComboBox<>(EXTENSION_TYPES);
         myExtensionComboBox.setEditable(true);
         myExtensionComboBox.addActionListener(this);
@@ -134,7 +139,7 @@ public class FWGUI implements ActionListener {
         containPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         containPanel.add(dropDownPanels);
         
-        myTopPanel.add(containPanel, BorderLayout.NORTH);
+        return containPanel;
     }
 
     /*
