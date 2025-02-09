@@ -24,6 +24,7 @@ import javax.swing.JTextField;
 import javax.swing.Timer;
 
 import model.FileEvent;
+import model.DatabaseConnection;
 import model.EventType;
 
 public class FWGUI implements ActionListener {
@@ -35,7 +36,8 @@ public class FWGUI implements ActionListener {
     private JLabel myTimeLabel;
     private JMenuItem myStartButton;
     private JMenuItem myStopButton;
-    private String[] EXTENSION_TYPES = {"","DOCX", "PDF", "TXT", "PNG", "JPG", "JPEG", "GIF", "MP3", "MP4", "WAV", "AVI", "MOV"};
+    private String[] EXTENSION_TYPES = { "", "DOCX", "PDF", "TXT", "PNG", "JPG", "JPEG", "GIF", "MP3", "MP4", "WAV",
+            "AVI", "MOV" };
     private JComboBox<String> myExtensionComboBox;
     private JTextField myDirectoryField;
     private JButton myDirectoryButton;
@@ -55,7 +57,7 @@ public class FWGUI implements ActionListener {
         // Create the menu bar and start the timer when necessary.
         createMenuBar();
 
-        //Create topPanel and add components to it.
+        // Create topPanel and add components to it.
         myTopPanel = new JPanel(new BorderLayout());
         JPanel imageButtons = imageButtons();
         JPanel dropDownMenus = dropDownMenus();
@@ -70,18 +72,20 @@ public class FWGUI implements ActionListener {
         // Add the time panel to the frame.
         myFrame.add(timePanel, BorderLayout.SOUTH);
 
-        //Setup and add FileEvent table to GUI
+        // Setup and add FileEvent table to GUI
         myEventTable = new FWEventTable();
-        //myFrame.add(myEventTable, BorderLayout.CENTER); //Set to CENTER to prevent the table covering other GUI elements
+        // myFrame.add(myEventTable, BorderLayout.CENTER); //Set to CENTER to prevent
+        // the table covering other GUI elements
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myTopPanel, myEventTable);
         splitPane.setDividerSize(0); // Hide the divider
         splitPane.setResizeWeight(splitPaneResizeWeight);
         myFrame.add(splitPane, BorderLayout.CENTER);
 
-        //Add 100 test events to the table to test scrolling
+        // Add 100 test events to the table to test scrolling
         for (int i = 0; i < 100; i++) {
-            myEventTable.addEvent(new FileEvent("TestFile.txt", "C:/path/to/TestFile.txt", EventType.FILECREATED, "txt", LocalDateTime.of(2025, 2, 2, 12, 27)));
+            myEventTable.addEvent(new FileEvent("TestFile.txt", "C:/path/to/TestFile.txt", EventType.FILECREATED, "txt",
+                    LocalDateTime.of(2025, 2, 2, 12, 27)));
         }
 
         myFrame.setVisible(true);
@@ -109,12 +113,13 @@ public class FWGUI implements ActionListener {
 
     }
 
-    private JPanel dropDownMenus(){
-        myExtensionComboBox= new JComboBox<>(EXTENSION_TYPES);
+    private JPanel dropDownMenus() {
+        myExtensionComboBox = new JComboBox<>(EXTENSION_TYPES);
         myExtensionComboBox.setEditable(true);
         myExtensionComboBox.addActionListener(this);
 
-        JLabel extensionLable = new JLabel("Select a file extension, a directory, and click Watch to begin File System Monitor.");
+        JLabel extensionLable = new JLabel(
+                "Select a file extension, a directory, and click Watch to begin File System Monitor.");
         JPanel dropDownPanels = new JPanel();
         dropDownPanels.setLayout(new BoxLayout(dropDownPanels, BoxLayout.Y_AXIS));
 
@@ -128,7 +133,7 @@ public class FWGUI implements ActionListener {
         JPanel directoryPanel = new JPanel();
         directoryPanel.add(myDirectoryButton);
         directoryPanel.add(myClearDirectoryButton);
-        
+
         dropDownPanels.add(extensionLable);
         dropDownPanels.add(myExtensionComboBox);
         dropDownPanels.add(directLabel);
@@ -138,12 +143,13 @@ public class FWGUI implements ActionListener {
         JPanel containPanel = new JPanel();
         containPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         containPanel.add(dropDownPanels);
-        
+
         return containPanel;
     }
 
     /*
-     * This method will keep track of the time that the user has been monitoring files.
+     * This method will keep track of the time that the user has been monitoring
+     * files.
      */
     private void timeKeeper() {
         // Create a timer to keep track of time (VSCode is extremely helpful.)
@@ -199,6 +205,12 @@ public class FWGUI implements ActionListener {
         databaseMenu.add(connectDbItem);
         databaseMenu.add(disconnectDbItem);
 
+        connectDbItem.addActionListener(this);
+        disconnectDbItem.addActionListener(this);
+
+        databaseMenu.add(connectDbItem);
+        databaseMenu.add(disconnectDbItem);
+
         // Add Help menu
         JMenuItem aboutHelpItem = new JMenuItem("About");
         // Add action listener to aboutHelpItem.
@@ -216,7 +228,8 @@ public class FWGUI implements ActionListener {
     }
 
     /*
-     * This method will handle the actions of the user when they click on the menu items,
+     * This method will handle the actions of the user when they click on the menu
+     * items,
      * different actions will be taken depending on the menu item clicked.
      */
     public void actionPerformed(final ActionEvent theEvent) {
@@ -244,27 +257,41 @@ public class FWGUI implements ActionListener {
         } else if (theEvent.getSource().equals(myDirectoryButton)) {
             JFileChooser direcChooser = new JFileChooser();
             direcChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            direcChooser.setAcceptAllFileFilterUsed(false); //Disabling the ability to select all files.
+            direcChooser.setAcceptAllFileFilterUsed(false); // Disabling selection of all files.
 
             int directoryValue = direcChooser.showOpenDialog(null);
-            if(directoryValue == JFileChooser.APPROVE_OPTION){
+            if (directoryValue == JFileChooser.APPROVE_OPTION) {
                 myDirectoryField.setText(direcChooser.getSelectedFile().getAbsolutePath());
             }
-        } else if(theEvent.getSource().equals(myClearDirectoryButton)){
+        } else if (theEvent.getSource().equals(myClearDirectoryButton)) {
             myDirectoryField.setText("");
+        }
+        // Database Connection Handling
+        else if (theEvent.getActionCommand().equals("Connect to Database")) {
+            if (DatabaseConnection.connect()) {
+                JOptionPane.showMessageDialog(myFrame, "Connected to SQLite database successfully!");
+            } else {
+                JOptionPane.showMessageDialog(myFrame, "Failed to connect to database.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } else if (theEvent.getActionCommand().equals("Disconnect Database")) {
+            DatabaseConnection.disconnect();
+            JOptionPane.showMessageDialog(myFrame, "Disconnected from SQLite database.");
         }
     }
 
     /*
-     * This method will extend the timer label to show the time in days, hours, minutes, and seconds.
+     * This method will extend the timer label to show the time in days, hours,
+     * minutes, and seconds.
      */
-    private void timerLabelExtended(){
+    private void timerLabelExtended() {
         int days = runningTime / 86400;
         int hours = (runningTime % 86400) / 3600;
         int minutes = (runningTime % 3600) / 60;
         int seconds = runningTime % 60;
 
-        String timeFormatted = String.format("Time Running: %02d Days: %02d Hours: %02d Minutes: %02d Seconds",days,hours,minutes,seconds);
+        String timeFormatted = String.format("Time Running: %02d Days: %02d Hours: %02d Minutes: %02d Seconds", days,
+                hours, minutes, seconds);
         myTimeLabel.setText(timeFormatted);
     }
 }
