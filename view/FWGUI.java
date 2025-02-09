@@ -60,7 +60,7 @@ public class FWGUI implements ActionListener {
 
         // Add 100 test events to the table to test scrolling
         for (int i = 0; i < 100; i++) {
-            myEventTable.addEvent(new FileEvent("TestFile.txt", "C:/path/to/TestFile.txt", EventType.FILECREATED, "txt", LocalDateTime.of(2025, 2, 2, 12, 27)));
+            myEventTable.addEvent(new FileEvent("Test.txt", "C:/path/to/TestFile.txt", EventType.FILECREATED, "txt", LocalDateTime.of(2025, 2, 2, 12, 27)));
         }
 
         myFrame.setVisible(true);

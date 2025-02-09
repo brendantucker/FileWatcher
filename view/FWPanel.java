@@ -89,7 +89,7 @@ public class FWPanel extends JPanel {
         clearButton = createModernButton("Clear");
         gbc.gridx = 0; gbc.gridy = 5;
         gbc.gridwidth = 2;
-        gbc.weightx = .5; // Reset weightx
+        gbc.weightx = .5; 
         gbc.fill = GridBagConstraints.HORIZONTAL; // Reset fill
         mainPanel.add(writeDbButton, gbc);
         gbc.gridx = 2; gbc.gridy = 5;
