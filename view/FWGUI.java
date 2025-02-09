@@ -19,6 +19,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 
@@ -41,8 +42,9 @@ public class FWGUI implements ActionListener {
     private JButton myClearDirectoryButton;
     private JButton myImgStartButton;
     private JButton myImgStopButton;
-    //New field
     private FWEventTable myEventTable;
+    private JPanel myTopPanel;
+    private double splitPaneResizeWeight = 0.1;
 
     /*
      * Constructor for the GUI. This will create the GUI and set up the menu bar.
@@ -52,6 +54,9 @@ public class FWGUI implements ActionListener {
         myFrame = new FWFrame().frameOutline();
         // Create the menu bar and start the timer when necessary.
         createMenuBar();
+
+        //Create topPanel and add components to it.
+        myTopPanel = new JPanel();
         imageButtons();
         dropDownMenus();
         timeKeeper();
@@ -63,7 +68,12 @@ public class FWGUI implements ActionListener {
 
         //Setup and add FileEvent table to GUI
         myEventTable = new FWEventTable();
-        myFrame.add(myEventTable, BorderLayout.CENTER); //Set to CENTER to prevent the table covering other GUI elements
+        //myFrame.add(myEventTable, BorderLayout.CENTER); //Set to CENTER to prevent the table covering other GUI elements
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myTopPanel, myEventTable);
+        splitPane.setDividerSize(0); // Hide the divider
+        splitPane.setResizeWeight(splitPaneResizeWeight);
+        myFrame.add(splitPane, BorderLayout.CENTER);
 
         //Add 100 test events to the table to test scrolling
         for (int i = 0; i < 100; i++) {
@@ -91,7 +101,7 @@ public class FWGUI implements ActionListener {
         imagePanel.add(myImgStopButton);
 
         // Add the image panel to the frame
-        myFrame.add(imagePanel, BorderLayout.WEST);
+        myTopPanel.add(imagePanel, BorderLayout.SOUTH);
     }
 
     private void dropDownMenus(){
@@ -124,7 +134,7 @@ public class FWGUI implements ActionListener {
         containPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         containPanel.add(dropDownPanels);
         
-        myFrame.add(containPanel, BorderLayout.NORTH);
+        myTopPanel.add(containPanel, BorderLayout.NORTH);
     }
 
     /*

@@ -43,7 +43,7 @@ public class FWEventTable extends JPanel{
         //Adds the JTable to a scroll pane, then adds the scroll pane to the FWEventTable panel.
         JScrollPane scrollPane = new JScrollPane(myEventTable);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        this.add(scrollPane, BorderLayout.SOUTH);
+        this.add(scrollPane, BorderLayout.CENTER);
     }
 
 
