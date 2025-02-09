@@ -9,7 +9,7 @@ public class FWPanel extends JPanel {
     private JButton startButton, stopButton;
     private JComboBox<String> queryExtensionDropdown;
     private JTextField databaseField;
-    private JButton writeDbButton, queryButton, clearButton;
+    private JButton writeDbButton, queryButton, clearButton, browseButton;
     
     public FWPanel() {
         setLayout(new BorderLayout());
@@ -26,7 +26,7 @@ public class FWPanel extends JPanel {
 
         extensionDropdown = new JComboBox<>(new String[]{"DOCX", "PDF", "TXT", "PNG", "JPG", "JPEG", "GIF", "MP3", "MP4", "WAV", "log", "csv"});
         gbc.gridx = 1; gbc.gridy = 0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         mainPanel.add(extensionDropdown, gbc);
 
         JLabel directoryLabel = new JLabel("Directory to monitor");
@@ -34,25 +34,33 @@ public class FWPanel extends JPanel {
         gbc.gridwidth = 1;
         mainPanel.add(directoryLabel, gbc);
 
-        directoryField = new JTextField(30); // Increase the size of the text field
+        directoryField = new JTextField(0); // Increase the size of the text field
         gbc.gridx = 1; gbc.gridy = 1;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.weightx = 1.0; // Allow the text field to expand
-        gbc.fill = GridBagConstraints.BOTH; // Make the text field fill the available space
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Make the text field fill the available space
         mainPanel.add(directoryField, gbc);
 
         startButton = createModernButton("Start");
         stopButton = createModernButton("Stop");
+        browseButton = createModernButton("Browse");
+
         stopButton.setEnabled(false);
         gbc.gridx = 0; gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.weightx = .5; // Reset weightx
+        gbc.gridwidth = 1;
+        gbc.weightx = 1/3; // Reset weightx
         gbc.fill = GridBagConstraints.HORIZONTAL; 
         mainPanel.add(startButton, gbc);
-        gbc.gridx = 2; gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.weightx = .5; // Reset weightx
+
+        gbc.gridx = 1; gbc.gridy = 2;
+        gbc.gridwidth = GridBagConstraints.RELATIVE;
+        gbc.weightx = 1/3; // Reset weightx
         mainPanel.add(stopButton, gbc);
+
+        gbc.gridx = 3; gbc.gridy = 2;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.weightx = 1/3; // Reset weightx
+        mainPanel.add(browseButton, gbc);
 
         JLabel queryLabel = new JLabel("Query or Write by extension");
         gbc.gridx = 0; gbc.gridy = 3;
@@ -61,7 +69,7 @@ public class FWPanel extends JPanel {
 
         queryExtensionDropdown = new JComboBox<>(new String[]{"txt", "log", "csv"});
         gbc.gridx = 1; gbc.gridy = 3;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         mainPanel.add(queryExtensionDropdown, gbc);
 
         JLabel databaseLabel = new JLabel("Database");
@@ -71,9 +79,9 @@ public class FWPanel extends JPanel {
 
         databaseField = new JTextField(30); // Increase the size of the text field
         gbc.gridx = 1; gbc.gridy = 4;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.weightx = 1.0; // Allow the text field to expand
-        gbc.fill = GridBagConstraints.BOTH; // Make the text field fill the available space
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Make the text field fill the available space
         mainPanel.add(databaseField, gbc);
 
         writeDbButton = createModernButton("Write to database");
@@ -88,7 +96,7 @@ public class FWPanel extends JPanel {
         mainPanel.add(queryButton, gbc);
         gbc.gridx = 0; gbc.gridy = 6;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         mainPanel.add(clearButton, gbc);
 
         add(mainPanel, BorderLayout.CENTER);
