@@ -1,5 +1,3 @@
-package view;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -23,9 +21,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 
-import model.FileEvent;
-import model.DatabaseConnection;
-import model.EventType;
+
 
 public class FWGUI implements ActionListener {
 
@@ -47,6 +43,9 @@ public class FWGUI implements ActionListener {
     private FWEventTable myEventTable;
     private JPanel myTopPanel;
     private double splitPaneResizeWeight = 0.1;
+
+    private Thread myFileWatcherThread;
+    private FileWatcher myFileWatcher;
 
     /*
      * Constructor for the GUI. This will create the GUI and set up the menu bar.
@@ -243,30 +242,40 @@ public class FWGUI implements ActionListener {
             myTimer.stop();
             myStartButton.setEnabled(true);
             myStopButton.setEnabled(false);
-        } else if (theEvent.getActionCommand().equals("Close")) {
+        } 
+        // Handle closing
+        else if (theEvent.getActionCommand().equals("Close")) {
             System.exit(0);
-        } else if (theEvent.getActionCommand().equals("About")) {
+        } 
+        // Handle About
+        else if (theEvent.getActionCommand().equals("About")) {
             JOptionPane.showMessageDialog(myFrame,
                     "Program Usage: This application watches file system changes.\n" +
                             "Version: 1.0\n" +
                             "Developers: Manjinder Ghuman, Ryder Deback, Brendan Tucker",
                     "About",
                     JOptionPane.INFORMATION_MESSAGE);
-        } else if (theEvent.getSource().equals(myExtensionComboBox) && myExtensionComboBox.getSelectedItem() != "") {
+        } 
+        // Handle File Extension Selection
+        else if (theEvent.getSource().equals(myExtensionComboBox) && myExtensionComboBox.getSelectedItem() != "") {
             JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
-        } else if (theEvent.getSource().equals(myDirectoryButton)) {
+        } 
+        // Handle Directory Selection
+        else if (theEvent.getSource().equals(myDirectoryButton)) {
             JFileChooser direcChooser = new JFileChooser();
             direcChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            direcChooser.setAcceptAllFileFilterUsed(false); // Disabling selection of all files.
-
+            direcChooser.setAcceptAllFileFilterUsed(false);
+    
             int directoryValue = direcChooser.showOpenDialog(null);
             if (directoryValue == JFileChooser.APPROVE_OPTION) {
                 myDirectoryField.setText(direcChooser.getSelectedFile().getAbsolutePath());
             }
-        } else if (theEvent.getSource().equals(myClearDirectoryButton)) {
+        } 
+        // Handle Clearing Directory
+        else if (theEvent.getSource().equals(myClearDirectoryButton)) {
             myDirectoryField.setText("");
-        }
-        // Database Connection Handling
+        } 
+        // Handle Database Connection
         else if (theEvent.getActionCommand().equals("Connect to Database")) {
             if (DatabaseConnection.connect()) {
                 JOptionPane.showMessageDialog(myFrame, "Connected to SQLite database successfully!");
@@ -274,11 +283,34 @@ public class FWGUI implements ActionListener {
                 JOptionPane.showMessageDialog(myFrame, "Failed to connect to database.", "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
-        } else if (theEvent.getActionCommand().equals("Disconnect Database")) {
+        } 
+        else if (theEvent.getActionCommand().equals("Disconnect Database")) {
             DatabaseConnection.disconnect();
             JOptionPane.showMessageDialog(myFrame, "Disconnected from SQLite database.");
+        } 
+        // Handle Start Watching Directory
+        else if (theEvent.getActionCommand().equals("Start Watching")) {
+            String directoryToWatch = myDirectoryField.getText();
+            if (directoryToWatch.isEmpty()) {
+                JOptionPane.showMessageDialog(myFrame, "Please select a directory to monitor!", "Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+    
+            myFileWatcher = new FileWatcher(directoryToWatch);
+            myFileWatcherThread = new Thread(myFileWatcher);
+            myFileWatcherThread.start();
+    
+            JOptionPane.showMessageDialog(myFrame, "Started watching directory: " + directoryToWatch);
+        } 
+        // Handle Stop Watching Directory
+        else if (theEvent.getActionCommand().equals("Stop Watching")) {
+            if (myFileWatcher != null) {
+                myFileWatcher.stopWatching();
+            }
+            JOptionPane.showMessageDialog(myFrame, "Stopped watching.");
         }
     }
+    
 
     /*
      * This method will extend the timer label to show the time in days, hours,

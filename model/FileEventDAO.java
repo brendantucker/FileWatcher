@@ -1,6 +1,3 @@
-package model;
-
-import model.FileEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -9,7 +6,7 @@ public class FileEventDAO {
     public static void insertFileEvent(FileEvent event) {
         Connection conn = DatabaseConnection.getConnection();
         if (conn == null) {
-            System.out.println("Database is not connected!");
+            System.out.println(" Database is not connected!");
             return;
         }
 
@@ -22,11 +19,15 @@ public class FileEventDAO {
             pstmt.setString(4, event.getExtension());
             pstmt.setString(5, event.getEventTime().toString());
 
-            pstmt.executeUpdate();
-            System.out.println("File event inserted successfully.");
+            int rowsInserted = pstmt.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println(" File event inserted: " + event.getFileName() + " (" + event.getEventType() + ")");
+            } else {
+                System.out.println("File event NOT inserted.");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Error inserting file event.");
+            System.out.println(" Error inserting file event.");
         }
     }
 }

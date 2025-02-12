@@ -1,4 +1,3 @@
-package model;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,15 +10,21 @@ public class DatabaseConnection {
 
     public static boolean connect() {
         try {
+            // **LOAD THE DRIVER EXPLICITLY**
+            Class.forName("org.sqlite.JDBC");
+
             if (connection == null || connection.isClosed()) {
                 System.out.println("Attempting to connect to database...");
                 connection = DriverManager.getConnection(URL);
                 System.out.println("Connected to SQLite database successfully!");
                 return true;
             }
+        } catch (ClassNotFoundException e) {
+            System.out.println("SQLite JDBC Driver not found. Make sure sqlite.jar is in the classpath.");
+            e.printStackTrace();
         } catch (SQLException e) {
-            e.printStackTrace(); // Prints the detailed error message
             System.out.println("Failed to connect to SQLite database. Error: " + e.getMessage());
+            e.printStackTrace();
         }
         return false;
     }
@@ -39,7 +44,6 @@ public class DatabaseConnection {
     public static Connection getConnection() {
         return connection;
     }
-
     private static void initializeDatabase() {
         String sql = "CREATE TABLE IF NOT EXISTS file_events (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
