@@ -183,7 +183,8 @@ public class FWGUI implements ActionListener {
                     "About",
                     JOptionPane.INFORMATION_MESSAGE);
         } else if (theEvent.getSource().equals(myExtensionComboBox)
-                && !myExtensionComboBox.getSelectedItem().equals("")) {
+                && !myExtensionComboBox.getSelectedItem().equals("")
+                && myExtensionComboBox.getEditor().getEditorComponent().hasFocus()) {
             JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
         } else if (theEvent.getSource().equals(myDirectoryBrowseButton)) {
             JFileChooser direcChooser = new JFileChooser();
