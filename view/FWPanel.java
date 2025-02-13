@@ -7,7 +7,7 @@ public class FWPanel extends JPanel {
     private JComboBox<String> extensionDropdown;
     private JTextField directoryField;
     private JComboBox<String> queryExtensionDropdown;
-    private JTextField databaseField;
+    private JTextField myDatabaseField;
     private JButton myWriteDbButton, myQueryButton, myClearButton, myBrowseButton, myStartButton, myStopButton;
     private GridBagConstraints myGBC;
     private JPanel myMainPanel;
@@ -63,8 +63,9 @@ public class FWPanel extends JPanel {
         myStartButton = createModernButton("Start");
         myStopButton = createModernButton("Stop");
         myBrowseButton = createModernButton("Browse");
-
+        //Disabling both buttons for until the user has a directory and extension to monitor.
         myStopButton.setEnabled(false);
+        myStartButton.setEnabled(false);
         adjustGridBagConstraints(0, 2, 1, 1 / 3);
         myGBC.fill = GridBagConstraints.HORIZONTAL;
         myMainPanel.add(myStartButton, myGBC);
@@ -104,10 +105,10 @@ public class FWPanel extends JPanel {
         adjustGridBagConstraints(0, 4, 1);
         myMainPanel.add(databaseLabel, myGBC);
 
-        databaseField = new JTextField(30); // Increase the size of the text field
+        myDatabaseField = new JTextField(30); // Increase the size of the text field
         adjustGridBagConstraints(1, 4, GridBagConstraints.REMAINDER, 1.0);
         myGBC.fill = GridBagConstraints.HORIZONTAL; // Make the text field fill the available space
-        myMainPanel.add(databaseField, myGBC);
+        myMainPanel.add(myDatabaseField, myGBC);
 
         myWriteDbButton = createModernButton("Write to database");
         myQueryButton = createModernButton("Query");
@@ -121,6 +122,10 @@ public class FWPanel extends JPanel {
         myGBC.fill = GridBagConstraints.HORIZONTAL;
         myGBC.gridwidth = GridBagConstraints.REMAINDER;
         myMainPanel.add(myClearButton, myGBC);
+    }
+
+    public JTextField getMyDatabaseField() {
+        return myDatabaseField;
     }
 
     private void adjustGridBagConstraints(int theX, int theY) {

@@ -18,6 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.Timer;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import model.FileEvent;
 import model.EventType;
@@ -35,6 +37,7 @@ public class FWGUI implements ActionListener {
     private FWEventTable myEventTable;
     private JComboBox<String> myExtensionComboBox;
     private JTextField myDirectoryField;
+    private JTextField myDatabaseField;
     private JButton myClearDirectoryButton;
     private JButton myDirectoryBrowseButton;
     private JButton myDirectoryStartButton;
@@ -55,11 +58,7 @@ public class FWGUI implements ActionListener {
         createMenuBar();
         timeKeeper();
         setUpButtons();
-
-        // Create a panel for the time label
-        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        timePanel.add(myTimeLabel);
-        myFrame.add(timePanel, BorderLayout.SOUTH);
+        setUpDocumentListeners();
 
         myFrame.add(myMainPanel, BorderLayout.NORTH);
 
@@ -86,8 +85,6 @@ public class FWGUI implements ActionListener {
         myExtensionComboBox.setEditable(true);
         myExtensionComboBox.addActionListener(this);
 
-        myDirectoryField = myMainPanel.getDirectoryField();
-
         myDirectoryStartButton = myMainPanel.getStartButton();
         myDirectoryStartButton.addActionListener(this);
 
@@ -112,6 +109,24 @@ public class FWGUI implements ActionListener {
         });
         myStartButton.addActionListener(this);
         myStopButton.addActionListener(this);
+        // Create a panel for the time label
+        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        timePanel.add(myTimeLabel);
+        myFrame.add(timePanel, BorderLayout.SOUTH);
+    }
+
+    /*
+     * This method will extend the timer label to show the time in days, hours,
+     * minutes, and seconds.
+     */
+    private void timerLabelExtended() {
+        int days = runningTime / 86400;
+        int hours = (runningTime % 86400) / 3600;
+        int minutes = (runningTime % 3600) / 60;
+        int seconds = runningTime % 60;
+        String timeFormatted = String.format("Time Running: %02d Days: %02d Hours: %02d Minutes: %02d Seconds", days,
+                hours, minutes, seconds);
+        myTimeLabel.setText(timeFormatted);
     }
 
     /*
@@ -197,20 +212,44 @@ public class FWGUI implements ActionListener {
             }
         } else if (theEvent.getSource().equals(myClearDirectoryButton)) {
             myDirectoryField.setText("");
+            myExtensionComboBox.setSelectedItem("");
+            myDatabaseField.setText("");
         }
     }
 
-    /*
-     * This method will extend the timer label to show the time in days, hours,
-     * minutes, and seconds.
-     */
-    private void timerLabelExtended() {
-        int days = runningTime / 86400;
-        int hours = (runningTime % 86400) / 3600;
-        int minutes = (runningTime % 3600) / 60;
-        int seconds = runningTime % 60;
-        String timeFormatted = String.format("Time Running: %02d Days: %02d Hours: %02d Minutes: %02d Seconds", days,
-                hours, minutes, seconds);
-        myTimeLabel.setText(timeFormatted);
+    private void setUpDocumentListeners(){
+        DocumentListener theListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                checkFields();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                checkFields();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                checkFields();
+            }
+        };
+
+        myDirectoryField = myMainPanel.getDirectoryField();
+        myDirectoryField.getDocument().addDocumentListener(theListener);
+        myDatabaseField = myMainPanel.getMyDatabaseField();
+        myDatabaseField.getDocument().addDocumentListener(theListener);
     }
+
+    private void checkFields(){
+        if (!myExtensionComboBox.getSelectedItem().equals("") && !myDirectoryField.getText().equals("")
+                && !myDatabaseField.getText().equals("")) {
+            if(!myDirectoryStopButton.isEnabled()){
+                myDirectoryStartButton.setEnabled(true);
+            }
+        } else {
+            myDirectoryStartButton.setEnabled(false);
+        }
+    }
+    
 }
