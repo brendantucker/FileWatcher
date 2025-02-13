@@ -11,11 +11,12 @@ import java.awt.BorderLayout;
 import java.util.ArrayList;
 
 /**
- * This class represents a table that will display the events that have occurred to files. 
+ * This class represents a table that will display the events that have occurred
+ * to files.
  * 
- *  To add: ability to sort table ascending/descending by column
+ * To add: ability to sort table ascending/descending by column
  */
-public class FWEventTable extends JPanel{
+public class FWEventTable extends JPanel {
     /** JTable to display the events that have occurred. */
     private JTable myEventTable;
     /** DefaultTableModel to hold and act as manager for JTable. */
@@ -26,7 +27,8 @@ public class FWEventTable extends JPanel{
     private ArrayList<FileEvent> myData;
 
     /**
-     * Constructor for the FWEventTable. This will create the table and set up the panel.
+     * Constructor for the FWEventTable. This will create the table and set up the
+     * panel.
      */
     public FWEventTable() {
         super(new BorderLayout()); // Ensure that the panel is using a BorderLayout.
@@ -34,18 +36,18 @@ public class FWEventTable extends JPanel{
         myTableModel = new DefaultTableModel();
         myTableModel.setColumnIdentifiers(myColumnNames);
         myData = new ArrayList<FileEvent>();
-        
+
         myEventTable = new JTable(myTableModel);
-        
-        //Allow column reordering
+
+        // Allow column reordering
         myEventTable.getTableHeader().setReorderingAllowed(true);
 
-        //Adds the JTable to a scroll pane, then adds the scroll pane to the FWEventTable panel.
+        // Adds the JTable to a scroll pane, then adds the scroll pane to the
+        // FWEventTable panel.
         JScrollPane scrollPane = new JScrollPane(myEventTable);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         this.add(scrollPane, BorderLayout.CENTER);
     }
-
 
     /**
      * Adds a FileEvent to the table.
@@ -54,7 +56,8 @@ public class FWEventTable extends JPanel{
      */
     public void addEvent(FileEvent theEvent) {
         myData.add(theEvent);
-        myTableModel.addRow(new Object[] { theEvent.getFileName(), theEvent.getFilePath(), theEvent.getEventType(), theEvent.getExtension(), theEvent.getEventTime() });
+        myTableModel.addRow(new Object[] { theEvent.getFileName(), theEvent.getFilePath(), theEvent.getEventType(),
+                theEvent.getExtension(), theEvent.getEventTime() });
     }
 
     /**
@@ -72,7 +75,8 @@ public class FWEventTable extends JPanel{
     public void updateTable() {
         myTableModel.setRowCount(0);
         for (FileEvent event : myData) {
-            myTableModel.addRow(new Object[] { event.getFileName(), event.getFilePath(), event.getEventType(), event.getExtension(), event.getEventTime() });
+            myTableModel.addRow(new Object[] { event.getFileName(), event.getFilePath(), event.getEventType(),
+                    event.getExtension(), event.getEventTime() });
         }
     }
 

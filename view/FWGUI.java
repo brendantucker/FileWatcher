@@ -20,7 +20,6 @@ import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
 import model.FileEvent;
 import model.EventType;
 
@@ -59,8 +58,13 @@ public class FWGUI implements ActionListener {
         timeKeeper();
         setUpButtons();
         setUpDocumentListeners();
+        setUpFileViewer();
 
         myFrame.add(myMainPanel, BorderLayout.NORTH);
+        myFrame.setVisible(true);
+    }
+
+    private void setUpFileViewer() {
 
         // Create a JSplitPane to divide the space between the main panel and the event
         // table
@@ -76,8 +80,6 @@ public class FWGUI implements ActionListener {
             myEventTable.addEvent(new FileEvent("Test.txt", "C:/path/to/TestFile.txt", EventType.FILECREATED, "txt",
                     LocalDateTime.of(2025, 2, 2, 12, 27)));
         }
-
-        myFrame.setVisible(true);
     }
 
     private void setUpButtons() {
@@ -178,16 +180,10 @@ public class FWGUI implements ActionListener {
             runningTime = 0;
             myTimeLabel.setText("Time not started.");
             myTimer.start();
-            myStartButton.setEnabled(false);
-            myDirectoryStartButton.setEnabled(false);
-            myStopButton.setEnabled(true);
-            myDirectoryStopButton.setEnabled(true);
+            buttonReverse(false);
         } else if (theEvent.getSource().equals(myStopButton) || theEvent.getSource().equals(myDirectoryStopButton)) {
             myTimer.stop();
-            myStartButton.setEnabled(true);
-            myDirectoryStartButton.setEnabled(true);
-            myStopButton.setEnabled(false);
-            myDirectoryStopButton.setEnabled(false);
+            buttonReverse(false);
         } else if (theEvent.getActionCommand().equals("Close")) {
             System.exit(0);
         } else if (theEvent.getActionCommand().equals("About")) {
@@ -217,7 +213,15 @@ public class FWGUI implements ActionListener {
         }
     }
 
-    private void setUpDocumentListeners(){
+    /* Helper method to clean up repeated lines. */
+    private void buttonReverse(boolean theValue){
+        myStartButton.setEnabled(theValue);
+        myDirectoryStartButton.setEnabled(theValue);
+        myStopButton.setEnabled(!theValue);
+        myDirectoryStopButton.setEnabled(!theValue);
+    }
+
+    private void setUpDocumentListeners() {
         DocumentListener theListener = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -241,15 +245,15 @@ public class FWGUI implements ActionListener {
         myDatabaseField.getDocument().addDocumentListener(theListener);
     }
 
-    private void checkFields(){
+    private void checkFields() {
         if (!myExtensionComboBox.getSelectedItem().equals("") && !myDirectoryField.getText().equals("")
                 && !myDatabaseField.getText().equals("")) {
-            if(!myDirectoryStopButton.isEnabled()){
+            if (!myDirectoryStopButton.isEnabled()) {
                 myDirectoryStartButton.setEnabled(true);
             }
         } else {
             myDirectoryStartButton.setEnabled(false);
         }
     }
-    
+
 }

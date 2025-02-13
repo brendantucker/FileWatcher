@@ -63,7 +63,8 @@ public class FWPanel extends JPanel {
         myStartButton = createModernButton("Start");
         myStopButton = createModernButton("Stop");
         myBrowseButton = createModernButton("Browse");
-        //Disabling both buttons for until the user has a directory and extension to monitor.
+        // Disabling both buttons for until the user has a directory and extension to
+        // monitor.
         myStopButton.setEnabled(false);
         myStartButton.setEnabled(false);
         adjustGridBagConstraints(0, 2, 1, 1 / 3);
