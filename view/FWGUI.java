@@ -4,11 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import java.time.LocalDateTime;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -58,7 +53,6 @@ public class FWGUI implements ActionListener {
         myEventTable = new FWEventTable();
 
         createMenuBar();
-        dropDownMenus();
         timeKeeper();
         setUpButtons();
 
