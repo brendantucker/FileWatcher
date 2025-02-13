@@ -196,6 +196,7 @@ public class FWGUI implements ActionListener {
         } else if (theEvent.getSource().equals(myExtensionComboBox)
                 && !myExtensionComboBox.getSelectedItem().equals("")
                 && myExtensionComboBox.getEditor().getEditorComponent().hasFocus()) {
+            checkFields();
             JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
         } else if (theEvent.getSource().equals(myDirectoryBrowseButton)) {
             JFileChooser direcChooser = new JFileChooser();
@@ -214,7 +215,7 @@ public class FWGUI implements ActionListener {
     }
 
     /* Helper method to clean up repeated lines. */
-    private void buttonReverse(boolean theValue){
+    private void buttonReverse(boolean theValue) {
         myStartButton.setEnabled(theValue);
         myDirectoryStartButton.setEnabled(theValue);
         myStopButton.setEnabled(!theValue);
