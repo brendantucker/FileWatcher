@@ -91,6 +91,10 @@ public class FWPanel extends JPanel {
         return myClearButton;
     }
 
+    public JButton getMyWriteDBButton() {
+        return myWriteDbButton;
+    }
+
     private void setUpDatabaseBox() {
         JLabel queryLabel = new JLabel("Query or Write by extension");
         adjustGridBagConstraints(0, 3, 1);

@@ -17,6 +17,7 @@ public class DatabaseConnection {
                 System.out.println("Attempting to connect to database...");
                 connection = DriverManager.getConnection(URL);
                 System.out.println("Connected to SQLite database successfully!");
+                initializeDatabase();
                 return true;
             }
         } catch (ClassNotFoundException e) {

@@ -37,6 +37,7 @@ public class FWGUI implements ActionListener {
     private JButton myDirectoryBrowseButton;
     private JButton myDirectoryStartButton;
     private JButton myDirectoryStopButton;
+    private JButton myWriteDbButton;
     private FWPanel myMainPanel;
 
     /*
@@ -94,6 +95,9 @@ public class FWGUI implements ActionListener {
 
         myClearDirectoryButton = myMainPanel.getClearButton();
         myClearDirectoryButton.addActionListener(this);
+
+        myWriteDbButton = myMainPanel.getMyWriteDBButton();
+        myWriteDbButton.addActionListener(this);
     }
 
     /*
@@ -213,6 +217,8 @@ public class FWGUI implements ActionListener {
             myDirectoryField.setText("");
             myExtensionComboBox.setSelectedItem("");
             myDatabaseField.setText("");
+        } else if (theEvent.getSource().equals(myWriteDbButton)) {
+            DatabaseConnection.connect();
         }
     }
 
