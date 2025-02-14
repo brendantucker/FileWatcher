@@ -3,55 +3,70 @@ import java.nio.file.*;
 import java.time.LocalDateTime;
 
 public class FileWatcher implements Runnable {
-    private final Path directory;
-    private volatile boolean running = true;
-
-    public FileWatcher(String directoryPath) {
-        this.directory = Paths.get(directoryPath);
+    /** The directory to watch */
+    private final Path myDirectory;
+    /** Flag to control the running state of the watcher */
+    private volatile boolean myRunning = true;
+    /**
+     * Constructor for FileWatcher.
+     * @param theDirectoryPath
+     */
+    public FileWatcher(String theDirectoryPath) {
+        this.myDirectory = Paths.get(theDirectoryPath);
     }
 
+    /**
+     * Stops the file watcher.
+     */
     public void stopWatching() {
-        this.running = false;
+        this.myRunning = false;
+        System.out.println("Stopping file watcher.");
     }
 
+    /**
+     * Starts the file watcher.
+     */
     @Override
     public void run() {
+        // Check if the directory exists
+        if (!Files.exists(myDirectory)) {
+            System.out.println(" ERROR: Directory does not exist: " + myDirectory);
+            return;
+        }
+
+        System.out.println(" Watching directory: " + myDirectory);
+
+        // Register the directory with the watch service
         try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
-            directory.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, 
-                StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+            myDirectory.register(watchService, 
+                StandardWatchEventKinds.ENTRY_CREATE, 
+                StandardWatchEventKinds.ENTRY_DELETE, 
+                StandardWatchEventKinds.ENTRY_MODIFY);
+        
+            while (myRunning) {
+                WatchKey key = watchService.take(); // Blocks until event occurs
 
-            System.out.println("🔍 Watching directory: " + directory);
-
-            while (running) {
-                WatchKey key = watchService.take(); // Wait for an event
                 for (WatchEvent<?> event : key.pollEvents()) {
                     WatchEvent.Kind<?> kind = event.kind();
-                    Path filePath = directory.resolve((Path) event.context());
+                    Path filePath = myDirectory.resolve((Path) event.context());
 
-                    System.out.println("📂 File Event Detected: " + filePath + " -> " + kind.name());
+                    System.out.println(" Detected Event: " + filePath + " -> " + kind.name());
 
-                    EventType eventType;
-                    if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                        eventType = EventType.FILECREATED;
-                    } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-                        eventType = EventType.FILEDELETED;
-                    } else {
-                        eventType = EventType.FILEMODIFIED;
-                    }
-
+                    // Process event
+                    EventType eventType = getEventType(kind);
                     FileEvent fileEvent = new FileEvent(
-                            filePath.getFileName().toString(),
-                            filePath.toString(),
-                            eventType,
-                            getFileExtension(filePath.toString()),
-                            LocalDateTime.now()
+                        filePath.getFileName().toString(),
+                        filePath.toString(),
+                        eventType,
+                        getFileExtension(filePath.toString()),
+                        LocalDateTime.now()
                     );
 
-                    // Insert event into DB
-                    if (DatabaseConnection.getConnection() != null) {
+                    // Store event in DB
+                    if (DatabaseConnection.getMyConnection() != null) {
                         FileEventDAO.insertFileEvent(fileEvent);
                     } else {
-                        System.out.println("Database is not connected. Event not logged.");
+                        System.out.println("Database not connected. Event not logged.");
                     }
                 }
                 key.reset();
@@ -61,6 +76,22 @@ public class FileWatcher implements Runnable {
         }
     }
 
+    /**
+     * Determines the event type based on the kind of event.
+     * @param kind The kind of event.
+     * @return The corresponding EventType.
+     */
+    private EventType getEventType(WatchEvent.Kind<?> kind) {
+        if (kind == StandardWatchEventKinds.ENTRY_CREATE) return EventType.FILECREATED;
+        if (kind == StandardWatchEventKinds.ENTRY_DELETE) return EventType.FILEDELETED;
+        return EventType.FILEMODIFIED;
+    }
+
+    /**
+     * Gets the file extension from the file name.
+     * @param fileName The name of the file.
+     * @return The file extension.
+     */
     private String getFileExtension(String fileName) {
         int lastIndex = fileName.lastIndexOf('.');
         return (lastIndex == -1) ? "" : fileName.substring(lastIndex + 1);

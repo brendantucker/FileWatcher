@@ -1,49 +1,34 @@
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseConnection {
-    private static final String URL = "jdbc:sqlite:filewatcher.db"; // SQLite database file
-    private static Connection connection = null;
+    private static final String myURL = "jdbc:sqlite:filewatcher.db";
+    private static Connection myConnection = null;
 
     public static boolean connect() {
         try {
-            // **LOAD THE DRIVER EXPLICITLY**
             Class.forName("org.sqlite.JDBC");
+            myConnection = DriverManager.getConnection(myURL);
+            System.out.println(" Connected to SQLite database!");
 
-            if (connection == null || connection.isClosed()) {
-                System.out.println("Attempting to connect to database...");
-                connection = DriverManager.getConnection(URL);
-                System.out.println("Connected to SQLite database successfully!");
-                return true;
-            }
+            //  Ensure the table exists
+            initializeDatabase();
+
+            return true;
         } catch (ClassNotFoundException e) {
-            System.out.println("SQLite JDBC Driver not found. Make sure sqlite.jar is in the classpath.");
+            System.out.println("SQLite JDBC Driver not found!");
             e.printStackTrace();
         } catch (SQLException e) {
-            System.out.println("Failed to connect to SQLite database. Error: " + e.getMessage());
+            System.out.println("Failed to connect to SQLite database.");
             e.printStackTrace();
         }
         return false;
     }
-
-    public static void disconnect() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-                System.out.println("Disconnected from SQLite database.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Error disconnecting from database.");
-        }
-    }
-
-    public static Connection getConnection() {
-        return connection;
-    }
+    /**
+     * Initializes the database by creating the necessary table if it doesn't exist.
+     */
     private static void initializeDatabase() {
         String sql = "CREATE TABLE IF NOT EXISTS file_events (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -53,11 +38,34 @@ public class DatabaseConnection {
                 "file_extension TEXT, " +
                 "event_time TEXT NOT NULL);";
 
-        try (Statement stmt = getConnection().createStatement()) {
+        try (Statement stmt = getMyConnection().createStatement()) {
             stmt.execute(sql);
-            System.out.println("Database initialized.");
+            System.out.println(" Database initialized. Table 'file_events' is ready.");
         } catch (SQLException e) {
+            System.out.println(" ERROR: Failed to initialize the database.");
             e.printStackTrace();
         }
+    }
+    /**
+     * Disconnects from the SQLite database.
+     */
+    public static void disconnect() {
+        try {
+            if (myConnection != null && !myConnection.isClosed()) {
+                myConnection.close();
+                System.out.println(" Disconnected from SQLite database.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(" Error disconnecting from database.");
+        }
+    }
+    /**
+     * Returns the current database connection.
+     *
+     * @return the current database connection
+     */
+    public static Connection getMyConnection() {
+        return myConnection;
     }
 }

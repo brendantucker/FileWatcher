@@ -21,8 +21,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 
-
-
 public class FWGUI implements ActionListener {
 
     private JFrame myFrame;
@@ -232,21 +230,30 @@ public class FWGUI implements ActionListener {
      * different actions will be taken depending on the menu item clicked.
      */
     public void actionPerformed(final ActionEvent theEvent) {
+        // DEBUG LINE
+        System.out.println("📢 DEBUG: Button clicked - " + theEvent.getActionCommand());
+        
+        // Handle Start button
         if (theEvent.getSource().equals(myStartButton) || theEvent.getSource().equals(myImgStartButton)) {
+            System.out.println(" DEBUG: myStartButton OR myImgStartButton was clicked!");
             runningTime = 0;
             myTimeLabel.setText("Time not started.");
             myTimer.start();
             myStartButton.setEnabled(false);
             myStopButton.setEnabled(true);
-        } else if (theEvent.getSource().equals(myStopButton) || theEvent.getSource().equals(myImgStopButton)) {
+            startWatching();
+        } 
+        // Handle Stop Watching
+        else if (theEvent.getSource().equals(myStopButton) || theEvent.getSource().equals(myImgStopButton)) {
+            System.out.println(" DEBUG: myStopButton OR myImgStopButton was clicked!");
             myTimer.stop();
             myStartButton.setEnabled(true);
             myStopButton.setEnabled(false);
-        } 
+        }
         // Handle closing
         else if (theEvent.getActionCommand().equals("Close")) {
             System.exit(0);
-        } 
+        }
         // Handle About
         else if (theEvent.getActionCommand().equals("About")) {
             JOptionPane.showMessageDialog(myFrame,
@@ -255,26 +262,26 @@ public class FWGUI implements ActionListener {
                             "Developers: Manjinder Ghuman, Ryder Deback, Brendan Tucker",
                     "About",
                     JOptionPane.INFORMATION_MESSAGE);
-        } 
+        }
         // Handle File Extension Selection
         else if (theEvent.getSource().equals(myExtensionComboBox) && myExtensionComboBox.getSelectedItem() != "") {
             JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
-        } 
+        }
         // Handle Directory Selection
         else if (theEvent.getSource().equals(myDirectoryButton)) {
             JFileChooser direcChooser = new JFileChooser();
             direcChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             direcChooser.setAcceptAllFileFilterUsed(false);
-    
+
             int directoryValue = direcChooser.showOpenDialog(null);
             if (directoryValue == JFileChooser.APPROVE_OPTION) {
                 myDirectoryField.setText(direcChooser.getSelectedFile().getAbsolutePath());
             }
-        } 
+        }
         // Handle Clearing Directory
         else if (theEvent.getSource().equals(myClearDirectoryButton)) {
             myDirectoryField.setText("");
-        } 
+        }
         // Handle Database Connection
         else if (theEvent.getActionCommand().equals("Connect to Database")) {
             if (DatabaseConnection.connect()) {
@@ -283,25 +290,29 @@ public class FWGUI implements ActionListener {
                 JOptionPane.showMessageDialog(myFrame, "Failed to connect to database.", "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
-        } 
-        else if (theEvent.getActionCommand().equals("Disconnect Database")) {
+        } else if (theEvent.getActionCommand().equals("Disconnect Database")) {
             DatabaseConnection.disconnect();
             JOptionPane.showMessageDialog(myFrame, "Disconnected from SQLite database.");
-        } 
-        // Handle Start Watching Directory
-        else if (theEvent.getActionCommand().equals("Start Watching")) {
+        }
+        // Handle Start Watching 
+        else if (theEvent.getActionCommand().equals("Start Watching") || theEvent.getSource().equals(myImgStartButton)) {
+            System.out.println(" DEBUG: Start Watching triggered!");
+
             String directoryToWatch = myDirectoryField.getText();
             if (directoryToWatch.isEmpty()) {
                 JOptionPane.showMessageDialog(myFrame, "Please select a directory to monitor!", "Warning", JOptionPane.WARNING_MESSAGE);
+                System.out.println(" No directory selected.");
                 return;
             }
-    
-            myFileWatcher = new FileWatcher(directoryToWatch);
-            myFileWatcherThread = new Thread(myFileWatcher);
-            myFileWatcherThread.start();
-    
-            JOptionPane.showMessageDialog(myFrame, "Started watching directory: " + directoryToWatch);
-        } 
+
+        System.out.println(" DEBUG: Selected directory: " + directoryToWatch);
+
+        myFileWatcher = new FileWatcher(directoryToWatch);
+        myFileWatcherThread = new Thread(myFileWatcher);
+        myFileWatcherThread.start();
+
+        JOptionPane.showMessageDialog(myFrame, "Started watching directory: " + directoryToWatch);
+    }
         // Handle Stop Watching Directory
         else if (theEvent.getActionCommand().equals("Stop Watching")) {
             if (myFileWatcher != null) {
@@ -310,7 +321,6 @@ public class FWGUI implements ActionListener {
             JOptionPane.showMessageDialog(myFrame, "Stopped watching.");
         }
     }
-    
 
     /*
      * This method will extend the timer label to show the time in days, hours,
@@ -326,4 +336,27 @@ public class FWGUI implements ActionListener {
                 hours, minutes, seconds);
         myTimeLabel.setText(timeFormatted);
     }
+
+    /*
+     * This method will start the file watcher.
+     */
+    private void startWatching() {
+        System.out.println(" DEBUG: Start Watching triggered!");
+    
+        String directoryToWatch = myDirectoryField.getText();
+        if (directoryToWatch.isEmpty()) {
+            JOptionPane.showMessageDialog(myFrame, "Please select a directory to monitor!", "Warning", JOptionPane.WARNING_MESSAGE);
+            System.out.println("No directory selected.");
+            return;
+        }
+    
+        System.out.println(" DEBUG: Selected directory: " + directoryToWatch);
+    
+        myFileWatcher = new FileWatcher(directoryToWatch);
+        myFileWatcherThread = new Thread(myFileWatcher);
+        myFileWatcherThread.start();
+    
+        JOptionPane.showMessageDialog(myFrame, "Started watching directory: " + directoryToWatch);
+    }
+
 }
