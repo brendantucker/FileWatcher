@@ -1,5 +1,3 @@
-package view;
-
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -20,8 +18,6 @@ import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import model.FileEvent;
-import model.EventType;
 
 public class FWGUI implements ActionListener {
     private JFrame myFrame;
@@ -103,6 +99,8 @@ public class FWGUI implements ActionListener {
     /*
      * This method will keep track of the time that the user has been monitoring
      * files.
+     * This method will keep track of the time that the user has been monitoring
+     * files.
      */
     private void timeKeeper() {
         myTimer = new Timer(1000, (ActionEvent e) -> {
@@ -173,6 +171,8 @@ public class FWGUI implements ActionListener {
     /*
      * This method will handle the actions of the user when they click on the menu
      * items,
+     * This method will handle the actions of the user when they click on the menu
+     * items,
      * different actions will be taken depending on the menu item clicked.
      */
     public void actionPerformed(final ActionEvent theEvent) {
@@ -186,7 +186,9 @@ public class FWGUI implements ActionListener {
             buttonReverse(false);
         } else if (theEvent.getActionCommand().equals("Close")) {
             System.exit(0);
-        } else if (theEvent.getActionCommand().equals("About")) {
+        } 
+        // Handle About
+        else if (theEvent.getActionCommand().equals("About")) {
             JOptionPane.showMessageDialog(myFrame,
                     "Program Usage: This application watches file system changes.\n" +
                             "Version: 1.0\n" +

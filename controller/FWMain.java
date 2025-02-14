@@ -1,8 +1,5 @@
-package controller;
 
 import java.awt.EventQueue;
-
-import view.FWGUI;
 
 public class FWMain {
 

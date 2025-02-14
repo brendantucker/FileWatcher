@@ -1,12 +1,9 @@
-package view;
+
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-
-import model.FileEvent;
-
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 

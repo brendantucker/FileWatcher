@@ -1,0 +1,13 @@
+{
+    "java.project.sourcePaths": [
+        "controller",
+        "model",
+        "view",
+        "libs"
+    ],
+    "java.project.referencedLibraries": [
+        "libs/sqlite.jar"
+
+    ]
+}
+  
