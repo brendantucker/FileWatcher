@@ -67,11 +67,11 @@ public class FWPanel extends JPanel {
         myStopButton.setEnabled(false);
         adjustGridBagConstraints(0, 2, 1, 1 / 3);
         myGBC.fill = GridBagConstraints.HORIZONTAL;
-        myMainPanel.add(myStartButton, myGBC);
-        adjustGridBagConstraints(1, 2, GridBagConstraints.RELATIVE, 1 / 3);
-        myMainPanel.add(myStopButton, myGBC);
-        adjustGridBagConstraints(3, 2, GridBagConstraints.REMAINDER, 1 / 3);
         myMainPanel.add(myBrowseButton, myGBC);
+        adjustGridBagConstraints(1, 2, GridBagConstraints.RELATIVE, 1 / 3);
+        myMainPanel.add(myStartButton, myGBC);
+        adjustGridBagConstraints(3, 2, GridBagConstraints.REMAINDER, 1 / 3);
+        myMainPanel.add(myStopButton, myGBC);
 
     }
 
