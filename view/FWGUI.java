@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -20,6 +21,7 @@ import javax.swing.JTextField;
 import javax.swing.Timer;
 
 import model.FileEvent;
+import model.DirectoryWatchService;
 import model.EventType;
 
 public class FWGUI implements ActionListener {
@@ -40,6 +42,8 @@ public class FWGUI implements ActionListener {
     private JButton myDirectoryStartButton;
     private JButton myDirectoryStopButton;
     private FWPanel myMainPanel;
+    private boolean myIsMonitoring;;
+    private DirectoryWatchService myDirectoryWatchService;
 
     /*
      * Constructor for the GUI. This will create the GUI and set up the menu bar.
@@ -51,6 +55,7 @@ public class FWGUI implements ActionListener {
         // Create the main panel and event table
         myMainPanel = new FWPanel();
         myEventTable = new FWEventTable();
+        myIsMonitoring = false; // Program not monitoring at the start
 
         createMenuBar();
         timeKeeper();
@@ -71,12 +76,6 @@ public class FWGUI implements ActionListener {
 
         // Add the JSplitPane to the frame
         myFrame.add(splitPane, BorderLayout.CENTER);
-
-        // Add 100 test events to the table to test scrolling
-        for (int i = 0; i < 100; i++) {
-            myEventTable.addEvent(new FileEvent("Test.txt", "C:/path/to/TestFile.txt", EventType.FILECREATED, "txt",
-                    LocalDateTime.of(2025, 2, 2, 12, 27)));
-        }
 
         myFrame.setVisible(true);
     }
@@ -164,15 +163,27 @@ public class FWGUI implements ActionListener {
             myTimeLabel.setText("Time not started.");
             myTimer.start();
             myStartButton.setEnabled(false);
+            myIsMonitoring = true; // Program is now monitoring
             myDirectoryStartButton.setEnabled(false);
             myStopButton.setEnabled(true);
             myDirectoryStopButton.setEnabled(true);
+            try {
+                myDirectoryWatchService = new DirectoryWatchService(myDirectoryField.getText(), this);
+                myDirectoryWatchService.start();
+            } catch (IOException e) {
+                //TODO - Handle the exception with JOptionPane
+                System.out.println("Error starting directory watch service: " + e.getMessage());
+                e.printStackTrace();
+            }
+
         } else if (theEvent.getSource().equals(myStopButton) || theEvent.getSource().equals(myDirectoryStopButton)) {
             myTimer.stop();
             myStartButton.setEnabled(true);
             myDirectoryStartButton.setEnabled(true);
             myStopButton.setEnabled(false);
+            myIsMonitoring = false; // Program is no longer monitoring
             myDirectoryStopButton.setEnabled(false);
+            myDirectoryWatchService.stop();
         } else if (theEvent.getActionCommand().equals("Close")) {
             System.exit(0);
         } else if (theEvent.getActionCommand().equals("About")) {
@@ -194,11 +205,21 @@ public class FWGUI implements ActionListener {
             if (directoryValue == JFileChooser.APPROVE_OPTION) {
                 myDirectoryField.setText(direcChooser.getSelectedFile().getAbsolutePath());
             }
+
         } else if (theEvent.getSource().equals(myClearDirectoryButton)) {
             myDirectoryField.setText("");
         }
     }
 
+    public String getDirectoryField() {
+        return myDirectoryField.getText();
+    }
+    public boolean isMonitoring() {
+        return myIsMonitoring;
+    }
+    public FWEventTable getEventTable() {
+        return myEventTable;
+    }
     /*
      * This method will extend the timer label to show the time in days, hours,
      * minutes, and seconds.
