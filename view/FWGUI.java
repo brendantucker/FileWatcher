@@ -30,7 +30,6 @@ public class FWGUI implements ActionListener {
     private JMenuItem myStartButton;
     private JMenuItem myStopButton;
     private double splitPaneResizeWeight = 0.2;
-    // New field
     private FWEventTable myEventTable;
     private JComboBox<String> myExtensionComboBox;
     private JTextField myDirectoryField;
