@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -65,7 +66,6 @@ public class FWGUI implements ActionListener {
         myFrame.add(myMainPanel, BorderLayout.NORTH);
 
         // Create a JSplitPane to divide the space between the main panel and the event
-        // table
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myMainPanel, myEventTable);
         splitPane.setResizeWeight(splitPaneResizeWeight);
         splitPane.setDividerSize(0);

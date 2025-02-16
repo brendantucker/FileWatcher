@@ -24,13 +24,15 @@ public class FWEventTable extends JPanel{
     private String[] myColumnNames;
     /** ArrayList to hold the data for the JTable. */
     private ArrayList<FileEvent> myData;
+    /** Array of default column widths for the JTable. */
+    private int[] myDefaultColumnWidths = { 100, 250, 50, 25, 100 }; // Default column widths for the table
 
     /**
      * Constructor for the FWEventTable. This will create the table and set up the panel.
      */
     public FWEventTable() {
         super(new BorderLayout()); // Ensure that the panel is using a BorderLayout.
-        myColumnNames = new String[] { "File Name", "File Path", "Event Type", "File Extension", "Time", };
+        myColumnNames = new String[] { "File Name", "File Path", "Event Type", "Extension", "Time", };
         myTableModel = new DefaultTableModel();
         myTableModel.setColumnIdentifiers(myColumnNames);
         myData = new ArrayList<FileEvent>();
@@ -43,6 +45,11 @@ public class FWEventTable extends JPanel{
         //Adds the JTable to a scroll pane, then adds the scroll pane to the FWEventTable panel.
         JScrollPane scrollPane = new JScrollPane(myEventTable);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        
+        for (int i = 0; i < myColumnNames.length; i++) {
+            myEventTable.getColumnModel().getColumn(i).setPreferredWidth(myDefaultColumnWidths[i]);
+        }
+
         this.add(scrollPane, BorderLayout.CENTER);
     }
 

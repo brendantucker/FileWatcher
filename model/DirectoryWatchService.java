@@ -67,16 +67,16 @@ public class DirectoryWatchService {
             //Loop to watch for events
             while(myRunning && myGUI.isMonitoring()) {
                 try {
-                    myWatchService.take(); // call take() to force thread to wait until an event is available
-                } catch (InterruptedException e) { //Stop DWS if watch service is closed
-                    stop();
-                } catch (ClosedWatchServiceException e) {
-                    stop();
-                }
+                    myWatchService.take(); // call take() to force thread to wait until a new file event is available to log
+                } 
+                //Stop DWS if watch service is closed
+                catch (InterruptedException e) { stop(); }
+                catch (ClosedWatchServiceException e) { stop(); }
                 
                 for (WatchEvent<?> event : myKey.pollEvents()) {
-                    myEventTable.addEvent(new FileEvent(event.context().toString(), myDirectory.toString() + "\\" + event.context().toString(), event.kind().toString(), getExtension(event).toString(), createDateString()));
+                    myEventTable.addEvent(new FileEvent(event.context().toString(), myDirectory.toString() + "\\" + event.context().toString(), eventTypeFormatter(event.kind()), getExtension(event).toString(), createDateString()));
                 }
+                myKey.reset(); // Reset the key to receive further events
     
             }
         }).start();
@@ -125,5 +125,21 @@ public class DirectoryWatchService {
         return now.format(formatter);
     }
 
+    /**
+     * Formats the event type to a more readable string.
+     * @param theEvent One of the three StandardWatchEventKinds enum
+     * @return  Formatted event type string
+     */
+    private String eventTypeFormatter(WatchEvent.Kind<?> theEvent) {
+        String eventType = theEvent.toString();
+        if (eventType.equals("ENTRY_CREATE")) {
+            return "CREATED";
+        } else if (eventType.equals("ENTRY_DELETE")) {
+            return "DELETED";
+        } else if (eventType.equals("ENTRY_MODIFY")) {
+            return "MODIFIED";
+        }
+        return null;
+    }
 
 }
