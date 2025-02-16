@@ -5,7 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -20,9 +19,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 
-import model.FileEvent;
 import model.DirectoryWatchService;
-import model.EventType;
 
 public class FWGUI implements ActionListener {
     private JFrame myFrame;
@@ -159,6 +156,18 @@ public class FWGUI implements ActionListener {
      */
     public void actionPerformed(final ActionEvent theEvent) {
         if (theEvent.getSource().equals(myStartButton) || theEvent.getSource().equals(myDirectoryStartButton)) {
+            // Start the file system watcher; throw an error if the directory is invalid; try block must run before disabling start button
+            try {
+                myDirectoryWatchService = new DirectoryWatchService(myDirectoryField.getText(), this);
+                //Test for valid directory input before starting watch service
+                myDirectoryWatchService.start();
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null,  "\"" + myDirectoryField.getText() + "\" is not a valid directory" , "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            } catch (NullPointerException e) {
+                JOptionPane.showMessageDialog(null,  "\"" + myDirectoryField.getText() + "\" is not a valid directory" , "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             runningTime = 0;
             myTimeLabel.setText("Time not started.");
             myTimer.start();
@@ -167,14 +176,8 @@ public class FWGUI implements ActionListener {
             myDirectoryStartButton.setEnabled(false);
             myStopButton.setEnabled(true);
             myDirectoryStopButton.setEnabled(true);
-            try {
-                myDirectoryWatchService = new DirectoryWatchService(myDirectoryField.getText(), this);
-                myDirectoryWatchService.start();
-            } catch (IOException e) {
-                //TODO - Handle the exception with JOptionPane
-                System.out.println("Error starting directory watch service: " + e.getMessage());
-                e.printStackTrace();
-            }
+
+
 
         } else if (theEvent.getSource().equals(myStopButton) || theEvent.getSource().equals(myDirectoryStopButton)) {
             myTimer.stop();
@@ -207,8 +210,11 @@ public class FWGUI implements ActionListener {
             }
 
         } else if (theEvent.getSource().equals(myClearDirectoryButton)) {
+            //Clear table or clear directory?
+            myEventTable.clearTable();
+            
             myDirectoryField.setText("");
-        }
+        } 
     }
 
     public String getDirectoryField() {
