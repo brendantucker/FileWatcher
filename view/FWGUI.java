@@ -33,6 +33,7 @@ public class FWGUI implements ActionListener {
     private JComboBox<String> myExtensionComboBox;
     private JTextField myDirectoryField;
     private JTextField myDatabaseField;
+    private JTextField myExtensionField;
     private JButton myClearDirectoryButton;
     private JButton myDirectoryBrowseButton;
     private JButton myDirectoryStartButton;
@@ -252,10 +253,12 @@ public class FWGUI implements ActionListener {
         myDirectoryField.getDocument().addDocumentListener(theListener);
         myDatabaseField = myMainPanel.getMyDatabaseField();
         myDatabaseField.getDocument().addDocumentListener(theListener);
+        myExtensionField = (JTextField) myExtensionComboBox.getEditor().getEditorComponent();
+        myExtensionField.getDocument().addDocumentListener(theListener);
     }
 
     private void checkFields() {
-        if (!myExtensionComboBox.getSelectedItem().equals("") && !myDirectoryField.getText().equals("")
+        if (!myExtensionField.getText().equals("") && !myDirectoryField.getText().equals("")
                 && !myDatabaseField.getText().equals("")) {
             if (!myDirectoryStopButton.isEnabled()) {
                 myDirectoryStartButton.setEnabled(true);
