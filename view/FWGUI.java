@@ -2,7 +2,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalDateTime;
+import java.io.IOException;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -28,7 +29,6 @@ public class FWGUI implements ActionListener {
     private JMenuItem myStartButton;
     private JMenuItem myStopButton;
     private double splitPaneResizeWeight = 0.2;
-    // New field
     private FWEventTable myEventTable;
     private JComboBox<String> myExtensionComboBox;
     private JTextField myDirectoryField;
