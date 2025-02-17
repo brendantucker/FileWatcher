@@ -188,7 +188,7 @@ public class FWGUI implements ActionListener {
             buttonReverse(false);
         } else if (theEvent.getSource().equals(myStopButton) || theEvent.getSource().equals(myDirectoryStopButton)) {
             myTimer.stop();
-            buttonReverse(false);
+            buttonReverse(true);
         } else if (theEvent.getActionCommand().equals("Close")) {
             System.exit(0);
         } 
@@ -262,6 +262,7 @@ public class FWGUI implements ActionListener {
                 && !myDatabaseField.getText().equals("")) {
             if (!myDirectoryStopButton.isEnabled()) {
                 myDirectoryStartButton.setEnabled(true);
+                myDirectoryStopButton.setEnabled(false);
             }
         } else {
             myDirectoryStartButton.setEnabled(false);
