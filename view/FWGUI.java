@@ -191,7 +191,7 @@ public class FWGUI implements ActionListener {
             buttonReverse(true);
         } else if (theEvent.getActionCommand().equals("Close")) {
             System.exit(0);
-        } 
+        }
         // Handle About
         else if (theEvent.getActionCommand().equals("About")) {
             JOptionPane.showMessageDialog(myFrame,
