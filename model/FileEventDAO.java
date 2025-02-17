@@ -20,7 +20,7 @@ public class FileEventDAO {
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, theEvent.getFileName());
             pstmt.setString(2, theEvent.getFilePath());
-            pstmt.setString(3, theEvent.getEventType().name());
+            pstmt.setString(3, theEvent.getEventType());
             pstmt.setString(4, theEvent.getExtension());
             pstmt.setString(5, theEvent.getEventTime().toString());
 

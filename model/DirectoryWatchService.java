@@ -1,5 +1,3 @@
-package model;
-
 import java.io.IOException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
@@ -13,9 +11,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.JOptionPane;
-
-import view.FWEventTable;
-import view.FWGUI;
 
 public class DirectoryWatchService {
 

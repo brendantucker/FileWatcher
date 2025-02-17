@@ -3,6 +3,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -73,12 +74,6 @@ public class FWGUI implements ActionListener {
     
             // Add the JSplitPane to the frame
             myFrame.add(splitPane, BorderLayout.CENTER);
-    
-            // Add 100 test events to the table to test scrolling
-            for (int i = 0; i < 100; i++) {
-                myEventTable.addEvent(new FileEvent("Test.txt", "C:/path/to/TestFile.txt", EventType.FILECREATED, "txt",
-                        LocalDateTime.of(2025, 2, 2, 12, 27)));
-            }
         }
     
         private void setUpButtons() {
@@ -261,6 +256,10 @@ public class FWGUI implements ActionListener {
     
         public boolean isMonitoring() {
             return myIsMonitoring;
+    }
+
+     public FWEventTable getEventTable() {
+        return myEventTable;
     }
 
     private void checkFields() {
