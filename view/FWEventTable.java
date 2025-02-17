@@ -1,24 +1,16 @@
-
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.util.ArrayList;
 
 /**
- * This class represents a table that will display the events that have occurred to files. 
- * 
- *  To add: ability to sort table ascending/descending by column
+ * This class represents a table that will display the events that have occurred to files.
  */
-public class FWEventTable extends JPanel{
+public class FWEventTable extends JPanel {
     /** JTable to display the events that have occurred. */
     private JTable myEventTable;
     /** DefaultTableModel to hold and act as manager for JTable. */
     private DefaultTableModel myTableModel;
-    /** Array of column names for the JTable. */
-    private String[] myColumnNames;
     /** ArrayList to hold the data for the JTable. */
     private ArrayList<FileEvent> myData;
 
@@ -27,22 +19,25 @@ public class FWEventTable extends JPanel{
      */
     public FWEventTable() {
         super(new BorderLayout()); // Ensure that the panel is using a BorderLayout.
-        myColumnNames = new String[] { "File Name", "File Path", "Event Type", "File Extension", "Time", };
-        myTableModel = new DefaultTableModel();
-        myTableModel.setColumnIdentifiers(myColumnNames);
-        myData = new ArrayList<FileEvent>();
+        String[] myColumnNames = { "File Name", "File Path", "Event Type", "File Extension", "Time" };
         
-        myEventTable = new JTable(myTableModel);
+        myTableModel = new DefaultTableModel(myColumnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         
-        //Allow column reordering
-        myEventTable.getTableHeader().setReorderingAllowed(true);
+        myData = new ArrayList<>();
 
-        //Adds the JTable to a scroll pane, then adds the scroll pane to the FWEventTable panel.
+        myEventTable = new JTable(myTableModel);
+        myEventTable.getTableHeader().setReorderingAllowed(true); // Allow column reordering
+
         JScrollPane scrollPane = new JScrollPane(myEventTable);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
         this.add(scrollPane, BorderLayout.CENTER);
     }
-
 
     /**
      * Adds a FileEvent to the table.
@@ -51,7 +46,28 @@ public class FWEventTable extends JPanel{
      */
     public void addEvent(FileEvent theEvent) {
         myData.add(theEvent);
-        myTableModel.addRow(new Object[] { theEvent.getFileName(), theEvent.getFilePath(), theEvent.getEventType(), theEvent.getExtension(), theEvent.getEventTime() });
+        myTableModel.addRow(new Object[] {
+                theEvent.getFileName(),
+                theEvent.getFilePath(),
+                theEvent.getEventType(),
+                theEvent.getExtension(),
+                theEvent.getEventTime()
+        });
+        
+        int rowIndex = myTableModel.getRowCount() - 1;
+        myTableModel.fireTableRowsInserted(rowIndex, rowIndex);
+        
+        // Ensure database is connected before inserting event
+        if (DatabaseConnection.getMyConnection() == null) {
+            System.out.println("Database is not connected. Attempting to reconnect...");
+            if (!DatabaseConnection.connect()) {
+                System.out.println("Failed to reconnect to the database. Event not stored.");
+                return;
+            }
+        }
+        
+        // Insert event into database
+        FileEventDAO.insertFileEvent(theEvent);
     }
 
     /**
@@ -80,5 +96,4 @@ public class FWEventTable extends JPanel{
         myData.clear();
         myTableModel.setRowCount(0);
     }
-
 }
