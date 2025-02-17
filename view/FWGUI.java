@@ -214,6 +214,7 @@ public class FWGUI implements ActionListener {
                 myDirectoryField.setText("");
                 myExtensionComboBox.setSelectedItem("");
                 myDatabaseField.setText("");
+                myTimeLabel.setText("Time Not Started.");
             } else if (theEvent.getSource().equals(myWriteDbButton)) {
                 DatabaseConnection.connect();
             }
