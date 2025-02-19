@@ -286,7 +286,7 @@ public class FWGUI implements ActionListener {
     }
 
     private void checkFields() {
-        if (!myDirectoryField.getText().equals("")) { // !myExtensionField.getText().equals("") && !myDatabaseField.getText().equals(""))
+        if (!myDirectoryField.getText().equals("") && !myExtensionField.getText().equals("") && !myDatabaseField.getText().equals("")) {
             if (!myDirectoryStopButton.isEnabled()) {
                 myDirectoryStartButton.setEnabled(true);
                 myDirectoryStopButton.setEnabled(false);
