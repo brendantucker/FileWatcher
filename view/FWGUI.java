@@ -2,6 +2,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.IOException;
 
 import javax.swing.JButton;
@@ -42,65 +44,75 @@ public class FWGUI implements ActionListener {
     private FWPanel myMainPanel;
     private boolean myIsMonitoring;
     private DirectoryWatchService myDirectoryWatchService;
-    
-        /*
-         * Constructor for the GUI. This will create the GUI and set up the menu bar.
-         */
+    private boolean myDatabaseActive;
+
+    /*
+     * Constructor for the GUI. This will create the GUI and set up the menu bar.
+     */
     public FWGUI() {
         myFrame = new FWFrame().frameOutline();
         myFrame.setLayout(new BorderLayout());
-    
+
         // Create the main panel and event table
         myMainPanel = new FWPanel();
         myEventTable = new FWEventTable();
         myIsMonitoring = false;
-    
+
         createMenuBar();
         timeKeeper();
         setUpButtons();
         setUpDocumentListeners();
         setUpFileViewer();
-    
+
         myFrame.add(myMainPanel, BorderLayout.NORTH);
         myFrame.setVisible(true);
     }
-    
+
     private void setUpFileViewer() {
-    
-        // Create a JSplitPane to divide the space between the main panel and the event table
+
+        // Create a JSplitPane to divide the space between the main panel and the event
+        // table
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myMainPanel, myEventTable);
         splitPane.setResizeWeight(splitPaneResizeWeight);
         splitPane.setDividerSize(0);
-    
+
         // Add the JSplitPane to the frame
         myFrame.add(splitPane, BorderLayout.CENTER);
     }
-    
+
     private void setUpButtons() {
         myExtensionComboBox = myMainPanel.getExtensionBox();
         myExtensionComboBox.setEditable(true);
+        myExtensionComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                Object theDropdowObject = myExtensionComboBox.getSelectedItem();
+                if (theDropdowObject.equals("Enter an extension")) {
+                    myExtensionComboBox.setEditable(true);
+                } else {
+                    myExtensionComboBox.setEditable(false);
+                }
+            }
+        });
         myExtensionComboBox.addActionListener(this);
-    
+
         myDirectoryStartButton = myMainPanel.getStartButton();
         myDirectoryStartButton.addActionListener(this);
-        //myDirectoryStartButton.setEnabled(true);
-    
+
         myDirectoryStopButton = myMainPanel.getStopButton();
         myDirectoryStopButton.addActionListener(this);
-    
+
         myDirectoryBrowseButton = myMainPanel.getBrowseButton();
         myDirectoryBrowseButton.addActionListener(this);
-    
+
         myClearDirectoryButton = myMainPanel.getClearButton();
         myClearDirectoryButton.addActionListener(this);
-    
+
         myWriteDbButton = myMainPanel.getMyWriteDBButton();
         myWriteDbButton.addActionListener(this);
     }
-    
+
     /*
-     * This method will keep track of the time that the user has been monitoring
-     * files.
      * This method will keep track of the time that the user has been monitoring
      * files.
      */
@@ -116,7 +128,7 @@ public class FWGUI implements ActionListener {
         timePanel.add(myTimeLabel);
         myFrame.add(timePanel, BorderLayout.SOUTH);
     }
-    
+
     /*
      * This method will extend the timer label to show the time in days, hours,
      * minutes, and seconds.
@@ -130,7 +142,7 @@ public class FWGUI implements ActionListener {
                 hours, minutes, seconds);
         myTimeLabel.setText(timeFormatted);
     }
-    
+
     /*
      * This method will create the menu bar for the GUI.
      */
@@ -169,35 +181,59 @@ public class FWGUI implements ActionListener {
         myMenuBar.add(aboutMenu);
         myFrame.setJMenuBar(myMenuBar);
     }
-    
+
+    private void setUpDocumentListeners() {
+        DocumentListener theListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                checkFields();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                checkFields();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                checkFields();
+            }
+        };
+
+        myDirectoryField = myMainPanel.getDirectoryField();
+        myDirectoryField.getDocument().addDocumentListener(theListener);
+        myDatabaseField = myMainPanel.getMyDatabaseField();
+        myDatabaseField.getDocument().addDocumentListener(theListener);
+        myExtensionField = (JTextField) myExtensionComboBox.getEditor().getEditorComponent();
+        myExtensionField.getDocument().addDocumentListener(theListener);
+    }
+
     /*
      * This method will handle the actions of the user when they click on the menu
-     * items,
-     * This method will handle the actions of the user when they click on the menu
-     * items,
-     * different actions will be taken depending on the menu item clicked.
+     * items, different actions will be taken depending on the menu item clicked.
      */
     public void actionPerformed(final ActionEvent theEvent) {
         if (theEvent.getSource().equals(myStartButton) || theEvent.getSource().equals(myDirectoryStartButton)) {
-            myIsMonitoring = true; //Must be true for DirectoryWatchService to run
+            myIsMonitoring = true; // Must be true for DirectoryWatchService to run
 
-            //Create and start a new DirectoryWatchService for chosen directory
+            // Create and start a new DirectoryWatchService for chosen directory
             try {
-                myDirectoryWatchService = new DirectoryWatchService(myDirectoryField.getText(), this); //Throws if given invalid directory
+                // Throws if given invalid directory.
+                myDirectoryWatchService = new DirectoryWatchService(myDirectoryField.getText(), this);
                 myDirectoryWatchService.start();
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(null,  "\"" + myDirectoryField.getText() + "\" is not a valid directory" , "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "\"" + myDirectoryField.getText() + "\" is not a valid directory",
+                        "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
                 return;
             } catch (NullPointerException e) {
-                JOptionPane.showMessageDialog(null,  "\"" + myDirectoryField.getText() + "\" is not a valid directory" , "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "\"" + myDirectoryField.getText() + "\" is not a valid directory",
+                        "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
             runningTime = 0;
             myTimeLabel.setText("Time not started.");
             myTimer.start();
             buttonReverse(false);
-            
         } else if (theEvent.getSource().equals(myStopButton) || theEvent.getSource().equals(myDirectoryStopButton)) {
             myTimer.stop();
             myIsMonitoring = false;
@@ -215,7 +251,8 @@ public class FWGUI implements ActionListener {
                     "About",
                     JOptionPane.INFORMATION_MESSAGE);
         } else if (theEvent.getSource().equals(myExtensionComboBox)
-                && !myExtensionComboBox.getSelectedItem().equals("")
+                && !myExtensionField.getText().equals("")
+                && !myExtensionComboBox.getSelectedItem().equals("Enter an extension")
                 && myExtensionComboBox.getEditor().getEditorComponent().hasFocus()) {
             checkFields();
             JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
@@ -223,21 +260,26 @@ public class FWGUI implements ActionListener {
             JFileChooser direcChooser = new JFileChooser();
             direcChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             direcChooser.setAcceptAllFileFilterUsed(false); // Disabling the ability to select all files.
-    
+
             int directoryValue = direcChooser.showOpenDialog(null);
             if (directoryValue == JFileChooser.APPROVE_OPTION) {
                 myDirectoryField.setText(direcChooser.getSelectedFile().getAbsolutePath());
             }
         } else if (theEvent.getSource().equals(myClearDirectoryButton)) {
             myDirectoryField.setText("");
-            myExtensionComboBox.setSelectedItem("");
+            myExtensionComboBox.setSelectedItem("Enter an extension");
             myDatabaseField.setText("");
             myTimeLabel.setText("Time Not Started.");
+            myStopButton.setEnabled(false);
+            myDirectoryStopButton.setEnabled(false);
+            DatabaseConnection.disconnect();
+            myDatabaseActive = false;
         } else if (theEvent.getSource().equals(myWriteDbButton)) {
-            DatabaseConnection.connect();
+            myDatabaseActive = DatabaseConnection.connect();
+            checkFields();
         }
     }
-    
+
     /* Helper method - Flips state of start and stop buttons */
     private void buttonReverse(boolean theValue) {
         myStartButton.setEnabled(theValue);
@@ -245,55 +287,36 @@ public class FWGUI implements ActionListener {
         myStopButton.setEnabled(!theValue);
         myDirectoryStopButton.setEnabled(!theValue);
     }
-    
-    private void setUpDocumentListeners() {
-        DocumentListener theListener = new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                checkFields();
-            }
-    
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                checkFields();
-            }
-    
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                checkFields();
-            }
-        };
-    
-        myDirectoryField = myMainPanel.getDirectoryField();
-        myDirectoryField.getDocument().addDocumentListener(theListener);
-        myDatabaseField = myMainPanel.getMyDatabaseField();
-        myDatabaseField.getDocument().addDocumentListener(theListener);
-        myExtensionField = (JTextField) myExtensionComboBox.getEditor().getEditorComponent();
-        myExtensionField.getDocument().addDocumentListener(theListener);
-    }
-    
+
     /**
      * Returns true if GUI is monitoring a directory. Used by DirectoryWatchService
      * to check if it should continue running.
+     * 
      * @return true if monitoring, false otherwise
      */
     public boolean isMonitoring() {
         return myIsMonitoring;
     }
 
-     public FWEventTable getEventTable() {
+    public FWEventTable getEventTable() {
         return myEventTable;
     }
 
     private void checkFields() {
-        if (!myDirectoryField.getText().equals("") && !myExtensionField.getText().equals("") && !myDatabaseField.getText().equals("")) {
+        // If the user wants to only write to local directory.
+        if (!myDirectoryField.getText().equals("")
+                && !myExtensionField.getText().equals("Enter an extension")
+                && !myExtensionField.getText().equals("")
+                && !myDatabaseActive && myDatabaseField.getText().equals("")) {
             if (!myDirectoryStopButton.isEnabled()) {
-                myDirectoryStartButton.setEnabled(true);
-                myDirectoryStopButton.setEnabled(false);
+                buttonReverse(true);
+            }
+        } else if (myDatabaseActive && !myDatabaseField.getText().equals("")) {
+            if (!myDirectoryStopButton.isEnabled()) {
+                buttonReverse(true);
             }
         } else {
             myDirectoryStartButton.setEnabled(false);
         }
     }
-
 }
