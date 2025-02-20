@@ -1,4 +1,3 @@
-package view;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -22,13 +21,13 @@ public class FWFrame extends JFrame {
     private static final double VERTICAL_SCALE = 0.7;
     private static final double HORIZONTAL_SCALE = 0.3;
 
-
     public JFrame frameOutline() {
         // Setting up the frame and adjusting it to be 70% of the screens dimensions.
         final JFrame fileFrame = new JFrame("TCSS 360 - File Watcher");
         fileFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //fileFrame.setSize((int) (SCREEN_WIDTH * SCALE), (int) (SCREEN_HEIGHT * SCALE));
-        fileFrame.setSize((int) (SCREEN_WIDTH * HORIZONTAL_SCALE), (int) (SCREEN_HEIGHT * VERTICAL_SCALE)); 
+        // fileFrame.setSize((int) (SCREEN_WIDTH * SCALE), (int) (SCREEN_HEIGHT *
+        // SCALE));
+        fileFrame.setSize((int) (SCREEN_WIDTH * HORIZONTAL_SCALE), (int) (SCREEN_HEIGHT * VERTICAL_SCALE));
 
         // Centering the frame on program start.
         fileFrame.setLocationRelativeTo(null);
