@@ -1,15 +1,13 @@
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
+import java.io.IOException;
+import java.util.List;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
-import java.time.LocalDateTime;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -20,9 +18,13 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.Timer;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 
 public class FWGUI implements ActionListener {
-
     private JFrame myFrame;
     private JMenuBar myMenuBar;
     private int runningTime = 0;
@@ -30,298 +32,101 @@ public class FWGUI implements ActionListener {
     private JLabel myTimeLabel;
     private JMenuItem myStartButton;
     private JMenuItem myStopButton;
-    private String[] EXTENSION_TYPES = { "", "DOCX", "PDF", "TXT", "PNG", "JPG", "JPEG", "GIF", "MP3", "MP4", "WAV",
-            "AVI", "MOV" };
+    private double splitPaneResizeWeight = 0.2;
+    private FWEventTable myEventTable;
     private JComboBox<String> myExtensionComboBox;
     private JTextField myDirectoryField;
-    private JButton myDirectoryButton;
+    private JTextField myDatabaseField;
+    private JTextField myExtensionField;
     private JButton myClearDirectoryButton;
-    private JButton myImgStartButton;
-    private JButton myImgStopButton;
-    private FWEventTable myEventTable;
-    private JPanel myTopPanel;
-    private double splitPaneResizeWeight = 0.1;
-
-    private Thread myFileWatcherThread;
-    private FileWatcher myFileWatcher;
-
-    /*
-     * Constructor for the GUI. This will create the GUI and set up the menu bar.
-     */
+    private JButton myDirectoryBrowseButton;
+    private JButton myDirectoryStartButton;
+    private JButton myDirectoryStopButton;
+    private JButton myWriteDbButton;
+    private FWPanel myMainPanel;
+    private boolean myIsMonitoring;
+    private DirectoryWatchService myDirectoryWatchService;
+    private static FWGUI myInstance; 
+    
+        /*
+         * Constructor for the GUI. This will create the GUI and set up the menu bar.
+         */
     public FWGUI() {
-        super();
+        myInstance = this;
         myFrame = new FWFrame().frameOutline();
-        // Create the menu bar and start the timer when necessary.
-        createMenuBar();
-
-        // Create topPanel and add components to it.
-        myTopPanel = new JPanel(new BorderLayout());
-        JPanel imageButtons = imageButtons();
-        JPanel dropDownMenus = dropDownMenus();
-
-        myTopPanel.add(imageButtons, BorderLayout.NORTH);
-        myTopPanel.add(dropDownMenus, BorderLayout.CENTER);
-
-        timeKeeper();
-        // Create a panel for the time label
-        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        timePanel.add(myTimeLabel);
-        // Add the time panel to the frame.
-        myFrame.add(timePanel, BorderLayout.SOUTH);
-
-        // Setup and add FileEvent table to GUI
+        myFrame.setLayout(new BorderLayout());
+    
+        // Create the main panel and event table
+        myMainPanel = new FWPanel();
         myEventTable = new FWEventTable();
-        // myFrame.add(myEventTable, BorderLayout.CENTER); //Set to CENTER to prevent
-        // the table covering other GUI elements
+        myIsMonitoring = false;
+    
+        createMenuBar();
+        timeKeeper();
+        setUpButtons();
+        setUpDocumentListeners();
+        setUpFileViewer();
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myTopPanel, myEventTable);
-        splitPane.setDividerSize(0); // Hide the divider
-        splitPane.setResizeWeight(splitPaneResizeWeight);
-        myFrame.add(splitPane, BorderLayout.CENTER);
-
-        // Add 100 test events to the table to test scrolling
-        for (int i = 0; i < 100; i++) {
-            myEventTable.addEvent(new FileEvent("TestFile.txt", "C:/path/to/TestFile.txt", EventType.FILECREATED, "txt",
-                    LocalDateTime.of(2025, 2, 2, 12, 27)));
-        }
-
+        // Set up the exit listener
+        setUpExitListener();
+    
+        myFrame.add(myMainPanel, BorderLayout.NORTH);
         myFrame.setVisible(true);
     }
-
-    private JPanel imageButtons() {
-        // Create a panel for the image buttons
-        JPanel imagePanel = new JPanel();
-        imagePanel.setLayout(new BoxLayout(imagePanel, BoxLayout.Y_AXIS));
-
-        // Load the images
-        ImageIcon startImgIcon = new ImageIcon("files/startWatching.png");
-        myImgStartButton = new JButton(startImgIcon);
-        myImgStartButton.addActionListener(this);
-        ImageIcon stopImageIcon = new ImageIcon("files/stopWatching.png");
-        myImgStopButton = new JButton(stopImageIcon);
-        myImgStopButton.addActionListener(this);
-
-        // Add the image buttons to the panel
-        imagePanel.add(myImgStartButton);
-        imagePanel.add(myImgStopButton);
-
-        // Add the image panel to the frame
-        return imagePanel;
-
+    
+    private void setUpFileViewer() {
+    
+        // Create a JSplitPane to divide the space between the main panel and the event table
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myMainPanel, myEventTable);
+        splitPane.setResizeWeight(splitPaneResizeWeight);
+        splitPane.setDividerSize(0);
+    
+        // Add the JSplitPane to the frame
+        myFrame.add(splitPane, BorderLayout.CENTER);
     }
-
-    private JPanel dropDownMenus() {
-        myExtensionComboBox = new JComboBox<>(EXTENSION_TYPES);
+    
+    private void setUpButtons() {
+        myExtensionComboBox = myMainPanel.getExtensionBox();
         myExtensionComboBox.setEditable(true);
         myExtensionComboBox.addActionListener(this);
-
-        JLabel extensionLable = new JLabel(
-                "Select a file extension, a directory, and click Watch to begin File System Monitor.");
-        JPanel dropDownPanels = new JPanel();
-        dropDownPanels.setLayout(new BoxLayout(dropDownPanels, BoxLayout.Y_AXIS));
-
-        JLabel directLabel = new JLabel("Directory to monitor:");
-        myDirectoryField = new JTextField();
-        myDirectoryButton = new JButton("Browse Directory");
-        myDirectoryButton.addActionListener(this);
-        myClearDirectoryButton = new JButton("Clear Directory");
+    
+        myDirectoryStartButton = myMainPanel.getStartButton();
+        myDirectoryStartButton.addActionListener(this);
+        myDirectoryStartButton.setEnabled(false); // Disable until directory is chosen
+    
+        myDirectoryStopButton = myMainPanel.getStopButton();
+        myDirectoryStopButton.addActionListener(this);
+    
+        myDirectoryBrowseButton = myMainPanel.getBrowseButton();
+        myDirectoryBrowseButton.addActionListener(this);
+    
+        myClearDirectoryButton = myMainPanel.getClearButton();
         myClearDirectoryButton.addActionListener(this);
-
-        JPanel directoryPanel = new JPanel();
-        directoryPanel.add(myDirectoryButton);
-        directoryPanel.add(myClearDirectoryButton);
-
-        dropDownPanels.add(extensionLable);
-        dropDownPanels.add(myExtensionComboBox);
-        dropDownPanels.add(directLabel);
-        dropDownPanels.add(myDirectoryField);
-        dropDownPanels.add(directoryPanel);
-
-        JPanel containPanel = new JPanel();
-        containPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        containPanel.add(dropDownPanels);
-
-        return containPanel;
+    
+        myWriteDbButton = myMainPanel.getMyWriteDBButton();
+        myWriteDbButton.setEnabled(false); // Disable until database is connected
+        myWriteDbButton.addActionListener(this);
     }
-
+    
     /*
+     * This method will keep track of the time that the user has been monitoring
+     * files.
      * This method will keep track of the time that the user has been monitoring
      * files.
      */
     private void timeKeeper() {
-        // Create a timer to keep track of time (VSCode is extremely helpful.)
         myTimer = new Timer(1000, (ActionEvent e) -> {
             runningTime++;
             timerLabelExtended();
         });
-        // Add action listeners to the start and stop buttons.
         myStartButton.addActionListener(this);
         myStopButton.addActionListener(this);
+        // Create a panel for the time label
+        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        timePanel.add(myTimeLabel);
+        myFrame.add(timePanel, BorderLayout.SOUTH);
     }
-
-    /*
-     * This method will create the menu bar for the GUI.
-     */
-    private void createMenuBar() {
-        // Create the menu bar
-        myMenuBar = new JMenuBar();
-
-        // Create menus
-        JMenu fileMenu = new JMenu("File");
-        JMenu watcherMenu = new JMenu("File System Watcher");
-        JMenu databaseMenu = new JMenu("Database");
-        JMenu aboutMenu = new JMenu("About");
-
-        // Create a label for the time.
-        myTimeLabel = new JLabel("Time not started.");
-
-        // Add menu items for "File"
-        myStartButton = new JMenuItem("Start");
-        myStopButton = new JMenuItem("Stop");
-        JMenuItem queryItem = new JMenuItem("Query Database(file extension)");
-        JMenuItem closeItem = new JMenuItem("Close");
-        myStartButton.setEnabled(true); // Disable startItem by default
-        myStopButton.setEnabled(false); // Disable stopItem by default
-        fileMenu.add(myStartButton);
-        fileMenu.add(myStopButton);
-        fileMenu.add(queryItem);
-        fileMenu.add(closeItem);
-
-        // Add action listener to closeItem
-        closeItem.addActionListener(this);
-
-        // Add menu items to "File System Watcher"
-        JMenuItem startWatcherItem = new JMenuItem("Start Watching");
-        JMenuItem stopWatcherItem = new JMenuItem("Stop Watching");
-        watcherMenu.add(startWatcherItem);
-        watcherMenu.add(stopWatcherItem);
-
-        // Add menu items to "Database"
-        JMenuItem connectDbItem = new JMenuItem("Connect to Database");
-        JMenuItem disconnectDbItem = new JMenuItem("Disconnect Database");
-        databaseMenu.add(connectDbItem);
-        databaseMenu.add(disconnectDbItem);
-
-        connectDbItem.addActionListener(this);
-        disconnectDbItem.addActionListener(this);
-
-        databaseMenu.add(connectDbItem);
-        databaseMenu.add(disconnectDbItem);
-
-        // Add Help menu
-        JMenuItem aboutHelpItem = new JMenuItem("About");
-        // Add action listener to aboutHelpItem.
-        aboutHelpItem.addActionListener(this);
-        aboutMenu.add(aboutHelpItem);
-
-        // Add menus to the menu bar
-        myMenuBar.add(fileMenu);
-        myMenuBar.add(watcherMenu);
-        myMenuBar.add(databaseMenu);
-        myMenuBar.add(aboutMenu);
-
-        // Attach menu bar to the frame
-        myFrame.setJMenuBar(myMenuBar);
-    }
-
-    /*
-     * This method will handle the actions of the user when they click on the menu
-     * items,
-     * different actions will be taken depending on the menu item clicked.
-     */
-    public void actionPerformed(final ActionEvent theEvent) {
-        // DEBUG LINE
-        System.out.println("📢 DEBUG: Button clicked - " + theEvent.getActionCommand());
-        
-        // Handle Start button
-        if (theEvent.getSource().equals(myStartButton) || theEvent.getSource().equals(myImgStartButton)) {
-            System.out.println(" DEBUG: myStartButton OR myImgStartButton was clicked!");
-            runningTime = 0;
-            myTimeLabel.setText("Time not started.");
-            myTimer.start();
-            myStartButton.setEnabled(false);
-            myStopButton.setEnabled(true);
-            startWatching();
-        } 
-        // Handle Stop Watching
-        else if (theEvent.getSource().equals(myStopButton) || theEvent.getSource().equals(myImgStopButton)) {
-            System.out.println(" DEBUG: myStopButton OR myImgStopButton was clicked!");
-            myTimer.stop();
-            myStartButton.setEnabled(true);
-            myStopButton.setEnabled(false);
-        }
-        // Handle closing
-        else if (theEvent.getActionCommand().equals("Close")) {
-            System.exit(0);
-        }
-        // Handle About
-        else if (theEvent.getActionCommand().equals("About")) {
-            JOptionPane.showMessageDialog(myFrame,
-                    "Program Usage: This application watches file system changes.\n" +
-                            "Version: 1.0\n" +
-                            "Developers: Manjinder Ghuman, Ryder Deback, Brendan Tucker",
-                    "About",
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
-        // Handle File Extension Selection
-        else if (theEvent.getSource().equals(myExtensionComboBox) && myExtensionComboBox.getSelectedItem() != "") {
-            JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
-        }
-        // Handle Directory Selection
-        else if (theEvent.getSource().equals(myDirectoryButton)) {
-            JFileChooser direcChooser = new JFileChooser();
-            direcChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            direcChooser.setAcceptAllFileFilterUsed(false);
-
-            int directoryValue = direcChooser.showOpenDialog(null);
-            if (directoryValue == JFileChooser.APPROVE_OPTION) {
-                myDirectoryField.setText(direcChooser.getSelectedFile().getAbsolutePath());
-            }
-        }
-        // Handle Clearing Directory
-        else if (theEvent.getSource().equals(myClearDirectoryButton)) {
-            myDirectoryField.setText("");
-        }
-        // Handle Database Connection
-        else if (theEvent.getActionCommand().equals("Connect to Database")) {
-            if (DatabaseConnection.connect()) {
-                JOptionPane.showMessageDialog(myFrame, "Connected to SQLite database successfully!");
-            } else {
-                JOptionPane.showMessageDialog(myFrame, "Failed to connect to database.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        } else if (theEvent.getActionCommand().equals("Disconnect Database")) {
-            DatabaseConnection.disconnect();
-            JOptionPane.showMessageDialog(myFrame, "Disconnected from SQLite database.");
-        }
-        // Handle Start Watching 
-        else if (theEvent.getActionCommand().equals("Start Watching") || theEvent.getSource().equals(myImgStartButton)) {
-            System.out.println(" DEBUG: Start Watching triggered!");
-
-            String directoryToWatch = myDirectoryField.getText();
-            if (directoryToWatch.isEmpty()) {
-                JOptionPane.showMessageDialog(myFrame, "Please select a directory to monitor!", "Warning", JOptionPane.WARNING_MESSAGE);
-                System.out.println(" No directory selected.");
-                return;
-            }
-
-        System.out.println(" DEBUG: Selected directory: " + directoryToWatch);
-
-        myFileWatcher = new FileWatcher(directoryToWatch);
-        myFileWatcherThread = new Thread(myFileWatcher);
-        myFileWatcherThread.start();
-
-        JOptionPane.showMessageDialog(myFrame, "Started watching directory: " + directoryToWatch);
-    }
-        // Handle Stop Watching Directory
-        else if (theEvent.getActionCommand().equals("Stop Watching")) {
-            if (myFileWatcher != null) {
-                myFileWatcher.stopWatching();
-            }
-            JOptionPane.showMessageDialog(myFrame, "Stopped watching.");
-        }
-    }
-
+    
     /*
      * This method will extend the timer label to show the time in days, hours,
      * minutes, and seconds.
@@ -331,32 +136,285 @@ public class FWGUI implements ActionListener {
         int hours = (runningTime % 86400) / 3600;
         int minutes = (runningTime % 3600) / 60;
         int seconds = runningTime % 60;
-
         String timeFormatted = String.format("Time Running: %02d Days: %02d Hours: %02d Minutes: %02d Seconds", days,
                 hours, minutes, seconds);
         myTimeLabel.setText(timeFormatted);
     }
-
-    /*
-     * This method will start the file watcher.
-     */
-    private void startWatching() {
-        System.out.println(" DEBUG: Start Watching triggered!");
     
-        String directoryToWatch = myDirectoryField.getText();
-        if (directoryToWatch.isEmpty()) {
-            JOptionPane.showMessageDialog(myFrame, "Please select a directory to monitor!", "Warning", JOptionPane.WARNING_MESSAGE);
-            System.out.println("No directory selected.");
-            return;
+    /*
+     * This method will create the menu bar for the GUI.
+     */
+    private void createMenuBar() {
+        myMenuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("File");
+       // JMenu watcherMenu = new JMenu("File System Watcher"); Removed because it is duplicated
+        JMenu databaseMenu = new JMenu("Database");
+        JMenu aboutMenu = new JMenu("About");
+        myTimeLabel = new JLabel("Time not started.");
+        myStartButton = new JMenuItem("Start");
+        myStopButton = new JMenuItem("Stop");
+        JMenuItem queryItem = new JMenuItem("Query Database(file extension)");
+        JMenuItem closeItem = new JMenuItem("Close");
+        myStartButton.setEnabled(false);
+        myStopButton.setEnabled(false);
+        fileMenu.add(myStartButton);
+        fileMenu.add(myStopButton);
+        fileMenu.add(queryItem);
+        fileMenu.add(closeItem);
+        closeItem.addActionListener(this);
+        //JMenuItem startWatcherItem = new JMenuItem("Start Watching");
+        //JMenuItem stopWatcherItem = new JMenuItem("Stop Watching");
+        //watcherMenu.add(startWatcherItem);
+        //watcherMenu.add(stopWatcherItem);
+
+        JMenuItem connectDbItem = new JMenuItem("Connect to Database");
+        JMenuItem disconnectDbItem = new JMenuItem("Disconnect Database");
+        databaseMenu.add(connectDbItem);
+        databaseMenu.add(disconnectDbItem);
+        connectDbItem.addActionListener(this);
+        disconnectDbItem.addActionListener(this);
+
+
+        JMenuItem aboutHelpItem = new JMenuItem("About");
+        aboutHelpItem.addActionListener(this);
+        aboutMenu.add(aboutHelpItem);
+        myMenuBar.add(fileMenu);
+        //myMenuBar.add(watcherMenu);
+        myMenuBar.add(databaseMenu);
+        myMenuBar.add(aboutMenu);
+        myFrame.setJMenuBar(myMenuBar);
+    }
+    
+    /*
+     * This method will handle the actions of the user when they click on the menu
+     * items,
+     * This method will handle the actions of the user when they click on the menu
+     * items,
+     * different actions will be taken depending on the menu item clicked.
+     */
+    public void actionPerformed(final ActionEvent theEvent) {
+        if (theEvent.getSource().equals(myStartButton) || theEvent.getSource().equals(myDirectoryStartButton)) {
+            myIsMonitoring = true; //Must be true for DirectoryWatchService to run
+
+            //Create and start a new DirectoryWatchService for chosen directory
+            try {
+                myDirectoryWatchService = new DirectoryWatchService(myDirectoryField.getText(), this); //Throws if given invalid directory
+                myDirectoryWatchService.start();
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null,  "\"" + myDirectoryField.getText() + "\" is not a valid directory" , "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            } catch (NullPointerException e) {
+                JOptionPane.showMessageDialog(null,  "\"" + myDirectoryField.getText() + "\" is not a valid directory" , "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            runningTime = 0;
+            myTimeLabel.setText("Time not started.");
+            myTimer.start();
+            buttonReverse(false);
+            
+        } else if (theEvent.getSource().equals(myStopButton) || theEvent.getSource().equals(myDirectoryStopButton)) {
+            myTimer.stop();
+            myIsMonitoring = false;
+            buttonReverse(true);
+            myDirectoryWatchService.stop();
+        } else if (theEvent.getActionCommand().equals("Close")) {
+            System.exit(0);
+        }
+        // Handle About button
+        else if (theEvent.getActionCommand().equals("About")) {
+            JOptionPane.showMessageDialog(myFrame,
+                    "Program Usage: This application watches file system changes.\n" +
+                            "Version: 1.0\n" +
+                            "Developers: Manjinder Ghuman, Ryder Deback, Brendan Tucker",
+                    "About",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } else if (theEvent.getSource().equals(myExtensionComboBox)
+                && !myExtensionComboBox.getSelectedItem().equals("")
+                && myExtensionComboBox.getEditor().getEditorComponent().hasFocus()) {
+            checkFields();
+            JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
+        } else if (theEvent.getSource().equals(myDirectoryBrowseButton)) {
+            JFileChooser direcChooser = new JFileChooser();
+            direcChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            direcChooser.setAcceptAllFileFilterUsed(false); // Disabling the ability to select all files.
+    
+            int directoryValue = direcChooser.showOpenDialog(null);
+            if (directoryValue == JFileChooser.APPROVE_OPTION) {
+                myDirectoryField.setText(direcChooser.getSelectedFile().getAbsolutePath());
+            }
+        } else if (theEvent.getSource().equals(myClearDirectoryButton)) {
+            myDirectoryField.setText("");
+            myExtensionComboBox.setSelectedItem("");
+            myDatabaseField.setText("");
+            myTimeLabel.setText("Time Not Started.");
+        } else if (theEvent.getSource().equals(myWriteDbButton)) {
+            storeFilesToDatabase();
+        }
+        else if (theEvent.getActionCommand().equals("Connect to Database")) {
+            boolean success = DatabaseConnection.connect();
+            if (success) {
+                JOptionPane.showMessageDialog(myFrame, "Connected to the database successfully!", "Database Connection", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(myFrame, "Failed to connect to the database.", "Database Connection Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        else if (theEvent.getActionCommand().equals("Disconnect Database")) {
+            DatabaseConnection.disconnect();
+            JOptionPane.showMessageDialog(myFrame, "Disconnected from the database.", "Database Disconnection", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    /* Helper method - Flips state of start and stop buttons */
+    private void buttonReverse(boolean theValue) {
+        myStartButton.setEnabled(theValue);
+        myDirectoryStartButton.setEnabled(theValue);
+        myStopButton.setEnabled(!theValue);
+        myDirectoryStopButton.setEnabled(!theValue);
+    }
+    
+    private void setUpDocumentListeners() {
+        DocumentListener theListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                checkFields();
+            }
+    
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                checkFields();
+            }
+    
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                checkFields();
+            }
+        };
+    
+        myDirectoryField = myMainPanel.getDirectoryField();
+        myDirectoryField.getDocument().addDocumentListener(theListener);
+        myDatabaseField = myMainPanel.getMyDatabaseField();
+        myDatabaseField.getDocument().addDocumentListener(theListener);
+        myExtensionField = (JTextField) myExtensionComboBox.getEditor().getEditorComponent();
+        myExtensionField.getDocument().addDocumentListener(theListener);
+        
+    
+    }
+    /**
+     * Returns true if GUI is monitoring a directory. Used by DirectoryWatchService
+     * to check if it should continue running.
+     * @return true if monitoring, false otherwise
+     */
+    public boolean isMonitoring() {
+        return myIsMonitoring;
+    }
+
+     public FWEventTable getEventTable() {
+        return myEventTable;
+    }
+
+    private void checkFields() {
+        boolean hasDirectory = !myDirectoryField.getText().trim().isEmpty();
+
+        // Enable the start button if the directory is provided.
+        myDirectoryStartButton.setEnabled(hasDirectory);
+        myStartButton.setEnabled(hasDirectory);
+
+        // Stop button remains disabled until Start is clicked
+        myDirectoryStopButton.setEnabled(false);
+        myStopButton.setEnabled(false);
+
+    }
+
+    /**
+     * Sets the database connection status in the GUI.
+     * @param theValue true if connected, false otherwise
+     */
+    public void setDatabaseConnected(boolean theValue) {
+        myWriteDbButton.setEnabled(theValue);
+    }
+
+    public static FWGUI getMyInstance() {
+        return myInstance;
+    }
+
+    public void storeFilesToDatabase() {
+        int rowsInserted = 0;
+        for (FileEvent event : myEventTable.getData()) {
+            FileEventDAO.insertFileEvent(event);
+            rowsInserted++;
+        }
+
+        JOptionPane.showMessageDialog(myFrame, rowsInserted + " events written to the database.", "Database Write", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void setUpExitListener() {
+        myFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        myFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                handleExit();
+            }
+        });
+    }
+
+    private void handleExit() {
+        List<FileEvent> unsavedEvents = myEventTable.getData();
+    
+        // Check if there are unsaved events
+        if (!unsavedEvents.isEmpty()) {
+            int choice = JOptionPane.showConfirmDialog(
+                    myFrame,
+                    "You have unsaved file events. Would you like to save them to the database before exiting?",
+                    "Unsaved Data",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE
+            );
+    
+            if (choice == JOptionPane.CANCEL_OPTION) {
+                return; // Do nothing, let user stay
+            }
+    
+            if (choice == JOptionPane.YES_OPTION) {
+                // Check if the database is connected
+                if (DatabaseConnection.getMyConnection() == null) {
+                    int dbChoice = JOptionPane.showConfirmDialog(
+                            myFrame,
+                            "Database is not connected. Would you like to connect now?",
+                            "Database Not Connected",
+                            JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.WARNING_MESSAGE
+                    );
+    
+                    if (dbChoice == JOptionPane.CANCEL_OPTION) {
+                        return; // Stop exit, let user stay
+                    }
+    
+                    if (dbChoice == JOptionPane.YES_OPTION) {
+                        if (!DatabaseConnection.connect()) {
+                            JOptionPane.showMessageDialog(
+                                    myFrame,
+                                    "Failed to connect to the database. Events will not be saved.",
+                                    "Database Connection Error",
+                                    JOptionPane.ERROR_MESSAGE
+                            );
+                            System.exit(0); // Exit without saving
+                        }
+                    } else {
+                        System.exit(0); // User chose not to connect, exit without saving
+                    }
+                }
+    
+                // If the database is connected, insert the events
+                FileEventDAO.insertFileEvents(unsavedEvents);
+            }
         }
     
-        System.out.println(" DEBUG: Selected directory: " + directoryToWatch);
-    
-        myFileWatcher = new FileWatcher(directoryToWatch);
-        myFileWatcherThread = new Thread(myFileWatcher);
-        myFileWatcherThread.start();
-    
-        JOptionPane.showMessageDialog(myFrame, "Started watching directory: " + directoryToWatch);
+        // Proceed with exit
+        System.exit(0);
     }
+    
+
+    
 
 }

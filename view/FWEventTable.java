@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -13,13 +14,15 @@ public class FWEventTable extends JPanel {
     private DefaultTableModel myTableModel;
     /** ArrayList to hold the data for the JTable. */
     private ArrayList<FileEvent> myData;
+    /** Array of default column widths for the JTable. */
+    private int[] myDefaultColumnWidths = { 100, 250, 50, 25, 100 }; // Default column widths for the table
 
     /**
      * Constructor for the FWEventTable. This will create the table and set up the panel.
      */
     public FWEventTable() {
         super(new BorderLayout()); // Ensure that the panel is using a BorderLayout.
-        String[] myColumnNames = { "File Name", "File Path", "Event Type", "File Extension", "Time" };
+        String[] myColumnNames = { "File Name", "File Path", "Event Type", "Extension", "Time" };
         
         myTableModel = new DefaultTableModel(myColumnNames, 0) {
             @Override
@@ -35,6 +38,10 @@ public class FWEventTable extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(myEventTable);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        
+        for (int i = 0; i < myColumnNames.length; i++) {
+            myEventTable.getColumnModel().getColumn(i).setPreferredWidth(myDefaultColumnWidths[i]);
+        }
 
         this.add(scrollPane, BorderLayout.CENTER);
     }
@@ -56,18 +63,6 @@ public class FWEventTable extends JPanel {
         
         int rowIndex = myTableModel.getRowCount() - 1;
         myTableModel.fireTableRowsInserted(rowIndex, rowIndex);
-        
-        // Ensure database is connected before inserting event
-        if (DatabaseConnection.getMyConnection() == null) {
-            System.out.println("Database is not connected. Attempting to reconnect...");
-            if (!DatabaseConnection.connect()) {
-                System.out.println("Failed to reconnect to the database. Event not stored.");
-                return;
-            }
-        }
-        
-        // Insert event into database
-        FileEventDAO.insertFileEvent(theEvent);
     }
 
     /**

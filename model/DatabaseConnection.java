@@ -16,6 +16,14 @@ public class DatabaseConnection {
             //  Ensure the table exists
             initializeDatabase();
 
+            // Set the GUI to show that the database is connected
+            // Enable "Write to Database" button
+            FWGUI gui = FWGUI.getMyInstance();
+            if (gui != null) {
+                gui.setDatabaseConnected(true);
+            }
+
+
             return true;
         } catch (ClassNotFoundException e) {
             System.out.println("SQLite JDBC Driver not found!");
@@ -54,6 +62,12 @@ public class DatabaseConnection {
             if (myConnection != null && !myConnection.isClosed()) {
                 myConnection.close();
                 System.out.println(" Disconnected from SQLite database.");
+
+                // Set the GUI to show that the database is disconnected
+                FWGUI gui = FWGUI.getMyInstance();
+                if (gui != null) {
+                    gui.setDatabaseConnected(false);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

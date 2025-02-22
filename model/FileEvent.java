@@ -1,8 +1,3 @@
-
-
-import java.time.LocalDateTime;
-
-
 /*
  * This class represents an event that occurs to a file and all necessary associated data. This will be used to track when
  *  and where an event occured to a file, as well as what type of event it was.
@@ -13,9 +8,9 @@ public class FileEvent {
     /** A string representing the name of a file */
     private String myFileName;
     /** An enum representing the type of event that occured to the file */
-    private EventType myEventType;
-    /** A LocalDateTime representing the time that the event occured */
-    private LocalDateTime myEventTime;
+    private String myEventType;
+    /** A String representing the time that the event occured */
+    private String myEventTime;
     /** A string representing the extension of the file */
     private String myExtension;
 
@@ -26,9 +21,9 @@ public class FileEvent {
      * @param filePath The path of the file that the event occured to.
      * @param eventType The type of event that occured to the file.
      * @param extension The extension of the file that the event occured to.
-     * @param eventTime The time that the event occured as a LocalDateTime.
+     * @param eventTime The time that the event occured.
      */
-    public FileEvent(String theFileName, String theFilePath, EventType theEventType, String theExtension, LocalDateTime theEventTime) {
+    public FileEvent(String theFileName, String theFilePath, String theEventType, String theExtension, String theEventTime) {
         myFileName = theFileName;
         myFilePath = theFilePath;
         myEventType = theEventType;
@@ -59,7 +54,7 @@ public class FileEvent {
      * 
      * @return The EventType from EventType enum.
      */
-    public EventType getEventType() {
+    public String getEventType() {
         return myEventType;
     }
 
@@ -68,7 +63,7 @@ public class FileEvent {
      * 
      * @return The LocalDateTime of the event.
      */
-    public LocalDateTime getEventTime() {
+    public String getEventTime() {
         return myEventTime;
     }
     

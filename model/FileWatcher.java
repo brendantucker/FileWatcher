@@ -57,17 +57,10 @@ public class FileWatcher implements Runnable {
                     FileEvent fileEvent = new FileEvent(
                         filePath.getFileName().toString(),
                         filePath.toString(),
-                        eventType,
+                        eventType.toString(),
                         getFileExtension(filePath.toString()),
-                        LocalDateTime.now()
+                        LocalDateTime.now().toString()
                     );
-
-                    // Store event in DB
-                    if (DatabaseConnection.getMyConnection() != null) {
-                        FileEventDAO.insertFileEvent(fileEvent);
-                    } else {
-                        System.out.println("Database not connected. Event not logged.");
-                    }
                 }
                 key.reset();
             }
