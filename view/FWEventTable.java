@@ -39,9 +39,12 @@ public class FWEventTable extends JPanel {
         JScrollPane scrollPane = new JScrollPane(myEventTable);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         
+        // Add preferred (default) widths to columns
         for (int i = 0; i < myColumnNames.length; i++) {
             myEventTable.getColumnModel().getColumn(i).setPreferredWidth(myDefaultColumnWidths[i]);
         }
+        
+        myEventTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 
         this.add(scrollPane, BorderLayout.CENTER);
     }

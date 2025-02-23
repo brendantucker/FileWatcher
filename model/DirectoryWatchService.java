@@ -1,12 +1,15 @@
 import java.io.IOException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -67,9 +70,10 @@ public class DirectoryWatchService {
         // in addition to using the take method of myWatchService to block until an event is available.
         myWatchThread = new Thread(() -> {
             try {
-                myKey = myDirectory.register(myWatchService, StandardWatchEventKinds.ENTRY_CREATE,
-                                                             StandardWatchEventKinds.ENTRY_DELETE, 
-                                                             StandardWatchEventKinds.ENTRY_MODIFY);
+                // myDirectory.register(myWatchService, StandardWatchEventKinds.ENTRY_CREATE,
+                //                                      StandardWatchEventKinds.ENTRY_DELETE, 
+                //                                      StandardWatchEventKinds.ENTRY_MODIFY);
+                registerAllFolders(myDirectory);
             } catch (IOException e) {
                 myRunning = false;            
                 return;
@@ -80,7 +84,27 @@ public class DirectoryWatchService {
                 try {
                     WatchKey key = myWatchService.take(); // Forces the thread to wait until new events occur
                     for (WatchEvent<?> event : key.pollEvents()) {
-                        myEventTable.addEvent(new FileEvent(event.context().toString(), myDirectory.toString() + "\\" + event.context().toString(), eventTypeFormatter(event.kind()), getExtension(event).toString(), createDateString()));
+                        //Resolve method combines base path (key.wathable) with relative path (event.context) to form full path to event
+                        Path eventPath = ((Path) key.watchable()).resolve((Path) event.context());
+                        if (Files.isDirectory(eventPath)) { // Register the new folder if it is a directory
+                            try {
+                                //TODO: Choose implementation for registering new folders: registerAllFolders or register single folder
+                                //registerAllFolders(myDirectory); //OR
+                                eventPath.register(myWatchService, StandardWatchEventKinds.ENTRY_CREATE,
+                                                                   StandardWatchEventKinds.ENTRY_DELETE, 
+                                                                   StandardWatchEventKinds.ENTRY_MODIFY);
+                            } catch (IOException e) {
+                                invalidDirectoryError();
+                            }
+                        } 
+                        if (!Files.isDirectory(eventPath) || event.kind() != StandardWatchEventKinds.ENTRY_MODIFY) {
+                            myEventTable.addEvent(new FileEvent(event.context().toString(),
+                                                    eventPath.toString(),
+                                                    //myDirectory.toString() + "\\" + event.context().toString(),
+                                                    eventTypeFormatter(event.kind()),
+                                                    getExtension(event).toString(),
+                                                    createDateString()));
+                        }
                     }
                     key.reset(); // Reset the key to receive further events /* throws when program stopped while take() method is waiting for new event */
                 } catch (InterruptedException e) { stop(); } 
@@ -96,9 +120,6 @@ public class DirectoryWatchService {
      */
     public void stop() {
         myRunning = false;
-        
-
-        //THROWS A CLOSEDWATCHSERVICEEXCEPTION ^^^^^^
 
         try { //Close the watch service and key if they are not null
             if (myKey != null) { myKey.cancel(); }
@@ -115,19 +136,39 @@ public class DirectoryWatchService {
     public void invalidDirectoryError() {
         JOptionPane.showMessageDialog(null,  "\"" + myDirectory.toString() + "\" is not a valid directory" , "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
     }
+
+    private void registerAllFolders(Path theStartPath) throws IOException {
+        Files.walkFileTree(theStartPath, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path theDir, BasicFileAttributes theAttrs) throws IOException {
+                theDir.register(myWatchService, StandardWatchEventKinds.ENTRY_CREATE,
+                                                StandardWatchEventKinds.ENTRY_DELETE,
+                                                StandardWatchEventKinds.ENTRY_MODIFY);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
     
     /**
-     * Gets the file extension from the event; includes the dot.
+     * Gets the file extension from the event; includes the dot. Returns "None" if no extension.
      * @param theEvent
      * @return
      */
-    private Path getExtension(WatchEvent<?> theEvent) {
+    private String getExtension(WatchEvent<?> theEvent) {
+        System.out.println(theEvent.context());
+        System.out.println((Path)theEvent.context());
+        System.out.println(Files.isDirectory((Path) theEvent.context()));
+
+        if (Files.isDirectory(myDirectory.resolve((Path) theEvent.context()))) {
+            return "folder";
+        }
+
         String fileName = theEvent.context().toString();
         int lastIndexOfDot = fileName.lastIndexOf('.');
         if (lastIndexOfDot == -1) {
-            return null; // No extension found or folder
+                return "none"; // No extension found or folder
         }
-        return Path.of(fileName.substring(lastIndexOfDot));
+        return Path.of(fileName.substring(lastIndexOfDot)).toString();
     }
 
     /**
