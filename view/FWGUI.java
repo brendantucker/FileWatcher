@@ -24,26 +24,43 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 public class FWGUI implements ActionListener {
+    // Frame to hold all of the GUI portions.
     private JFrame myFrame;
+    // Menu bar for the GUI.
     private JMenuBar myMenuBar;
+    // Timer variable to keep track of the time the user has been monitoring files.
     private int runningTime = 0;
+    // Timer to keep track of the time the user has been monitoring files.
     private Timer myTimer;
+    // Label to display the time the user has been monitoring files.
     private JLabel myTimeLabel;
+    // Menu item to start monitoring files.
     private JMenuItem myMenuStart;
+    // Menu item to stop monitoring files.
     private JMenuItem myMenuStop;
+    // The weight of the split pane.
     private double splitPaneResizeWeight = 0.2;
+    // Table that houses all the logged events.
     private FWEventTable myEventTable;
+    // The types of extensions for users to monitor.
     private JComboBox<String> myExtensionComboBox;
+    // Text fields for the directory, database, and extensions.
     private JTextField myDirectoryField, myDatabaseField, myExtensionField;
+    // Buttons for the GUI.
     private JButton myDirectoryStartButton, myDirectoryStopButton, myWriteDbButton, myDirectoryBrowseButton,
             myClearDirectoryButton;
+    // Buttons for the image icons.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
+    // The main panel for the GUI.
     private FWPanel myMainPanel;
+    // Boolean value for if the service is being watched and recorded.
     private boolean myIsMonitoring;
+    // The directory watch service to monitor the directory and files.
     private DirectoryWatchService myDirectoryWatchService;
+    // Boolean value for if the database is active.
     private boolean myDatabaseActive;
 
-    /*
+    /**
      * Constructor for the GUI. This will create the GUI and set up the menu bar.
      */
     public FWGUI() {
@@ -54,7 +71,7 @@ public class FWGUI implements ActionListener {
         myMainPanel = new FWPanel();
         myEventTable = new FWEventTable();
         myIsMonitoring = false;
-
+        // Methods to help break up the constructor and make it easier to read.
         setUpButtons();
         createMenuBar();
         timeKeeper();
@@ -65,9 +82,13 @@ public class FWGUI implements ActionListener {
         myFrame.setVisible(true);
     }
 
+    /**
+     * Sets up the buttons for the GUI and attaches action listeners to them.
+     */
     private void setUpButtons() {
         myExtensionComboBox = myMainPanel.getExtensionBox();
         myExtensionComboBox.setEditable(true);
+        // Needed a way to listen to the extension combo box to watch for changes.
         myExtensionComboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -81,6 +102,7 @@ public class FWGUI implements ActionListener {
         });
         myExtensionComboBox.addActionListener(this);
 
+        // Was a lot of repeated code for this part so created a method to clean it up.
         myDirectoryStartButton = addButtonActionListener(myMainPanel.getStartButton());
         myDirectoryStopButton = addButtonActionListener(myMainPanel.getStopButton());
         myDirectoryBrowseButton = addButtonActionListener(myMainPanel.getBrowseButton());
@@ -92,13 +114,18 @@ public class FWGUI implements ActionListener {
         myImgClearButton = addButtonActionListener(myMainPanel.getMyImgClearButton());
     }
 
+    /**
+     * Helper method for the setUpButtons method. This will add an action listener
+     * to the button passed in and return the button.
+     */
     private JButton addButtonActionListener(JButton theButton) {
         theButton.addActionListener(this);
         return theButton;
     }
 
-    /*
-     * This method will create the menu bar for the GUI.
+    /**
+     * This method will create the menu bar for the GUI. Cleaned up original version
+     * to make it more readable.
      */
     private void createMenuBar() {
         myMenuBar = new JMenuBar();
@@ -110,6 +137,9 @@ public class FWGUI implements ActionListener {
         myFrame.setJMenuBar(myMenuBar);
     }
 
+    /**
+     * Creates the first drop down menu choice for the GUI.
+     */
     private void createFileMenu() {
         JMenu fileMenu = new JMenu("File");
         myTimeLabel = new JLabel("Time not started.");
@@ -127,6 +157,9 @@ public class FWGUI implements ActionListener {
         myMenuBar.add(fileMenu);
     }
 
+    /**
+     * Creates the second drop down menu choice for the GUI.
+     */
     private void createWatcherMenu() {
         JMenu watcherMenu = new JMenu("File System Watcher");
         JMenuItem startWatcherItem = new JMenuItem("Start Watching");
@@ -136,6 +169,9 @@ public class FWGUI implements ActionListener {
         myMenuBar.add(watcherMenu);
     }
 
+    /**
+     * Creates the third drop down menu choice for the GUI.
+     */
     private void createDatabaseMenu() {
         JMenu databaseMenu = new JMenu("Database");
         JMenuItem connectDbItem = new JMenuItem("Connect to Database");
@@ -145,6 +181,9 @@ public class FWGUI implements ActionListener {
         myMenuBar.add(databaseMenu);
     }
 
+    /**
+     * Creates the fourth drop down menu choice for the GUI.
+     */
     private void createAboutMenu() {
         JMenu aboutMenu = new JMenu("About");
         JMenuItem aboutHelpItem = new JMenuItem("About");
@@ -153,6 +192,10 @@ public class FWGUI implements ActionListener {
         myMenuBar.add(aboutMenu);
     }
 
+    /**
+     * Creates the image buttons for the GUI and pushes them all the way to the end
+     * of the menu bar.
+     */
     private void createImgButtons() {
         myMenuBar.add(Box.createHorizontalGlue());
         myMenuBar.add(myImgStartButton);
@@ -161,7 +204,7 @@ public class FWGUI implements ActionListener {
         myMenuBar.add(myImgClearButton);
     }
 
-    /*
+    /**
      * This method will keep track of the time that the user has been monitoring
      * files.
      */
@@ -178,7 +221,7 @@ public class FWGUI implements ActionListener {
         myFrame.add(timePanel, BorderLayout.SOUTH);
     }
 
-    /*
+    /**
      * This method will extend the timer label to show the time in days, hours,
      * minutes, and seconds.
      */
@@ -192,6 +235,9 @@ public class FWGUI implements ActionListener {
         myTimeLabel.setText(timeFormatted);
     }
 
+    /**
+     * Adds document listeners for the directory, database, and extension fields.
+     */
     private void setUpDocumentListeners() {
         DocumentListener theListener = new DocumentListener() {
             @Override
@@ -218,6 +264,9 @@ public class FWGUI implements ActionListener {
         myExtensionField.getDocument().addDocumentListener(theListener);
     }
 
+    /**
+     * This method will set up the file viewer for the GUI.
+     */
     private void setUpFileViewer() {
 
         // Create a JSplitPane to divide the space between the main panel and the event
@@ -230,7 +279,7 @@ public class FWGUI implements ActionListener {
         myFrame.add(splitPane, BorderLayout.CENTER);
     }
 
-    /*
+    /**
      * This method will handle the actions of the user when they click on the menu
      * items, different actions will be taken depending on the menu item clicked.
      */
@@ -261,6 +310,10 @@ public class FWGUI implements ActionListener {
         }
     }
 
+    /**
+     * Method for if the user has hit the start button and all the correct fields
+     * are filled.
+     */
     private void startMonitoring() {
         myIsMonitoring = true;
         try {
@@ -277,6 +330,9 @@ public class FWGUI implements ActionListener {
         buttonReverse(false);
     }
 
+    /**
+     * Method for if the user has hit the stop button.
+     */
     private void stopMonitoring() {
         myTimer.stop();
         myIsMonitoring = false;
@@ -284,6 +340,9 @@ public class FWGUI implements ActionListener {
         myDirectoryWatchService.stop();
     }
 
+    /**
+     * Method to show the about dialog box.
+     */
     private void showAboutDialog() {
         JOptionPane.showMessageDialog(myFrame,
                 "Program Usage: This application watches file system changes.\n" +
@@ -293,6 +352,10 @@ public class FWGUI implements ActionListener {
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Method to browse the directory and set the text field to the directory
+     * chosen.
+     */
     private void browseDirectory() {
         JFileChooser direcChooser = new JFileChooser();
         direcChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -304,6 +367,9 @@ public class FWGUI implements ActionListener {
         }
     }
 
+    /**
+     * Method to clear all the fields in the GUI and reset the buttons.
+     */
     private void clearFields() {
         myDirectoryField.setText("");
         myExtensionComboBox.setSelectedItem("Enter an extension");
@@ -319,6 +385,9 @@ public class FWGUI implements ActionListener {
         myDatabaseActive = false;
     }
 
+    /**
+     * Method to connect to the database, used for button press.
+     */
     private void connectDatabase() {
         myDatabaseActive = DatabaseConnection.connect();
         checkFields();
@@ -344,10 +413,17 @@ public class FWGUI implements ActionListener {
         return myIsMonitoring;
     }
 
+    /**
+     * Returns the event table for the GUI.
+     * @return
+     */
     public FWEventTable getEventTable() {
         return myEventTable;
     }
 
+    /**
+     * Returns a check that the fields are filled out correctly.
+     */
     private void checkFields() {
         // If the user wants to only write to local directory.
         if (!myDirectoryField.getText().equals("")

@@ -2,15 +2,26 @@ import java.awt.*;
 import javax.swing.*;
 
 public class FWPanel extends JPanel {
+    // Combo box for selecting the extension to monitor.
     private JComboBox<String> extensionDropdown;
+    // Text field for the directory to monitor.
     private JTextField directoryField;
+    // Combo box for selecting the extension to query or write to the database.
     private JComboBox<String> queryExtensionDropdown;
+    // Text field for the database to write to.
     private JTextField myDatabaseField;
+    // Buttons for starting, stopping, and browsing for a directory to monitor.
     private JButton myWriteDbButton, myQueryButton, myClearButton, myBrowseButton, myStartButton, myStopButton;
+    // Buttons for the image icons.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
+    // GridBagConstraint for the layout.
     private GridBagConstraints myGBC;
+    // Main panel for the layout.
     private JPanel myMainPanel;
 
+    /**
+     * Constructor for the FWPanel. This will create the panel and set up the layout.
+     */
     public FWPanel() {
         setLayout(new BorderLayout());
 
@@ -28,6 +39,9 @@ public class FWPanel extends JPanel {
         add(myMainPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Creates the buttons for the image icons.
+     */
     private void createButtonBar() {
         ImageIcon startImageIcon = new ImageIcon("files/startWatching.png");
         ImageIcon stopImageIcon = new ImageIcon("files/stopWatching.png");
@@ -44,6 +58,9 @@ public class FWPanel extends JPanel {
         myImgClearButton = new JButton(clearImageIcon);
     }
 
+    /**
+     * Sets up the extension box for the panel.
+     */
     private void setUpExtensionBox() {
         JLabel monitorLabel = new JLabel("Monitor by extension");
         adjustGridBagConstraints(0, 1, 1);
@@ -57,6 +74,9 @@ public class FWPanel extends JPanel {
         myMainPanel.add(extensionDropdown, myGBC);
     }
 
+    /**
+     * Sets up the directory box for the panel.
+     */
     private void setUpDirectoryBox() {
         JLabel directoryLabel = new JLabel("Directory to monitor");
         adjustGridBagConstraints(0, 2, 1);
@@ -68,6 +88,9 @@ public class FWPanel extends JPanel {
         myMainPanel.add(directoryField, myGBC);
     }
 
+    /**
+     * Sets up the directory buttons for the panel.
+     */
     private void setUpDirectoryButtons() {
         myStartButton = createModernButton("Start");
         myStopButton = createModernButton("Stop");
@@ -85,6 +108,9 @@ public class FWPanel extends JPanel {
         myMainPanel.add(myStopButton, myGBC);
     }
 
+    /**
+     * Sets up the database box for the panel.
+     */
     private void setUpDatabaseBox() {
         JLabel queryLabel = new JLabel("Query or Write by extension");
         adjustGridBagConstraints(0, 4, 1);
@@ -117,6 +143,11 @@ public class FWPanel extends JPanel {
         myMainPanel.add(myClearButton, myGBC);
     }
 
+    /**
+     * Creates a "modern design" button with the given text.
+     * @param text The text being passed in that will appear on the button.
+     * @return The button with the given text in the modern design.
+     */
     private JButton createModernButton(String text) {
         JButton button = new JButton(text);
         button.setFocusPainted(false);
@@ -128,65 +159,131 @@ public class FWPanel extends JPanel {
         return button;
     }
 
+    /**
+     * Gets the extension box.
+     * @return The extension box.
+     */
     public JComboBox<String> getExtensionBox() {
         return extensionDropdown;
     }
 
+    /**
+     * Gets the directory box.
+     * @return The directory box.
+     */
     public JTextField getDirectoryField() {
         return directoryField;
     }
 
+    /**
+     * Gets the start button on the panel.
+     * @return The start button on the panel.
+     */
     public JButton getStartButton() {
         return myStartButton;
     }
 
+    /**
+     * Gets the stop button.
+     * @return The stop button.
+     */
     public JButton getStopButton() {
         return myStopButton;
     }
 
+    /**
+     * Gets the directory browse button.
+     * @return The directory browsing button.
+     */
     public JButton getBrowseButton() {
         return myBrowseButton;
     }
 
+    /**
+     * Gets the clear button
+     * @return The clear button.
+     */
     public JButton getClearButton() {
         return myClearButton;
     }
 
+    /**
+     * Gets the button to start the database.
+     * @return The button to start the database.
+     */
     public JButton getMyWriteDBButton() {
         return myWriteDbButton;
     }
 
+    /**
+     * Gets the start button with an image
+     * @return The start button with an image.
+     */
     public JButton getMyImgStarButton() {
         return myImgStartButton;
     }
 
+    /**
+     * Gets the stop button with an image.
+     * @return The stop button with an image.
+     */
     public JButton getMyImgStopButton() {
         return myImgStopButton;
     }
 
+    /**
+     * Gets the button to query the database with an image.
+     * @return The button to query the database with an image.
+     */
     public JButton getMyImgDBButton() {
         return myImgDBButton;
     }
 
+    /**
+     * Gets the clear button with an image.
+     * @return The clear button with an image.
+     */
     public JButton getMyImgClearButton() {
         return myImgClearButton;
     }
 
+    /**
+     * Gets the database textfield.
+     * @return The database textfield.
+     */
     public JTextField getMyDatabaseField() {
         return myDatabaseField;
     }
 
+    /**
+     * Helper constructor to clean up code above, adjusting gridbag with X and Y values.
+     * @param theX The X value to be adjusted for the gridbag.
+     * @param theY The Y value to be adjusted for the gridbag.
+     */
     private void adjustGridBagConstraints(int theX, int theY) {
         myGBC.gridx = theX;
         myGBC.gridy = theY;
     }
 
+    /**
+     * Helper constructor to clean up code above, adjusting gridbag with X, Y, and width values.
+     * @param theX The X value to be adjusted for the gridbag.
+     * @param theY The Y value to be adjusted for the gridbag.
+     * @param theWidth The width value to be adjusted for the gridbag.
+     */
     private void adjustGridBagConstraints(int theX, int theY, int theWidth) {
         myGBC.gridx = theX;
         myGBC.gridy = theY;
         myGBC.gridwidth = theWidth;
     }
 
+    /**
+     * Helper constructor to clean up code above, adjusting gridbag with X, Y, width, and weightx values.
+     * @param theX The X value to be adjusted for the gridbag.
+     * @param theY The Y value to be adjusted for the gridbag.
+     * @param theWidth The width value to be adjusted for the gridbag.
+     * @param theWeightx The weightx value to be adjusted for the gridbag.
+     */
     private void adjustGridBagConstraints(int theX, int theY, int theWidth, double theWeightx) {
         myGBC.gridx = theX;
         myGBC.gridy = theY;
