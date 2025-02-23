@@ -15,15 +15,16 @@ public class FileEvent {
     private String myExtension;
 
     /**
-     * Constructor for a FileEvent. 
+     * Constructor for a FileEvent.
      * 
-     * @param fileName The name of the file that the event occured to. 
-     * @param filePath The path of the file that the event occured to.
+     * @param fileName  The name of the file that the event occured to.
+     * @param filePath  The path of the file that the event occured to.
      * @param eventType The type of event that occured to the file.
      * @param extension The extension of the file that the event occured to.
      * @param eventTime The time that the event occured.
      */
-    public FileEvent(String theFileName, String theFilePath, String theEventType, String theExtension, String theEventTime) {
+    public FileEvent(String theFileName, String theFilePath, String theEventType, String theExtension,
+            String theEventTime) {
         myFileName = theFileName;
         myFilePath = theFilePath;
         myEventType = theEventType;
@@ -66,7 +67,7 @@ public class FileEvent {
     public String getEventTime() {
         return myEventTime;
     }
-    
+
     /**
      * Returns the extension of the file that the event occured to.
      * 

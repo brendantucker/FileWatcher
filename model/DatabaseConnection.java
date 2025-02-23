@@ -13,7 +13,7 @@ public class DatabaseConnection {
             myConnection = DriverManager.getConnection(myURL);
             System.out.println(" Connected to SQLite database!");
 
-            //  Ensure the table exists
+            // Ensure the table exists
             initializeDatabase();
 
             return true;
@@ -26,6 +26,7 @@ public class DatabaseConnection {
         }
         return false;
     }
+
     /**
      * Initializes the database by creating the necessary table if it doesn't exist.
      */
@@ -46,6 +47,7 @@ public class DatabaseConnection {
             e.printStackTrace();
         }
     }
+
     /**
      * Disconnects from the SQLite database.
      */
@@ -60,6 +62,7 @@ public class DatabaseConnection {
             System.out.println(" Error disconnecting from database.");
         }
     }
+
     /**
      * Returns the current database connection.
      *

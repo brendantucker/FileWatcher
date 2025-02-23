@@ -5,7 +5,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 /**
- * This class represents a table that will display the events that have occurred to files.
+ * This class represents a table that will display the events that have occurred
+ * to files.
  */
 public class FWEventTable extends JPanel {
     /** JTable to display the events that have occurred. */
@@ -18,19 +19,20 @@ public class FWEventTable extends JPanel {
     private int[] myDefaultColumnWidths = { 100, 250, 50, 25, 100 }; // Default column widths for the table
 
     /**
-     * Constructor for the FWEventTable. This will create the table and set up the panel.
+     * Constructor for the FWEventTable. This will create the table and set up the
+     * panel.
      */
     public FWEventTable() {
         super(new BorderLayout()); // Ensure that the panel is using a BorderLayout.
         String[] myColumnNames = { "File Name", "File Path", "Event Type", "Extension", "Time" };
-        
+
         myTableModel = new DefaultTableModel(myColumnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-        
+
         myData = new ArrayList<>();
 
         myEventTable = new JTable(myTableModel);
@@ -38,7 +40,7 @@ public class FWEventTable extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(myEventTable);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        
+
         for (int i = 0; i < myColumnNames.length; i++) {
             myEventTable.getColumnModel().getColumn(i).setPreferredWidth(myDefaultColumnWidths[i]);
         }
@@ -60,10 +62,10 @@ public class FWEventTable extends JPanel {
                 theEvent.getExtension(),
                 theEvent.getEventTime()
         });
-        
+
         int rowIndex = myTableModel.getRowCount() - 1;
         myTableModel.fireTableRowsInserted(rowIndex, rowIndex);
-        
+
         // Ensure database is connected before inserting event
         if (DatabaseConnection.getMyConnection() == null) {
             System.out.println("Database is not connected. Attempting to reconnect...");
@@ -72,7 +74,7 @@ public class FWEventTable extends JPanel {
                 return;
             }
         }
-        
+
         // Insert event into database
         FileEventDAO.insertFileEvent(theEvent);
     }
@@ -92,7 +94,8 @@ public class FWEventTable extends JPanel {
     public void updateTable() {
         myTableModel.setRowCount(0);
         for (FileEvent event : myData) {
-            myTableModel.addRow(new Object[] { event.getFileName(), event.getFilePath(), event.getEventType(), event.getExtension(), event.getEventTime() });
+            myTableModel.addRow(new Object[] { event.getFileName(), event.getFilePath(), event.getEventType(),
+                    event.getExtension(), event.getEventTime() });
         }
     }
 

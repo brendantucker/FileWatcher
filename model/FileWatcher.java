@@ -7,8 +7,10 @@ public class FileWatcher implements Runnable {
     private final Path myDirectory;
     /** Flag to control the running state of the watcher */
     private volatile boolean myRunning = true;
+
     /**
      * Constructor for FileWatcher.
+     * 
      * @param theDirectoryPath
      */
     public FileWatcher(String theDirectoryPath) {
@@ -38,11 +40,11 @@ public class FileWatcher implements Runnable {
 
         // Register the directory with the watch service
         try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
-            myDirectory.register(watchService, 
-                StandardWatchEventKinds.ENTRY_CREATE, 
-                StandardWatchEventKinds.ENTRY_DELETE, 
-                StandardWatchEventKinds.ENTRY_MODIFY);
-        
+            myDirectory.register(watchService,
+                    StandardWatchEventKinds.ENTRY_CREATE,
+                    StandardWatchEventKinds.ENTRY_DELETE,
+                    StandardWatchEventKinds.ENTRY_MODIFY);
+
             while (myRunning) {
                 WatchKey key = watchService.take(); // Blocks until event occurs
 
@@ -55,12 +57,11 @@ public class FileWatcher implements Runnable {
                     // Process event
                     EventType eventType = getEventType(kind);
                     FileEvent fileEvent = new FileEvent(
-                        filePath.getFileName().toString(),
-                        filePath.toString(),
-                        eventType.toString(),
-                        getFileExtension(filePath.toString()),
-                        LocalDateTime.now().toString()
-                    );
+                            filePath.getFileName().toString(),
+                            filePath.toString(),
+                            eventType.toString(),
+                            getFileExtension(filePath.toString()),
+                            LocalDateTime.now().toString());
 
                     // Store event in DB
                     if (DatabaseConnection.getMyConnection() != null) {
@@ -78,17 +79,21 @@ public class FileWatcher implements Runnable {
 
     /**
      * Determines the event type based on the kind of event.
+     * 
      * @param kind The kind of event.
      * @return The corresponding EventType.
      */
     private EventType getEventType(WatchEvent.Kind<?> kind) {
-        if (kind == StandardWatchEventKinds.ENTRY_CREATE) return EventType.FILECREATED;
-        if (kind == StandardWatchEventKinds.ENTRY_DELETE) return EventType.FILEDELETED;
+        if (kind == StandardWatchEventKinds.ENTRY_CREATE)
+            return EventType.FILECREATED;
+        if (kind == StandardWatchEventKinds.ENTRY_DELETE)
+            return EventType.FILEDELETED;
         return EventType.FILEMODIFIED;
     }
 
     /**
      * Gets the file extension from the file name.
+     * 
      * @param fileName The name of the file.
      * @return The file extension.
      */
