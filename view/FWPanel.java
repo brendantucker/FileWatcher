@@ -28,35 +28,20 @@ public class FWPanel extends JPanel {
         add(myMainPanel, BorderLayout.CENTER);
     }
 
-    private void createButtonBar(){
-        JPanel theImagesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // Use FlowLayout to prevent overriding layout behavior
-
+    private void createButtonBar() {
         ImageIcon startImageIcon = new ImageIcon("files/startWatching.png");
         ImageIcon stopImageIcon = new ImageIcon("files/stopWatching.png");
         ImageIcon dbImageIcon = new ImageIcon("files/startDB.png");
         ImageIcon clearImageIcon = new ImageIcon("files/clearData.png");
 
+        // Force fixing the scaling as for some reason it was larger than its siblings.
+        startImageIcon = new ImageIcon(startImageIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH));
         myImgStartButton = new JButton(startImageIcon);
         myImgStartButton.setEnabled(false);
-        theImagesPanel.add(myImgStartButton);
-
         myImgStopButton = new JButton(stopImageIcon);
-        theImagesPanel.add(myImgStopButton);
         myImgStopButton.setEnabled(false);
-
         myImgDBButton = new JButton(dbImageIcon);
-        theImagesPanel.add(myImgDBButton);
-
         myImgClearButton = new JButton(clearImageIcon);
-        theImagesPanel.add(myImgClearButton);
-
-    
-        // Adjust placement to ensure it does not interfere with other components
-        adjustGridBagConstraints(0, 0, GridBagConstraints.REMAINDER);
-        myGBC.anchor = GridBagConstraints.WEST;
-        myGBC.weightx = 1.0;
-        
-        myMainPanel.add(theImagesPanel, myGBC);
     }
 
     private void setUpExtensionBox() {
@@ -65,7 +50,8 @@ public class FWPanel extends JPanel {
         myMainPanel.add(monitorLabel, myGBC);
 
         extensionDropdown = new JComboBox<>(
-                new String[] { "Enter an extension", "All extensions", "DOCX", "PDF", "TXT", "PNG", "JPG", "JPEG", "GIF", "MP3", "MP4", "WAV",
+                new String[] { "Enter an extension", "All extensions", "DOCX", "PDF", "TXT", "PNG", "JPG", "JPEG",
+                        "GIF", "MP3", "MP4", "WAV",
                         "AVI", "MOV", "CSV" });
         adjustGridBagConstraints(1, 1, GridBagConstraints.REMAINDER);
         myMainPanel.add(extensionDropdown, myGBC);
@@ -169,20 +155,20 @@ public class FWPanel extends JPanel {
     public JButton getMyWriteDBButton() {
         return myWriteDbButton;
     }
-    
+
     public JButton getMyImgStarButton() {
         return myImgStartButton;
     }
 
-    public JButton getMyImgStopButton(){
+    public JButton getMyImgStopButton() {
         return myImgStopButton;
     }
 
-    public JButton getMyImgDBButton(){
+    public JButton getMyImgDBButton() {
         return myImgDBButton;
     }
 
-    public JButton getMyImgClearButton(){
+    public JButton getMyImgClearButton() {
         return myImgClearButton;
     }
 

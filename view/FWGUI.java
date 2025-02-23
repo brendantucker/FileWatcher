@@ -6,6 +6,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -54,26 +55,14 @@ public class FWGUI implements ActionListener {
         myEventTable = new FWEventTable();
         myIsMonitoring = false;
 
+        setUpButtons();
         createMenuBar();
         timeKeeper();
-        setUpButtons();
         setUpDocumentListeners();
         setUpFileViewer();
 
         myFrame.add(myMainPanel, BorderLayout.NORTH);
         myFrame.setVisible(true);
-    }
-
-    private void setUpFileViewer() {
-
-        // Create a JSplitPane to divide the space between the main panel and the event
-        // table
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myMainPanel, myEventTable);
-        splitPane.setResizeWeight(splitPaneResizeWeight);
-        splitPane.setDividerSize(0);
-
-        // Add the JSplitPane to the frame
-        myFrame.add(splitPane, BorderLayout.CENTER);
     }
 
     private void setUpButtons() {
@@ -92,63 +81,20 @@ public class FWGUI implements ActionListener {
         });
         myExtensionComboBox.addActionListener(this);
 
-        myDirectoryStartButton = myMainPanel.getStartButton();
-        myDirectoryStartButton.addActionListener(this);
-
-        myDirectoryStopButton = myMainPanel.getStopButton();
-        myDirectoryStopButton.addActionListener(this);
-
-        myDirectoryBrowseButton = myMainPanel.getBrowseButton();
-        myDirectoryBrowseButton.addActionListener(this);
-
-        myClearDirectoryButton = myMainPanel.getClearButton();
-        myClearDirectoryButton.addActionListener(this);
-
-        myWriteDbButton = myMainPanel.getMyWriteDBButton();
-        myWriteDbButton.addActionListener(this);
-
-        myImgStartButton = myMainPanel.getMyImgStarButton();
-        myImgStartButton.addActionListener(this);
-
-        myImgStopButton = myMainPanel.getMyImgStopButton();
-        myImgStopButton.addActionListener(this);
-
-        myImgDBButton = myMainPanel.getMyImgDBButton();
-        myImgDBButton.addActionListener(this);
-
-        myImgClearButton = myMainPanel.getMyImgClearButton();
-        myImgClearButton.addActionListener(this);
+        myDirectoryStartButton = addButtonActionListener(myMainPanel.getStartButton());
+        myDirectoryStopButton = addButtonActionListener(myMainPanel.getStopButton());
+        myDirectoryBrowseButton = addButtonActionListener(myMainPanel.getBrowseButton());
+        myClearDirectoryButton = addButtonActionListener(myMainPanel.getClearButton());
+        myWriteDbButton = addButtonActionListener(myMainPanel.getMyWriteDBButton());
+        myImgStartButton = addButtonActionListener(myMainPanel.getMyImgStarButton());
+        myImgStopButton = addButtonActionListener(myMainPanel.getMyImgStopButton());
+        myImgDBButton = addButtonActionListener(myMainPanel.getMyImgDBButton());
+        myImgClearButton = addButtonActionListener(myMainPanel.getMyImgClearButton());
     }
 
-    /*
-     * This method will keep track of the time that the user has been monitoring
-     * files.
-     */
-    private void timeKeeper() {
-        myTimer = new Timer(1000, (ActionEvent e) -> {
-            runningTime++;
-            timerLabelExtended();
-        });
-        myMenuStart.addActionListener(this);
-        myMenuStop.addActionListener(this);
-        // Create a panel for the time label
-        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        timePanel.add(myTimeLabel);
-        myFrame.add(timePanel, BorderLayout.SOUTH);
-    }
-
-    /*
-     * This method will extend the timer label to show the time in days, hours,
-     * minutes, and seconds.
-     */
-    private void timerLabelExtended() {
-        int days = runningTime / 86400;
-        int hours = (runningTime % 86400) / 3600;
-        int minutes = (runningTime % 3600) / 60;
-        int seconds = runningTime % 60;
-        String timeFormatted = String.format("Time Running: %02d Days: %02d Hours: %02d Minutes: %02d Seconds", days,
-                hours, minutes, seconds);
-        myTimeLabel.setText(timeFormatted);
+    private JButton addButtonActionListener(JButton theButton) {
+        theButton.addActionListener(this);
+        return theButton;
     }
 
     /*
@@ -160,6 +106,7 @@ public class FWGUI implements ActionListener {
         createWatcherMenu();
         createDatabaseMenu();
         createAboutMenu();
+        createImgButtons();
         myFrame.setJMenuBar(myMenuBar);
     }
 
@@ -206,6 +153,45 @@ public class FWGUI implements ActionListener {
         myMenuBar.add(aboutMenu);
     }
 
+    private void createImgButtons() {
+        myMenuBar.add(Box.createHorizontalGlue());
+        myMenuBar.add(myImgStartButton);
+        myMenuBar.add(myImgStopButton);
+        myMenuBar.add(myImgDBButton);
+        myMenuBar.add(myImgClearButton);
+    }
+
+    /*
+     * This method will keep track of the time that the user has been monitoring
+     * files.
+     */
+    private void timeKeeper() {
+        myTimer = new Timer(1000, (ActionEvent e) -> {
+            runningTime++;
+            timerLabelExtended();
+        });
+        myMenuStart.addActionListener(this);
+        myMenuStop.addActionListener(this);
+        // Create a panel for the time label
+        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        timePanel.add(myTimeLabel);
+        myFrame.add(timePanel, BorderLayout.SOUTH);
+    }
+
+    /*
+     * This method will extend the timer label to show the time in days, hours,
+     * minutes, and seconds.
+     */
+    private void timerLabelExtended() {
+        int days = runningTime / 86400;
+        int hours = (runningTime % 86400) / 3600;
+        int minutes = (runningTime % 3600) / 60;
+        int seconds = runningTime % 60;
+        String timeFormatted = String.format("Time Running: %02d Days: %02d Hours: %02d Minutes: %02d Seconds", days,
+                hours, minutes, seconds);
+        myTimeLabel.setText(timeFormatted);
+    }
+
     private void setUpDocumentListeners() {
         DocumentListener theListener = new DocumentListener() {
             @Override
@@ -232,83 +218,110 @@ public class FWGUI implements ActionListener {
         myExtensionField.getDocument().addDocumentListener(theListener);
     }
 
+    private void setUpFileViewer() {
+
+        // Create a JSplitPane to divide the space between the main panel and the event
+        // table
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myMainPanel, myEventTable);
+        splitPane.setResizeWeight(splitPaneResizeWeight);
+        splitPane.setDividerSize(0);
+
+        // Add the JSplitPane to the frame
+        myFrame.add(splitPane, BorderLayout.CENTER);
+    }
+
     /*
      * This method will handle the actions of the user when they click on the menu
      * items, different actions will be taken depending on the menu item clicked.
      */
     public void actionPerformed(final ActionEvent theEvent) {
-        if (theEvent.getSource().equals(myMenuStart) || theEvent.getSource().equals(myDirectoryStartButton)
-                || theEvent.getSource().equals(myImgStartButton)) {
-            myIsMonitoring = true; // Must be true for DirectoryWatchService to run
+        Object source = theEvent.getSource();
+        String command = theEvent.getActionCommand();
 
-            // Create and start a new DirectoryWatchService for chosen directory
-            try {
-                // Throws if given invalid directory.
-                myDirectoryWatchService = new DirectoryWatchService(myDirectoryField.getText(), this);
-                myDirectoryWatchService.start();
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "\"" + myDirectoryField.getText() + "\" is not a valid directory",
-                        "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            } catch (NullPointerException e) {
-                JOptionPane.showMessageDialog(null, "\"" + myDirectoryField.getText() + "\" is not a valid directory",
-                        "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            runningTime = 0;
-            myTimeLabel.setText("Time not started.");
-            myTimer.start();
-            buttonReverse(false);
-        } else if (theEvent.getSource().equals(myMenuStop) || theEvent.getSource().equals(myDirectoryStopButton)
-                || theEvent.getSource().equals(myImgStopButton)) {
-            myTimer.stop();
-            myIsMonitoring = false;
-            buttonReverse(true);
-            myDirectoryWatchService.stop();
-        } else if (theEvent.getActionCommand().equals("Close")) {
+        if (source.equals(myMenuStart) || source.equals(myDirectoryStartButton) || source.equals(myImgStartButton)) {
+            startMonitoring();
+        } else if (source.equals(myMenuStop) || source.equals(myDirectoryStopButton)
+                || source.equals(myImgStopButton)) {
+            stopMonitoring();
+        } else if (command.equals("Close")) {
             System.exit(0);
-        }
-        // Handle About button
-        else if (theEvent.getActionCommand().equals("About")) {
-            JOptionPane.showMessageDialog(myFrame,
-                    "Program Usage: This application watches file system changes.\n" +
-                            "Version: 1.0\n" +
-                            "Developers: Manjinder Ghuman, Ryder Deback, Brendan Tucker",
-                    "About",
-                    JOptionPane.INFORMATION_MESSAGE);
-        } else if (theEvent.getSource().equals(myExtensionComboBox)
-                && !myExtensionField.getText().equals("")
+        } else if (command.equals("About")) {
+            showAboutDialog();
+        } else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
                 && !myExtensionComboBox.getSelectedItem().equals("Enter an extension")
                 && myExtensionComboBox.getEditor().getEditorComponent().hasFocus()) {
             checkFields();
             JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
-        } else if (theEvent.getSource().equals(myDirectoryBrowseButton)) {
-            JFileChooser direcChooser = new JFileChooser();
-            direcChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            direcChooser.setAcceptAllFileFilterUsed(false); // Disabling the ability to select all files.
-
-            int directoryValue = direcChooser.showOpenDialog(null);
-            if (directoryValue == JFileChooser.APPROVE_OPTION) {
-                myDirectoryField.setText(direcChooser.getSelectedFile().getAbsolutePath());
-            }
-        } else if (theEvent.getSource().equals(myClearDirectoryButton)
-                || theEvent.getSource().equals(myImgClearButton)) {
-            myDirectoryField.setText("");
-            myExtensionComboBox.setSelectedItem("Enter an extension");
-            myDatabaseField.setText("");
-            myTimeLabel.setText("Time Not Started.");
-            myMenuStop.setEnabled(false);
-            myDirectoryStopButton.setEnabled(false);
-            myImgStartButton.setEnabled(false);
-            myImgStopButton.setEnabled(false);
-            myDirectoryStartButton.setEnabled(false);
-            myWriteDbButton.setEnabled(false);
-            DatabaseConnection.disconnect();
-            myDatabaseActive = false;
-        } else if (theEvent.getSource().equals(myWriteDbButton) || theEvent.getSource().equals(myImgDBButton)) {
-            myDatabaseActive = DatabaseConnection.connect();
-            checkFields();
+        } else if (source.equals(myDirectoryBrowseButton)) {
+            browseDirectory();
+        } else if (source.equals(myClearDirectoryButton) || source.equals(myImgClearButton)) {
+            clearFields();
+        } else if (source.equals(myWriteDbButton) || source.equals(myImgDBButton)) {
+            connectDatabase();
         }
+    }
+
+    private void startMonitoring() {
+        myIsMonitoring = true;
+        try {
+            myDirectoryWatchService = new DirectoryWatchService(myDirectoryField.getText(), this);
+            myDirectoryWatchService.start();
+        } catch (IOException | NullPointerException e) {
+            JOptionPane.showMessageDialog(null, "\"" + myDirectoryField.getText() + "\" is not a valid directory",
+                    "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        runningTime = 0;
+        myTimeLabel.setText("Time not started.");
+        myTimer.start();
+        buttonReverse(false);
+    }
+
+    private void stopMonitoring() {
+        myTimer.stop();
+        myIsMonitoring = false;
+        buttonReverse(true);
+        myDirectoryWatchService.stop();
+    }
+
+    private void showAboutDialog() {
+        JOptionPane.showMessageDialog(myFrame,
+                "Program Usage: This application watches file system changes.\n" +
+                        "Version: 1.0\n" +
+                        "Developers: Manjinder Ghuman, Ryder Deback, Brendan Tucker",
+                "About",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void browseDirectory() {
+        JFileChooser direcChooser = new JFileChooser();
+        direcChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        direcChooser.setAcceptAllFileFilterUsed(false);
+
+        int directoryValue = direcChooser.showOpenDialog(null);
+        if (directoryValue == JFileChooser.APPROVE_OPTION) {
+            myDirectoryField.setText(direcChooser.getSelectedFile().getAbsolutePath());
+        }
+    }
+
+    private void clearFields() {
+        myDirectoryField.setText("");
+        myExtensionComboBox.setSelectedItem("Enter an extension");
+        myDatabaseField.setText("");
+        myTimeLabel.setText("Time Not Started.");
+        myMenuStop.setEnabled(false);
+        myDirectoryStopButton.setEnabled(false);
+        myImgStartButton.setEnabled(false);
+        myImgStopButton.setEnabled(false);
+        myDirectoryStartButton.setEnabled(false);
+        myWriteDbButton.setEnabled(false);
+        DatabaseConnection.disconnect();
+        myDatabaseActive = false;
+    }
+
+    private void connectDatabase() {
+        myDatabaseActive = DatabaseConnection.connect();
+        checkFields();
     }
 
     /* Helper method - Flips state of start and stop buttons */
