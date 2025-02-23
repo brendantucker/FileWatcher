@@ -37,11 +37,16 @@ public class FWPanel extends JPanel {
         ImageIcon clearImageIcon = new ImageIcon("files/clearData.png");
 
         myImgStartButton = new JButton(startImageIcon);
+        myImgStartButton.setEnabled(false);
         theImagesPanel.add(myImgStartButton);
+
         myImgStopButton = new JButton(stopImageIcon);
         theImagesPanel.add(myImgStopButton);
+        myImgStopButton.setEnabled(false);
+
         myImgDBButton = new JButton(dbImageIcon);
         theImagesPanel.add(myImgDBButton);
+
         myImgClearButton = new JButton(clearImageIcon);
         theImagesPanel.add(myImgClearButton);
 
@@ -163,6 +168,22 @@ public class FWPanel extends JPanel {
 
     public JButton getMyWriteDBButton() {
         return myWriteDbButton;
+    }
+    
+    public JButton getMyImgStarButton() {
+        return myImgStartButton;
+    }
+
+    public JButton getMyImgStopButton(){
+        return myImgStopButton;
+    }
+
+    public JButton getMyImgDBButton(){
+        return myImgDBButton;
+    }
+
+    public JButton getMyImgClearButton(){
+        return myImgClearButton;
     }
 
     public JTextField getMyDatabaseField() {

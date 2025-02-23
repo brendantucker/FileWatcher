@@ -33,14 +33,10 @@ public class FWGUI implements ActionListener {
     private double splitPaneResizeWeight = 0.2;
     private FWEventTable myEventTable;
     private JComboBox<String> myExtensionComboBox;
-    private JTextField myDirectoryField;
-    private JTextField myDatabaseField;
-    private JTextField myExtensionField;
-    private JButton myClearDirectoryButton;
-    private JButton myDirectoryBrowseButton;
-    private JButton myDirectoryStartButton;
-    private JButton myDirectoryStopButton;
-    private JButton myWriteDbButton;
+    private JTextField myDirectoryField, myDatabaseField, myExtensionField;
+    private JButton myDirectoryStartButton, myDirectoryStopButton, myWriteDbButton, myDirectoryBrowseButton,
+            myClearDirectoryButton;
+    private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     private FWPanel myMainPanel;
     private boolean myIsMonitoring;
     private DirectoryWatchService myDirectoryWatchService;
@@ -110,6 +106,18 @@ public class FWGUI implements ActionListener {
 
         myWriteDbButton = myMainPanel.getMyWriteDBButton();
         myWriteDbButton.addActionListener(this);
+
+        myImgStartButton = myMainPanel.getMyImgStarButton();
+        myImgStartButton.addActionListener(this);
+
+        myImgStopButton = myMainPanel.getMyImgStopButton();
+        myImgStopButton.addActionListener(this);
+
+        myImgDBButton = myMainPanel.getMyImgDBButton();
+        myImgDBButton.addActionListener(this);
+
+        myImgClearButton = myMainPanel.getMyImgClearButton();
+        myImgClearButton.addActionListener(this);
     }
 
     /*
@@ -182,7 +190,6 @@ public class FWGUI implements ActionListener {
         myFrame.setJMenuBar(myMenuBar);
     }
 
-    
     private void setUpDocumentListeners() {
         DocumentListener theListener = new DocumentListener() {
             @Override
@@ -214,7 +221,8 @@ public class FWGUI implements ActionListener {
      * items, different actions will be taken depending on the menu item clicked.
      */
     public void actionPerformed(final ActionEvent theEvent) {
-        if (theEvent.getSource().equals(myMenuStart) || theEvent.getSource().equals(myDirectoryStartButton)) {
+        if (theEvent.getSource().equals(myMenuStart) || theEvent.getSource().equals(myDirectoryStartButton)
+                || theEvent.getSource().equals(myImgStartButton)) {
             myIsMonitoring = true; // Must be true for DirectoryWatchService to run
 
             // Create and start a new DirectoryWatchService for chosen directory
@@ -235,7 +243,8 @@ public class FWGUI implements ActionListener {
             myTimeLabel.setText("Time not started.");
             myTimer.start();
             buttonReverse(false);
-        } else if (theEvent.getSource().equals(myMenuStop) || theEvent.getSource().equals(myDirectoryStopButton)) {
+        } else if (theEvent.getSource().equals(myMenuStop) || theEvent.getSource().equals(myDirectoryStopButton)
+                || theEvent.getSource().equals(myImgStopButton)) {
             myTimer.stop();
             myIsMonitoring = false;
             buttonReverse(true);
@@ -266,16 +275,21 @@ public class FWGUI implements ActionListener {
             if (directoryValue == JFileChooser.APPROVE_OPTION) {
                 myDirectoryField.setText(direcChooser.getSelectedFile().getAbsolutePath());
             }
-        } else if (theEvent.getSource().equals(myClearDirectoryButton)) {
+        } else if (theEvent.getSource().equals(myClearDirectoryButton)
+                || theEvent.getSource().equals(myImgClearButton)) {
             myDirectoryField.setText("");
             myExtensionComboBox.setSelectedItem("Enter an extension");
             myDatabaseField.setText("");
             myTimeLabel.setText("Time Not Started.");
             myMenuStop.setEnabled(false);
             myDirectoryStopButton.setEnabled(false);
+            myImgStartButton.setEnabled(false);
+            myImgStopButton.setEnabled(false);
+            myDirectoryStartButton.setEnabled(false);
+            myWriteDbButton.setEnabled(false);
             DatabaseConnection.disconnect();
             myDatabaseActive = false;
-        } else if (theEvent.getSource().equals(myWriteDbButton)) {
+        } else if (theEvent.getSource().equals(myWriteDbButton) || theEvent.getSource().equals(myImgDBButton)) {
             myDatabaseActive = DatabaseConnection.connect();
             checkFields();
         }
@@ -285,8 +299,10 @@ public class FWGUI implements ActionListener {
     private void buttonReverse(boolean theValue) {
         myMenuStart.setEnabled(theValue);
         myDirectoryStartButton.setEnabled(theValue);
+        myImgStartButton.setEnabled(theValue);
         myMenuStop.setEnabled(!theValue);
         myDirectoryStopButton.setEnabled(!theValue);
+        myImgStopButton.setEnabled(!theValue);
     }
 
     /**
@@ -319,6 +335,7 @@ public class FWGUI implements ActionListener {
         } else {
             myDirectoryStartButton.setEnabled(false);
             myMenuStart.setEnabled(false);
+            myImgStartButton.setEnabled(false);
         }
     }
 }
