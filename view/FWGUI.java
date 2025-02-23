@@ -28,8 +28,8 @@ public class FWGUI implements ActionListener {
     private int runningTime = 0;
     private Timer myTimer;
     private JLabel myTimeLabel;
-    private JMenuItem myStartButton;
-    private JMenuItem myStopButton;
+    private JMenuItem myMenuStart;
+    private JMenuItem myMenuStop;
     private double splitPaneResizeWeight = 0.2;
     private FWEventTable myEventTable;
     private JComboBox<String> myExtensionComboBox;
@@ -121,8 +121,8 @@ public class FWGUI implements ActionListener {
             runningTime++;
             timerLabelExtended();
         });
-        myStartButton.addActionListener(this);
-        myStopButton.addActionListener(this);
+        myMenuStart.addActionListener(this);
+        myMenuStop.addActionListener(this);
         // Create a panel for the time label
         JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         timePanel.add(myTimeLabel);
@@ -153,14 +153,14 @@ public class FWGUI implements ActionListener {
         JMenu databaseMenu = new JMenu("Database");
         JMenu aboutMenu = new JMenu("About");
         myTimeLabel = new JLabel("Time not started.");
-        myStartButton = new JMenuItem("Start");
-        myStopButton = new JMenuItem("Stop");
+        myMenuStart = new JMenuItem("Start");
+        myMenuStop = new JMenuItem("Stop");
         JMenuItem queryItem = new JMenuItem("Query Database(file extension)");
         JMenuItem closeItem = new JMenuItem("Close");
-        myStartButton.setEnabled(true);
-        myStopButton.setEnabled(false);
-        fileMenu.add(myStartButton);
-        fileMenu.add(myStopButton);
+        myMenuStart.setEnabled(false);
+        myMenuStop.setEnabled(false);
+        fileMenu.add(myMenuStart);
+        fileMenu.add(myMenuStop);
         fileMenu.add(queryItem);
         fileMenu.add(closeItem);
         closeItem.addActionListener(this);
@@ -182,6 +182,7 @@ public class FWGUI implements ActionListener {
         myFrame.setJMenuBar(myMenuBar);
     }
 
+    
     private void setUpDocumentListeners() {
         DocumentListener theListener = new DocumentListener() {
             @Override
@@ -213,7 +214,7 @@ public class FWGUI implements ActionListener {
      * items, different actions will be taken depending on the menu item clicked.
      */
     public void actionPerformed(final ActionEvent theEvent) {
-        if (theEvent.getSource().equals(myStartButton) || theEvent.getSource().equals(myDirectoryStartButton)) {
+        if (theEvent.getSource().equals(myMenuStart) || theEvent.getSource().equals(myDirectoryStartButton)) {
             myIsMonitoring = true; // Must be true for DirectoryWatchService to run
 
             // Create and start a new DirectoryWatchService for chosen directory
@@ -234,7 +235,7 @@ public class FWGUI implements ActionListener {
             myTimeLabel.setText("Time not started.");
             myTimer.start();
             buttonReverse(false);
-        } else if (theEvent.getSource().equals(myStopButton) || theEvent.getSource().equals(myDirectoryStopButton)) {
+        } else if (theEvent.getSource().equals(myMenuStop) || theEvent.getSource().equals(myDirectoryStopButton)) {
             myTimer.stop();
             myIsMonitoring = false;
             buttonReverse(true);
@@ -270,7 +271,7 @@ public class FWGUI implements ActionListener {
             myExtensionComboBox.setSelectedItem("Enter an extension");
             myDatabaseField.setText("");
             myTimeLabel.setText("Time Not Started.");
-            myStopButton.setEnabled(false);
+            myMenuStop.setEnabled(false);
             myDirectoryStopButton.setEnabled(false);
             DatabaseConnection.disconnect();
             myDatabaseActive = false;
@@ -282,9 +283,9 @@ public class FWGUI implements ActionListener {
 
     /* Helper method - Flips state of start and stop buttons */
     private void buttonReverse(boolean theValue) {
-        myStartButton.setEnabled(theValue);
+        myMenuStart.setEnabled(theValue);
         myDirectoryStartButton.setEnabled(theValue);
-        myStopButton.setEnabled(!theValue);
+        myMenuStop.setEnabled(!theValue);
         myDirectoryStopButton.setEnabled(!theValue);
     }
 
@@ -317,6 +318,7 @@ public class FWGUI implements ActionListener {
             }
         } else {
             myDirectoryStartButton.setEnabled(false);
+            myMenuStart.setEnabled(false);
         }
     }
 }
