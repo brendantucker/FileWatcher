@@ -156,10 +156,15 @@ public class FWGUI implements ActionListener {
      */
     private void createMenuBar() {
         myMenuBar = new JMenuBar();
+        createFileMenu();
+        createWatcherMenu();
+        createDatabaseMenu();
+        createAboutMenu();
+        myFrame.setJMenuBar(myMenuBar);
+    }
+
+    private void createFileMenu() {
         JMenu fileMenu = new JMenu("File");
-        JMenu watcherMenu = new JMenu("File System Watcher");
-        JMenu databaseMenu = new JMenu("Database");
-        JMenu aboutMenu = new JMenu("About");
         myTimeLabel = new JLabel("Time not started.");
         myMenuStart = new JMenuItem("Start");
         myMenuStop = new JMenuItem("Stop");
@@ -172,22 +177,33 @@ public class FWGUI implements ActionListener {
         fileMenu.add(queryItem);
         fileMenu.add(closeItem);
         closeItem.addActionListener(this);
+        myMenuBar.add(fileMenu);
+    }
+
+    private void createWatcherMenu() {
+        JMenu watcherMenu = new JMenu("File System Watcher");
         JMenuItem startWatcherItem = new JMenuItem("Start Watching");
         JMenuItem stopWatcherItem = new JMenuItem("Stop Watching");
         watcherMenu.add(startWatcherItem);
         watcherMenu.add(stopWatcherItem);
+        myMenuBar.add(watcherMenu);
+    }
+
+    private void createDatabaseMenu() {
+        JMenu databaseMenu = new JMenu("Database");
         JMenuItem connectDbItem = new JMenuItem("Connect to Database");
         JMenuItem disconnectDbItem = new JMenuItem("Disconnect Database");
         databaseMenu.add(connectDbItem);
         databaseMenu.add(disconnectDbItem);
+        myMenuBar.add(databaseMenu);
+    }
+
+    private void createAboutMenu() {
+        JMenu aboutMenu = new JMenu("About");
         JMenuItem aboutHelpItem = new JMenuItem("About");
         aboutHelpItem.addActionListener(this);
         aboutMenu.add(aboutHelpItem);
-        myMenuBar.add(fileMenu);
-        myMenuBar.add(watcherMenu);
-        myMenuBar.add(databaseMenu);
         myMenuBar.add(aboutMenu);
-        myFrame.setJMenuBar(myMenuBar);
     }
 
     private void setUpDocumentListeners() {
