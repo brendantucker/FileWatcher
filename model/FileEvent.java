@@ -11,6 +11,9 @@ public class FileEvent {
     private String myEventType;
     /** A String representing the time that the event occured */
     private String myEventTime;
+    private String myEventType;
+    /** A String representing the time that the event occured */
+    private String myEventTime;
     /** A string representing the extension of the file */
     private String myExtension;
 
@@ -21,6 +24,7 @@ public class FileEvent {
      * @param filePath  The path of the file that the event occured to.
      * @param eventType The type of event that occured to the file.
      * @param extension The extension of the file that the event occured to.
+     * @param eventTime The time that the event occured.
      * @param eventTime The time that the event occured.
      */
     public FileEvent(String theFileName, String theFilePath, String theEventType, String theExtension,

@@ -6,7 +6,10 @@ import java.sql.Statement;
 public class DatabaseConnection {
     private static final String myURL = "jdbc:sqlite:filewatcher.db";
     private static Connection myConnection = null;
-
+    /**
+     * Connects to the SQLite database.
+     * @return
+     */
     public static boolean connect() {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -15,6 +18,14 @@ public class DatabaseConnection {
 
             // Ensure the table exists
             initializeDatabase();
+
+            // Set the GUI to show that the database is connected
+            // Enable "Write to Database" button
+            FWGUI gui = FWGUI.getMyInstance();
+            if (gui != null) {
+                gui.setDatabaseConnected(true);
+            }
+
 
             return true;
         } catch (ClassNotFoundException e) {
@@ -56,6 +67,12 @@ public class DatabaseConnection {
             if (myConnection != null && !myConnection.isClosed()) {
                 myConnection.close();
                 System.out.println(" Disconnected from SQLite database.");
+
+                // Set the GUI to show that the database is disconnected
+                FWGUI gui = FWGUI.getMyInstance();
+                if (gui != null) {
+                    gui.setDatabaseConnected(false);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

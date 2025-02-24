@@ -7,6 +7,9 @@ import java.awt.event.ItemListener;
 import java.io.IOException;
 
 import javax.swing.Box;
+import java.io.IOException;
+import java.util.List;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -22,7 +25,15 @@ import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
+/**
+ * This class is the main GUI for the FileWatcher application. It creates the
+ * main frame and sets up the menu bar, buttons, and event table.
+ */
 public class FWGUI implements ActionListener {
     // Frame to hold all of the GUI portions.
     private JFrame myFrame;
@@ -34,6 +45,11 @@ public class FWGUI implements ActionListener {
     private Timer myTimer;
     // Label to display the time the user has been monitoring files.
     private JLabel myTimeLabel;
+    private JLabel myDbStatusLabel;
+    private JMenuItem myStartButton;
+    private JMenuItem myStopButton;
+    private double splitPaneResizeWeight = 0.2;
+    private FWEventTable myEventTable;
     // Menu item to start monitoring files.
     private JMenuItem myMenuStart;
     // Menu item to stop monitoring files.
@@ -63,6 +79,22 @@ public class FWGUI implements ActionListener {
     /**
      * Constructor for the GUI. This will create the GUI and set up the menu bar.
      */
+    private JTextField myDirectoryField;
+    private JTextField myDatabaseField;
+    private JTextField myExtensionField;
+    private JButton myClearDirectoryButton;
+    private JButton myDirectoryBrowseButton;
+    private JButton myDirectoryStartButton;
+    private JButton myDirectoryStopButton;
+    private JButton myWriteDbButton;
+    private FWPanel myMainPanel;
+    private boolean myIsMonitoring;
+    private DirectoryWatchService myDirectoryWatchService;
+    private static FWGUI myInstance; 
+    
+        /*
+         * Constructor for the GUI. This will create the GUI and set up the menu bar.
+         */
     public FWGUI() {
         myFrame = new FWFrame().frameOutline();
         myFrame.setLayout(new BorderLayout());
@@ -75,16 +107,28 @@ public class FWGUI implements ActionListener {
         setUpButtons();
         createMenuBar();
         timeKeeper();
+        setUpButtons();
         setUpDocumentListeners();
         setUpFileViewer();
 
+        // Set up the exit listener
+        setUpExitListener();
+    
         myFrame.add(myMainPanel, BorderLayout.NORTH);
         myFrame.setVisible(true);
     }
-
-    /**
-     * Sets up the buttons for the GUI and attaches action listeners to them.
-     */
+    
+    private void setUpFileViewer() {
+    
+        // Create a JSplitPane to divide the space between the main panel and the event table
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myMainPanel, myEventTable);
+        splitPane.setResizeWeight(splitPaneResizeWeight);
+        splitPane.setDividerSize(0);
+    
+        // Add the JSplitPane to the frame
+        myFrame.add(splitPane, BorderLayout.CENTER);
+    }
+    
     private void setUpButtons() {
         myExtensionComboBox = myMainPanel.getExtensionBox();
         myExtensionComboBox.setEditable(true);
@@ -142,6 +186,9 @@ public class FWGUI implements ActionListener {
      */
     private void createFileMenu() {
         JMenu fileMenu = new JMenu("File");
+       // JMenu watcherMenu = new JMenu("File System Watcher"); Removed because it is duplicated
+        JMenu databaseMenu = new JMenu("Database");
+        JMenu aboutMenu = new JMenu("About");
         myTimeLabel = new JLabel("Time not started.");
         myMenuStart = new JMenuItem("Start");
         myMenuStop = new JMenuItem("Stop");
@@ -174,10 +221,19 @@ public class FWGUI implements ActionListener {
      */
     private void createDatabaseMenu() {
         JMenu databaseMenu = new JMenu("Database");
+        //JMenuItem startWatcherItem = new JMenuItem("Start Watching");
+        //JMenuItem stopWatcherItem = new JMenuItem("Stop Watching");
+        //watcherMenu.add(startWatcherItem);
+        //watcherMenu.add(stopWatcherItem);
+
         JMenuItem connectDbItem = new JMenuItem("Connect to Database");
         JMenuItem disconnectDbItem = new JMenuItem("Disconnect Database");
         databaseMenu.add(connectDbItem);
         databaseMenu.add(disconnectDbItem);
+        connectDbItem.addActionListener(this);
+        disconnectDbItem.addActionListener(this);
+
+
         myMenuBar.add(databaseMenu);
     }
 
@@ -189,6 +245,9 @@ public class FWGUI implements ActionListener {
         JMenuItem aboutHelpItem = new JMenuItem("About");
         aboutHelpItem.addActionListener(this);
         aboutMenu.add(aboutHelpItem);
+        myMenuBar.add(fileMenu);
+        //myMenuBar.add(watcherMenu);
+        myMenuBar.add(databaseMenu);
         myMenuBar.add(aboutMenu);
     }
 

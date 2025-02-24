@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -15,6 +16,8 @@ public class FWEventTable extends JPanel {
     private DefaultTableModel myTableModel;
     /** ArrayList to hold the data for the JTable. */
     private ArrayList<FileEvent> myData;
+    /** Array of default column widths for the JTable. */
+    private int[] myDefaultColumnWidths = { 100, 250, 50, 25, 100 }; // Default column widths for the table
     /** Array of default column widths for the JTable. */
     private int[] myDefaultColumnWidths = { 100, 250, 50, 25, 100 }; // Default column widths for the table
 

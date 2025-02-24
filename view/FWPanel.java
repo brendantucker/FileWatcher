@@ -1,5 +1,7 @@
 import java.awt.*;
 import javax.swing.*;
+import java.awt.*;
+import javax.swing.*;
 
 public class FWPanel extends JPanel {
     // Combo box for selecting the extension to monitor.
