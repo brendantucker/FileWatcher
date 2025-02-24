@@ -5,11 +5,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
-
 import javax.swing.Box;
-import java.io.IOException;
 import java.util.List;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -23,8 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.Timer;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.event.WindowAdapter;
@@ -88,7 +83,6 @@ public class FWGUI implements ActionListener {
         setUpButtons();
         createMenuBar();
         timeKeeper();
-        setUpButtons();
         setUpDocumentListeners();
         setUpFileViewer();
 
@@ -213,6 +207,7 @@ public class FWGUI implements ActionListener {
         aboutMenu.add(aboutHelpItem);
         myMenuBar.add(aboutMenu);
     }
+
     /**
      * Creates the image buttons for the GUI and pushes them all the way to the end
      * of the menu bar.
@@ -500,6 +495,7 @@ public class FWGUI implements ActionListener {
 
     /**
      * Sets the database connection status in the GUI.
+     * 
      * @param theValue true if connected, false otherwise
      */
     public void setDatabaseConnected(boolean theValue) {
@@ -508,6 +504,7 @@ public class FWGUI implements ActionListener {
 
     /**
      * Returns the event table for the GUI.
+     * 
      * @return The event table for the GUI
      */
     public FWEventTable getEventTable() {
@@ -516,6 +513,7 @@ public class FWGUI implements ActionListener {
 
     /**
      * Returns the instance of the GUI.
+     * 
      * @return The instance of the GUI
      */
     public static FWGUI getMyInstance() {
