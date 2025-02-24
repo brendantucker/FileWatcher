@@ -45,11 +45,6 @@ public class FWGUI implements ActionListener {
     private Timer myTimer;
     // Label to display the time the user has been monitoring files.
     private JLabel myTimeLabel;
-    private JLabel myDbStatusLabel;
-    private JMenuItem myStartButton;
-    private JMenuItem myStopButton;
-    private double splitPaneResizeWeight = 0.2;
-    private FWEventTable myEventTable;
     // Menu item to start monitoring files.
     private JMenuItem myMenuStart;
     // Menu item to stop monitoring files.
@@ -76,25 +71,11 @@ public class FWGUI implements ActionListener {
     // Boolean value for if the database is active.
     private boolean myDatabaseActive;
 
-    /**
+    private static FWGUI myInstance;
+
+    /*
      * Constructor for the GUI. This will create the GUI and set up the menu bar.
      */
-    private JTextField myDirectoryField;
-    private JTextField myDatabaseField;
-    private JTextField myExtensionField;
-    private JButton myClearDirectoryButton;
-    private JButton myDirectoryBrowseButton;
-    private JButton myDirectoryStartButton;
-    private JButton myDirectoryStopButton;
-    private JButton myWriteDbButton;
-    private FWPanel myMainPanel;
-    private boolean myIsMonitoring;
-    private DirectoryWatchService myDirectoryWatchService;
-    private static FWGUI myInstance; 
-    
-        /*
-         * Constructor for the GUI. This will create the GUI and set up the menu bar.
-         */
     public FWGUI() {
         myFrame = new FWFrame().frameOutline();
         myFrame.setLayout(new BorderLayout());
@@ -113,22 +94,11 @@ public class FWGUI implements ActionListener {
 
         // Set up the exit listener
         setUpExitListener();
-    
+
         myFrame.add(myMainPanel, BorderLayout.NORTH);
         myFrame.setVisible(true);
     }
-    
-    private void setUpFileViewer() {
-    
-        // Create a JSplitPane to divide the space between the main panel and the event table
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myMainPanel, myEventTable);
-        splitPane.setResizeWeight(splitPaneResizeWeight);
-        splitPane.setDividerSize(0);
-    
-        // Add the JSplitPane to the frame
-        myFrame.add(splitPane, BorderLayout.CENTER);
-    }
-    
+
     private void setUpButtons() {
         myExtensionComboBox = myMainPanel.getExtensionBox();
         myExtensionComboBox.setEditable(true);
@@ -186,9 +156,6 @@ public class FWGUI implements ActionListener {
      */
     private void createFileMenu() {
         JMenu fileMenu = new JMenu("File");
-       // JMenu watcherMenu = new JMenu("File System Watcher"); Removed because it is duplicated
-        JMenu databaseMenu = new JMenu("Database");
-        JMenu aboutMenu = new JMenu("About");
         myTimeLabel = new JLabel("Time not started.");
         myMenuStart = new JMenuItem("Start");
         myMenuStop = new JMenuItem("Stop");
@@ -221,10 +188,10 @@ public class FWGUI implements ActionListener {
      */
     private void createDatabaseMenu() {
         JMenu databaseMenu = new JMenu("Database");
-        //JMenuItem startWatcherItem = new JMenuItem("Start Watching");
-        //JMenuItem stopWatcherItem = new JMenuItem("Stop Watching");
-        //watcherMenu.add(startWatcherItem);
-        //watcherMenu.add(stopWatcherItem);
+        // JMenuItem startWatcherItem = new JMenuItem("Start Watching");
+        // JMenuItem stopWatcherItem = new JMenuItem("Stop Watching");
+        // watcherMenu.add(startWatcherItem);
+        // watcherMenu.add(stopWatcherItem);
 
         JMenuItem connectDbItem = new JMenuItem("Connect to Database");
         JMenuItem disconnectDbItem = new JMenuItem("Disconnect Database");
@@ -232,7 +199,6 @@ public class FWGUI implements ActionListener {
         databaseMenu.add(disconnectDbItem);
         connectDbItem.addActionListener(this);
         disconnectDbItem.addActionListener(this);
-
 
         myMenuBar.add(databaseMenu);
     }
@@ -245,12 +211,8 @@ public class FWGUI implements ActionListener {
         JMenuItem aboutHelpItem = new JMenuItem("About");
         aboutHelpItem.addActionListener(this);
         aboutMenu.add(aboutHelpItem);
-        myMenuBar.add(fileMenu);
-        //myMenuBar.add(watcherMenu);
-        myMenuBar.add(databaseMenu);
         myMenuBar.add(aboutMenu);
     }
-
     /**
      * Creates the image buttons for the GUI and pushes them all the way to the end
      * of the menu bar.
@@ -336,6 +298,70 @@ public class FWGUI implements ActionListener {
 
         // Add the JSplitPane to the frame
         myFrame.add(splitPane, BorderLayout.CENTER);
+    }
+
+    /**
+     * Sets up the exit listener for the GUI.
+     */
+    private void setUpExitListener() {
+        myFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        myFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                handleExit();
+            }
+        });
+    }
+
+    /**
+     * Handles the exit of the application.
+     */
+    private void handleExit() {
+        List<FileEvent> unsavedEvents = myEventTable.getData();
+
+        // Check if there are unsaved events
+        if (!unsavedEvents.isEmpty()) {
+            int choice = JOptionPane.showConfirmDialog(
+                    myFrame,
+                    "You have unsaved file events. Would you like to save them to the database before exiting?",
+                    "Unsaved Data",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+            if (choice == JOptionPane.CANCEL_OPTION) {
+                return; // Do nothing, let user stay
+            }
+            if (choice == JOptionPane.YES_OPTION) {
+                // Check if the database is connected
+                if (DatabaseConnection.getMyConnection() == null) {
+                    int dbChoice = JOptionPane.showConfirmDialog(
+                            myFrame,
+                            "Database is not connected. Would you like to connect now?",
+                            "Database Not Connected",
+                            JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.WARNING_MESSAGE);
+                    if (dbChoice == JOptionPane.CANCEL_OPTION) {
+                        return; // Stop exit, let user stay
+                    }
+                    // Connect to the database
+                    if (dbChoice == JOptionPane.YES_OPTION) {
+                        if (!DatabaseConnection.connect()) {
+                            JOptionPane.showMessageDialog(
+                                    myFrame,
+                                    "Failed to connect to the database. Events will not be saved.",
+                                    "Database Connection Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                            System.exit(0); // Exit without saving
+                        }
+                    } else {
+                        System.exit(0); // User chose not to connect, exit without saving
+                    }
+                }
+                // If the database is connected, insert the events
+                FileEventDAO.insertFileEvents(unsavedEvents);
+            }
+        }
+        // Proceed with exit
+        System.exit(0);
     }
 
     /**
@@ -473,11 +499,27 @@ public class FWGUI implements ActionListener {
     }
 
     /**
+     * Sets the database connection status in the GUI.
+     * @param theValue true if connected, false otherwise
+     */
+    public void setDatabaseConnected(boolean theValue) {
+        myWriteDbButton.setEnabled(theValue);
+    }
+
+    /**
      * Returns the event table for the GUI.
-     * @return
+     * @return The event table for the GUI
      */
     public FWEventTable getEventTable() {
         return myEventTable;
+    }
+
+    /**
+     * Returns the instance of the GUI.
+     * @return The instance of the GUI
+     */
+    public static FWGUI getMyInstance() {
+        return myInstance;
     }
 
     /**

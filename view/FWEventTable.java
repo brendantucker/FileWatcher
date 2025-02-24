@@ -18,8 +18,6 @@ public class FWEventTable extends JPanel {
     private ArrayList<FileEvent> myData;
     /** Array of default column widths for the JTable. */
     private int[] myDefaultColumnWidths = { 100, 250, 50, 25, 100 }; // Default column widths for the table
-    /** Array of default column widths for the JTable. */
-    private int[] myDefaultColumnWidths = { 100, 250, 50, 25, 100 }; // Default column widths for the table
 
     /**
      * Constructor for the FWEventTable. This will create the table and set up the
