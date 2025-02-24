@@ -11,6 +11,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.JOptionPane;
+/**
+ * This class is responsible for watching a directory for file events. It uses the WatchService class to monitor the directory
+ * for file creation, deletion, and modification events. When an event occurs, it will add the event to the event table in the GUI.
+ */
 
 public class DirectoryWatchService {
 

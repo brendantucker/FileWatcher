@@ -6,7 +6,10 @@ import java.sql.Statement;
 public class DatabaseConnection {
     private static final String myURL = "jdbc:sqlite:filewatcher.db";
     private static Connection myConnection = null;
-
+    /**
+     * Connects to the SQLite database.
+     * @return
+     */
     public static boolean connect() {
         try {
             Class.forName("org.sqlite.JDBC");

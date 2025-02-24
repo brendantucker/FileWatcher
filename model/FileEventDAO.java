@@ -42,12 +42,15 @@ public class FileEventDAO {
         }
     }
 
-
+    /**
+     * This method inserts a list of file events into the database.
+     * @param events
+     */
     public static void insertFileEvents(List<FileEvent> events) {
     if (events.isEmpty()) {
         return; // No events to insert
     }
-
+    
     Connection conn = DatabaseConnection.getMyConnection();
     if (conn == null) {
         System.out.println("Database is not connected! Events cannot be stored.");
@@ -55,7 +58,8 @@ public class FileEventDAO {
     }
 
     String sql = "INSERT INTO file_events (file_name, file_path, event_type, file_extension, event_time) VALUES (?, ?, ?, ?, ?)";
-
+    
+    // Prepare the SQL statement
     try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
         for (FileEvent event : events) {
             pstmt.setString(1, event.getFileName());

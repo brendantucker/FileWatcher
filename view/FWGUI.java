@@ -23,13 +23,17 @@ import javax.swing.event.DocumentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-
+/**
+ * This class is the main GUI for the FileWatcher application. It creates the
+ * main frame and sets up the menu bar, buttons, and event table.
+ */
 public class FWGUI implements ActionListener {
     private JFrame myFrame;
     private JMenuBar myMenuBar;
     private int runningTime = 0;
     private Timer myTimer;
     private JLabel myTimeLabel;
+    private JLabel myDbStatusLabel;
     private JMenuItem myStartButton;
     private JMenuItem myStopButton;
     private double splitPaneResizeWeight = 0.2;
@@ -121,9 +125,15 @@ public class FWGUI implements ActionListener {
         });
         myStartButton.addActionListener(this);
         myStopButton.addActionListener(this);
+        
         // Create a panel for the time label
         JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         timePanel.add(myTimeLabel);
+    
+        // defaulting to Database Disconnected
+        myDbStatusLabel = new JLabel("Database Disconnected");
+        timePanel.add(myDbStatusLabel);
+    
         myFrame.add(timePanel, BorderLayout.SOUTH);
     }
     
@@ -251,17 +261,33 @@ public class FWGUI implements ActionListener {
         } else if (theEvent.getSource().equals(myWriteDbButton)) {
             storeFilesToDatabase();
         }
+        // Handle database connection
         else if (theEvent.getActionCommand().equals("Connect to Database")) {
             boolean success = DatabaseConnection.connect();
             if (success) {
-                JOptionPane.showMessageDialog(myFrame, "Connected to the database successfully!", "Database Connection", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(myFrame, 
+                    "Connected to the database successfully!", 
+                    "Database Connection", 
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                myDbStatusLabel.setText("Database Connected");
             } else {
-                JOptionPane.showMessageDialog(myFrame, "Failed to connect to the database.", "Database Connection Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(myFrame, 
+                    "Failed to connect to the database.", 
+                    "Database Connection Error", 
+                    JOptionPane.ERROR_MESSAGE
+                );
+                myDbStatusLabel.setText("Database Disconnected");
             }
         }
         else if (theEvent.getActionCommand().equals("Disconnect Database")) {
             DatabaseConnection.disconnect();
-            JOptionPane.showMessageDialog(myFrame, "Disconnected from the database.", "Database Disconnection", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(myFrame, 
+                "Disconnected from the database.", 
+                "Database Disconnection", 
+                JOptionPane.INFORMATION_MESSAGE
+            );
+            myDbStatusLabel.setText("Database Disconnected");
         }
     }
     
@@ -309,10 +335,16 @@ public class FWGUI implements ActionListener {
         return myIsMonitoring;
     }
 
-     public FWEventTable getEventTable() {
+    /**
+     * Returns the event table for the GUI.
+     * @return
+     */
+    public FWEventTable getEventTable() {
         return myEventTable;
     }
-
+    /**
+     * Checks the fields in the GUI to enable/disable buttons.
+     */
     private void checkFields() {
         boolean hasDirectory = !myDirectoryField.getText().trim().isEmpty();
 
@@ -333,11 +365,16 @@ public class FWGUI implements ActionListener {
     public void setDatabaseConnected(boolean theValue) {
         myWriteDbButton.setEnabled(theValue);
     }
-
+    /**
+     * Returns the instance of the GUI.
+     * @return
+     */
     public static FWGUI getMyInstance() {
         return myInstance;
     }
-
+    /**
+     * Stores the files in the event table to the database.
+     */
     public void storeFilesToDatabase() {
         int rowsInserted = 0;
         for (FileEvent event : myEventTable.getData()) {
@@ -347,7 +384,10 @@ public class FWGUI implements ActionListener {
 
         JOptionPane.showMessageDialog(myFrame, rowsInserted + " events written to the database.", "Database Write", JOptionPane.INFORMATION_MESSAGE);
     }
-
+    
+    /**
+     * Sets up the exit listener for the GUI.
+     */
     private void setUpExitListener() {
         myFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         myFrame.addWindowListener(new WindowAdapter() {
@@ -357,7 +397,9 @@ public class FWGUI implements ActionListener {
             }
         });
     }
-
+    /**
+     * Handles the exit of the application.
+     */
     private void handleExit() {
         List<FileEvent> unsavedEvents = myEventTable.getData();
     
@@ -389,7 +431,8 @@ public class FWGUI implements ActionListener {
                     if (dbChoice == JOptionPane.CANCEL_OPTION) {
                         return; // Stop exit, let user stay
                     }
-    
+                    
+                    // Connect to the database
                     if (dbChoice == JOptionPane.YES_OPTION) {
                         if (!DatabaseConnection.connect()) {
                             JOptionPane.showMessageDialog(
