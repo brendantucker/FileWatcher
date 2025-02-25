@@ -54,7 +54,7 @@ public class FWGUI implements ActionListener {
     private JTextField myDirectoryField, myDatabaseField, myExtensionField;
     // Buttons for the GUI.
     private JButton myDirectoryStartButton, myDirectoryStopButton, myWriteDbButton, myDirectoryBrowseButton,
-            myClearDirectoryButton;
+            myResetDirectoryButton;
     // Buttons for the image icons.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // The main panel for the GUI.
@@ -114,7 +114,7 @@ public class FWGUI implements ActionListener {
         myDirectoryStartButton = addButtonActionListener(myMainPanel.getStartButton());
         myDirectoryStopButton = addButtonActionListener(myMainPanel.getStopButton());
         myDirectoryBrowseButton = addButtonActionListener(myMainPanel.getBrowseButton());
-        myClearDirectoryButton = addButtonActionListener(myMainPanel.getClearButton());
+        myResetDirectoryButton = addButtonActionListener(myMainPanel.getResetButton());
         myWriteDbButton = addButtonActionListener(myMainPanel.getMyWriteDBButton());
         myImgStartButton = addButtonActionListener(myMainPanel.getMyImgStarButton());
         myImgStopButton = addButtonActionListener(myMainPanel.getMyImgStopButton());
@@ -383,7 +383,7 @@ public class FWGUI implements ActionListener {
             JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
         } else if (source.equals(myDirectoryBrowseButton)) {
             browseDirectory();
-        } else if (source.equals(myClearDirectoryButton) || source.equals(myImgClearButton)) {
+        } else if (source.equals(myResetDirectoryButton) || source.equals(myImgClearButton)) {
             clearFields();
         } else if (source.equals(myWriteDbButton) || source.equals(myImgDBButton)) {
             connectDatabase();
@@ -456,13 +456,16 @@ public class FWGUI implements ActionListener {
         myDatabaseField.setText("");
         myTimeLabel.setText("Time Not Started.");
         myMenuStop.setEnabled(false);
+        myMenuStart.setEnabled(true);
         myDirectoryStopButton.setEnabled(false);
-        myImgStartButton.setEnabled(false);
+        myImgStartButton.setEnabled(true);
         myImgStopButton.setEnabled(false);
-        myDirectoryStartButton.setEnabled(false);
+        myDirectoryStartButton.setEnabled(true);
         myWriteDbButton.setEnabled(false);
         DatabaseConnection.disconnect();
         myDatabaseActive = false;
+        myDirectoryWatchService.stop();
+        myEventTable.clearTable();
     }
 
     /**

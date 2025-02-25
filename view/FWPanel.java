@@ -11,7 +11,7 @@ public class FWPanel extends JPanel {
     // Text field for the database to write to.
     private JTextField myDatabaseField;
     // Buttons for starting, stopping, and browsing for a directory to monitor.
-    private JButton myWriteDbButton, myQueryButton, myClearButton, myBrowseButton, myStartButton, myStopButton;
+    private JButton myWriteDbButton, myQueryButton, myResetButton, myBrowseButton, myStartButton, myStopButton;
     // Buttons for the image icons.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // GridBagConstraint for the layout.
@@ -63,14 +63,14 @@ public class FWPanel extends JPanel {
      */
     private void setUpExtensionBox() {
         JLabel monitorLabel = new JLabel("Monitor by extension");
-        adjustGridBagConstraints(0, 1, 1);
+        adjustGridBagConstraints(0, 1, GridBagConstraints.RELATIVE, 0.0);
         myMainPanel.add(monitorLabel, myGBC);
 
         extensionDropdown = new JComboBox<>(
                 new String[] { "Enter an extension", "All extensions", "DOCX", "PDF", "TXT", "PNG", "JPG", "JPEG",
                         "GIF", "MP3", "MP4", "WAV",
                         "AVI", "MOV", "CSV" });
-        adjustGridBagConstraints(1, 1, GridBagConstraints.REMAINDER);
+        adjustGridBagConstraints(1, 1, GridBagConstraints.REMAINDER, 1.0);
         myMainPanel.add(extensionDropdown, myGBC);
     }
 
@@ -79,7 +79,7 @@ public class FWPanel extends JPanel {
      */
     private void setUpDirectoryBox() {
         JLabel directoryLabel = new JLabel("Directory to monitor");
-        adjustGridBagConstraints(0, 2, 1);
+        adjustGridBagConstraints(0, 2, GridBagConstraints.RELATIVE, 0.0);
         myMainPanel.add(directoryLabel, myGBC);
 
         directoryField = new JTextField(0); // Increase the size of the text field
@@ -97,15 +97,20 @@ public class FWPanel extends JPanel {
         myBrowseButton = createModernButton("Browse");
         // Disabling both buttons for until the user has a directory and extension to
         // monitor.
+
+        // Create a panel to hold the browse, start, and stop buttons so they are equal size.
+        JPanel buttonSet1 = new JPanel(new GridLayout(1, 3, 5, 0));
+        buttonSet1.add(myBrowseButton);
+        buttonSet1.add(myStartButton);
+        buttonSet1.add(myStopButton);
+
         myStopButton.setEnabled(false);
         myStartButton.setEnabled(false);
-        adjustGridBagConstraints(0, 3, 1, 1 / 3.0);
+        
+        //Make JPanel take up remainder of row space and fill horizontally
         myGBC.fill = GridBagConstraints.HORIZONTAL;
-        myMainPanel.add(myBrowseButton, myGBC);
-        adjustGridBagConstraints(1, 3, GridBagConstraints.RELATIVE, 1 / 3.0);
-        myMainPanel.add(myStartButton, myGBC);
-        adjustGridBagConstraints(3, 3, GridBagConstraints.REMAINDER, 1 / 3.0);
-        myMainPanel.add(myStopButton, myGBC);
+        adjustGridBagConstraints(0, 3, GridBagConstraints.REMAINDER, 1 );
+        myMainPanel.add(buttonSet1, myGBC);
     }
 
     /**
@@ -113,15 +118,15 @@ public class FWPanel extends JPanel {
      */
     private void setUpDatabaseBox() {
         JLabel queryLabel = new JLabel("Query or Write by extension");
-        adjustGridBagConstraints(0, 4, 1);
+        adjustGridBagConstraints(0, 4, GridBagConstraints.RELATIVE, 0.0);
         myMainPanel.add(queryLabel, myGBC);
 
         queryExtensionDropdown = new JComboBox<>(new String[] { "txt", "log", "csv" });
-        adjustGridBagConstraints(1, 4, GridBagConstraints.REMAINDER);
+        adjustGridBagConstraints(1, 4, GridBagConstraints.REMAINDER, 1.0);
         myMainPanel.add(queryExtensionDropdown, myGBC);
 
         JLabel databaseLabel = new JLabel("Database");
-        adjustGridBagConstraints(0, 5, 1);
+        adjustGridBagConstraints(0, 5, GridBagConstraints.RELATIVE, 0.0);
         myMainPanel.add(databaseLabel, myGBC);
 
         myDatabaseField = new JTextField(30); // Increase the size of the text field
@@ -131,16 +136,20 @@ public class FWPanel extends JPanel {
 
         myWriteDbButton = createModernButton("Write to database");
         myQueryButton = createModernButton("Query");
-        myClearButton = createModernButton("Clear");
-        adjustGridBagConstraints(0, 6, 2, .5);
+        myResetButton = createModernButton("Reset");
+        adjustGridBagConstraints(0, 6, 1, 1);
         myGBC.fill = GridBagConstraints.HORIZONTAL; // Reset fill
-        myMainPanel.add(myWriteDbButton, myGBC);
-        adjustGridBagConstraints(2, 6);
-        myMainPanel.add(myQueryButton, myGBC);
-        adjustGridBagConstraints(0, 7);
+
+        // Create a panel to hold the write to database and query buttons so they are equal size.
+        JPanel buttonSet2 = new JPanel(new GridLayout(1, 2, 5, 0));
+        buttonSet2.add(myWriteDbButton);
+        buttonSet2.add(myQueryButton);
         myGBC.fill = GridBagConstraints.HORIZONTAL;
-        myGBC.gridwidth = GridBagConstraints.REMAINDER;
-        myMainPanel.add(myClearButton, myGBC);
+        myGBC.gridwidth = GridBagConstraints.REMAINDER; // Make the buttons take up entire row
+        myMainPanel.add(buttonSet2, myGBC);
+
+        adjustGridBagConstraints(0, 7);
+        myMainPanel.add(myResetButton, myGBC);
     }
 
     /**
@@ -200,11 +209,11 @@ public class FWPanel extends JPanel {
     }
 
     /**
-     * Gets the clear button
-     * @return The clear button.
+     * Gets the reset button
+     * @return The reset button.
      */
-    public JButton getClearButton() {
-        return myClearButton;
+    public JButton getResetButton() {
+        return myResetButton;
     }
 
     /**
@@ -269,7 +278,7 @@ public class FWPanel extends JPanel {
      * Helper constructor to clean up code above, adjusting gridbag with X, Y, and width values.
      * @param theX The X value to be adjusted for the gridbag.
      * @param theY The Y value to be adjusted for the gridbag.
-     * @param theWidth The width value to be adjusted for the gridbag.
+     * @param theWidth The width value to be adjusted for the gridbag. MUST USE GridBagConstraints ENUM.
      */
     private void adjustGridBagConstraints(int theX, int theY, int theWidth) {
         myGBC.gridx = theX;
@@ -281,7 +290,7 @@ public class FWPanel extends JPanel {
      * Helper constructor to clean up code above, adjusting gridbag with X, Y, width, and weightx values.
      * @param theX The X value to be adjusted for the gridbag.
      * @param theY The Y value to be adjusted for the gridbag.
-     * @param theWidth The width value to be adjusted for the gridbag.
+     * @param theWidth The width value to be adjusted for the gridbag. MUST USE GridBagConstraints ENUM.
      * @param theWeightx The weightx value to be adjusted for the gridbag.
      */
     private void adjustGridBagConstraints(int theX, int theY, int theWidth, double theWeightx) {
