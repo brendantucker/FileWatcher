@@ -448,24 +448,31 @@ public class FWGUI implements ActionListener {
     }
 
     /**
+     * Method to reset the timer and set the label to "Time Not Started."
+     */
+    private void resetTimer() {
+        if (myTimer != null) {
+            myTimer.stop();
+        }
+        runningTime = 0;
+        myTimeLabel.setText("Time Not Started.");
+    }
+
+    /**
      * Method to clear all the fields in the GUI and reset the buttons.
      */
     private void clearFields() {
         myDirectoryField.setText("");
         myExtensionComboBox.setSelectedItem("Enter an extension");
         myDatabaseField.setText("");
-        myTimeLabel.setText("Time Not Started.");
-        myMenuStop.setEnabled(false);
-        myMenuStart.setEnabled(true);
-        myDirectoryStopButton.setEnabled(false);
-        myImgStartButton.setEnabled(true);
-        myImgStopButton.setEnabled(false);
-        myDirectoryStartButton.setEnabled(true);
-        myWriteDbButton.setEnabled(false);
+        resetTimer();
         DatabaseConnection.disconnect();
         myDatabaseActive = false;
-        myDirectoryWatchService.stop();
+        if (myDirectoryWatchService != null)
+            myDirectoryWatchService.stop();
+        myIsMonitoring = false;
         myEventTable.clearTable();
+        checkFields();
     }
 
     /**
@@ -527,6 +534,12 @@ public class FWGUI implements ActionListener {
      * Returns a check that the fields are filled out correctly.
      */
     private void checkFields() {
+        // Prevent the pressing of the stop buttons if DirectoryWatchService isnt monitoring
+        if (!myIsMonitoring) {
+            myMenuStop.setEnabled(false);
+            myDirectoryStopButton.setEnabled(false);
+            myImgStopButton.setEnabled(false);
+        }
         // If the user wants to only write to local directory.
         if (!myDirectoryField.getText().equals("")
                 && !myExtensionField.getText().equals("Enter an extension")
