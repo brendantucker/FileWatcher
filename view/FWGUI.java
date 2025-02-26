@@ -96,7 +96,6 @@ public class FWGUI implements ActionListener {
     private void setUpButtons() {
         myExtensionComboBox = myMainPanel.getExtensionBox();
         myExtensionComboBox.setEditable(true);
-        // Needed a way to listen to the extension combo box to watch for changes.
         myExtensionComboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -109,18 +108,21 @@ public class FWGUI implements ActionListener {
             }
         });
         myExtensionComboBox.addActionListener(this);
-
-        // Was a lot of repeated code for this part so created a method to clean it up.
+    
         myDirectoryStartButton = addButtonActionListener(myMainPanel.getStartButton());
         myDirectoryStopButton = addButtonActionListener(myMainPanel.getStopButton());
         myDirectoryBrowseButton = addButtonActionListener(myMainPanel.getBrowseButton());
         myResetDirectoryButton = addButtonActionListener(myMainPanel.getResetButton());
+    
         myWriteDbButton = addButtonActionListener(myMainPanel.getMyWriteDBButton());
+        myWriteDbButton.setEnabled(false); // 🔹 Ensure "Write to Database" starts disabled
+    
         myImgStartButton = addButtonActionListener(myMainPanel.getMyImgStarButton());
         myImgStopButton = addButtonActionListener(myMainPanel.getMyImgStopButton());
         myImgDBButton = addButtonActionListener(myMainPanel.getMyImgDBButton());
         myImgClearButton = addButtonActionListener(myMainPanel.getMyImgClearButton());
     }
+    
 
     /**
      * Helper method for the setUpButtons method. This will add an action listener
@@ -308,87 +310,163 @@ public class FWGUI implements ActionListener {
         });
     }
 
-    /**
-     * Handles the exit of the application.
-     */
     private void handleExit() {
         List<FileEvent> unsavedEvents = myEventTable.getData();
-
-        // Check if there are unsaved events
+    
         if (!unsavedEvents.isEmpty()) {
             int choice = JOptionPane.showConfirmDialog(
                     myFrame,
                     "You have unsaved file events. Would you like to save them to the database before exiting?",
                     "Unsaved Data",
                     JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.WARNING_MESSAGE
+            );
+    
             if (choice == JOptionPane.CANCEL_OPTION) {
-                return; // Do nothing, let user stay
+                return; // Stop exit, let user stay
             }
+    
             if (choice == JOptionPane.YES_OPTION) {
-                // Check if the database is connected
                 if (DatabaseConnection.getMyConnection() == null) {
                     int dbChoice = JOptionPane.showConfirmDialog(
                             myFrame,
                             "Database is not connected. Would you like to connect now?",
                             "Database Not Connected",
                             JOptionPane.YES_NO_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.WARNING_MESSAGE
+                    );
+    
                     if (dbChoice == JOptionPane.CANCEL_OPTION) {
-                        return; // Stop exit, let user stay
+                        return; // Stop exit
                     }
-                    // Connect to the database
+    
                     if (dbChoice == JOptionPane.YES_OPTION) {
                         if (!DatabaseConnection.connect()) {
                             JOptionPane.showMessageDialog(
                                     myFrame,
                                     "Failed to connect to the database. Events will not be saved.",
                                     "Database Connection Error",
-                                    JOptionPane.ERROR_MESSAGE);
-                            System.exit(0); // Exit without saving
+                                    JOptionPane.ERROR_MESSAGE
+                            );
+                            System.exit(0);
                         }
                     } else {
-                        System.exit(0); // User chose not to connect, exit without saving
+                        System.exit(0);
                     }
                 }
-                // If the database is connected, insert the events
+    
                 FileEventDAO.insertFileEvents(unsavedEvents);
             }
         }
-        // Proceed with exit
+    
         System.exit(0);
     }
+    
 
     /**
      * This method will handle the actions of the user when they click on the menu
      * items, different actions will be taken depending on the menu item clicked.
      */
+    @Override
     public void actionPerformed(final ActionEvent theEvent) {
         Object source = theEvent.getSource();
         String command = theEvent.getActionCommand();
-
+    
+        // Start Monitoring
         if (source.equals(myMenuStart) || source.equals(myDirectoryStartButton) || source.equals(myImgStartButton)) {
             startMonitoring();
-        } else if (source.equals(myMenuStop) || source.equals(myDirectoryStopButton)
-                || source.equals(myImgStopButton)) {
+        } 
+        // Stop Monitoring
+        else if (source.equals(myMenuStop) || source.equals(myDirectoryStopButton) || source.equals(myImgStopButton)) {
             stopMonitoring();
-        } else if (command.equals("Close")) {
+        } 
+        // Close Application
+        else if (command.equals("Close")) {
             System.exit(0);
-        } else if (command.equals("About")) {
+        } 
+        // Show About Dialog
+        else if (command.equals("About")) {
             showAboutDialog();
-        } else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
+        } 
+        // Connect to Database
+        else if (command.equals("Connect to Database")) {
+            boolean success = DatabaseConnection.connect();
+            if (success) {
+                setDatabaseConnected(true);
+                JOptionPane.showMessageDialog(myFrame, "Connected to the database successfully!", 
+                        "Database Connection", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(myFrame, "Failed to connect to the database.", 
+                        "Database Connection Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } 
+        // Disconnect from Database
+        else if (command.equals("Disconnect Database")) {
+            DatabaseConnection.disconnect();
+            setDatabaseConnected(false);
+            JOptionPane.showMessageDialog(myFrame, "Disconnected from the database.", 
+                    "Database Disconnection", JOptionPane.INFORMATION_MESSAGE);
+        } 
+        // Extension Selection
+        else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
                 && !myExtensionComboBox.getSelectedItem().equals("Enter an extension")
                 && myExtensionComboBox.getEditor().getEditorComponent().hasFocus()) {
             checkFields();
             JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
-        } else if (source.equals(myDirectoryBrowseButton)) {
+        } 
+        // Browse Directory
+        else if (source.equals(myDirectoryBrowseButton)) {
             browseDirectory();
-        } else if (source.equals(myResetDirectoryButton) || source.equals(myImgClearButton)) {
+        } 
+        // Clear Fields
+        else if (source.equals(myResetDirectoryButton) || source.equals(myImgClearButton)) {
             clearFields();
-        } else if (source.equals(myWriteDbButton) || source.equals(myImgDBButton)) {
-            connectDatabase();
+        } 
+        // Write to Database
+        else if (source.equals(myWriteDbButton) || source.equals(myImgDBButton)) {
+            if (DatabaseConnection.getMyConnection() == null) {
+                int choice = JOptionPane.showConfirmDialog(
+                        myFrame,
+                        "Database is not connected. Would you like to connect now?",
+                        "Database Not Connected",
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+    
+                if (choice == JOptionPane.CANCEL_OPTION) {
+                    return; // Stop execution if the user cancels
+                }
+    
+                if (choice == JOptionPane.YES_OPTION) {
+                    boolean success = DatabaseConnection.connect();
+                    if (!success) {
+                        JOptionPane.showMessageDialog(
+                                myFrame,
+                                "Failed to connect to the database. Events will not be saved.",
+                                "Database Connection Error",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                        return; // Stop execution if connection fails
+                    }
+                    setDatabaseConnected(true);
+                } else {
+                    return; // Stop execution if the user chooses "No"
+                }
+            }
+    
+            // Write all stored events to the database
+            int rowsInserted = 0;
+            for (FileEvent event : myEventTable.getData()) {
+                FileEventDAO.insertFileEvent(event);
+                rowsInserted++;
+            }
+    
+            JOptionPane.showMessageDialog(myFrame, rowsInserted + " events written to the database.", 
+                    "Database Write", JOptionPane.INFORMATION_MESSAGE);
         }
     }
+    
+    
 
     /**
      * Method for if the user has hit the start button and all the correct fields
@@ -510,6 +588,7 @@ public class FWGUI implements ActionListener {
      */
     public void setDatabaseConnected(boolean theValue) {
         myWriteDbButton.setEnabled(theValue);
+        myImgDBButton.setEnabled(theValue);
     }
 
     /**
@@ -531,7 +610,7 @@ public class FWGUI implements ActionListener {
     }
 
     /**
-     * Returns a check that the fields are filled out correctly.
+     * Checks if the required fields are filled out correctly and enables/disables Start buttons accordingly.
      */
     private void checkFields() {
         // Prevent the pressing of the stop buttons if DirectoryWatchService isnt monitoring
@@ -540,22 +619,22 @@ public class FWGUI implements ActionListener {
             myDirectoryStopButton.setEnabled(false);
             myImgStopButton.setEnabled(false);
         }
-        // If the user wants to only write to local directory.
-        if (!myDirectoryField.getText().equals("")
-                && !myExtensionField.getText().equals("Enter an extension")
-                && !myExtensionField.getText().equals("")
-                && !myDatabaseActive && myDatabaseField.getText().equals("")) {
-            if (!myDirectoryStopButton.isEnabled()) {
-                buttonReverse(true);
-            }
-        } else if (myDatabaseActive && !myDatabaseField.getText().equals("")) {
-            if (!myDirectoryStopButton.isEnabled()) {
-                buttonReverse(true);
-            }
-        } else {
+        boolean hasDirectory = !myDirectoryField.getText().trim().isEmpty();
+        boolean hasExtension = !myExtensionField.getText().trim().isEmpty() && !myExtensionField.getText().equals("Enter an extension");
+        boolean hasDatabase = myDatabaseActive && !myDatabaseField.getText().trim().isEmpty();
+
+        boolean enableStart = (hasDirectory && hasExtension) || hasDatabase;
+
+        myDirectoryStartButton.setEnabled(enableStart);
+        myMenuStart.setEnabled(enableStart);
+        myImgStartButton.setEnabled(enableStart);
+
+        // If conditions are not met, disable the start buttons
+        if (!enableStart) {
             myDirectoryStartButton.setEnabled(false);
             myMenuStart.setEnabled(false);
             myImgStartButton.setEnabled(false);
         }
     }
 }
+
