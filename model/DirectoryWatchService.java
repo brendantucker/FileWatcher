@@ -167,9 +167,6 @@ public class DirectoryWatchService {
      * @return String representation of the file extension/type
      */
     private String getExtension(WatchEvent<?> theEvent) {
-        System.out.println(theEvent.context());
-        System.out.println((Path)theEvent.context());
-        System.out.println(Files.isDirectory((Path) theEvent.context()));
 
         if (Files.isDirectory(myDirectory.resolve((Path) theEvent.context()))) {
             return "folder";
