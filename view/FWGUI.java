@@ -5,6 +5,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
+import java.time.LocalDateTime;
+
 import javax.swing.Box;
 import java.util.List;
 import javax.swing.JButton;
@@ -65,6 +67,10 @@ public class FWGUI implements ActionListener {
     private DirectoryWatchService myDirectoryWatchService;
     // Boolean value for if the database is active.
     private boolean myDatabaseActive;
+
+    private JMenuItem add10Item;
+
+    private JMenuItem add100Item;
 
     private static FWGUI myInstance;
 
@@ -171,11 +177,15 @@ public class FWGUI implements ActionListener {
      * Creates the second drop down menu choice for the GUI.
      */
     private void createWatcherMenu() {
-        JMenu watcherMenu = new JMenu("File System Watcher");
-        JMenuItem startWatcherItem = new JMenuItem("Start Watching");
-        JMenuItem stopWatcherItem = new JMenuItem("Stop Watching");
-        watcherMenu.add(startWatcherItem);
-        watcherMenu.add(stopWatcherItem);
+        JMenu watcherMenu = new JMenu("Debug");
+        add10Item = new JMenuItem("Add 10 Events");
+        add100Item = new JMenuItem("Add 100 Events");
+        watcherMenu.add(add10Item);
+        watcherMenu.add(add100Item);
+        add10Item.addActionListener(this);
+        add100Item.addActionListener(this);  
+        watcherMenu.add(add10Item);
+        watcherMenu.add(add100Item);
         myMenuBar.add(watcherMenu);
     }
 
@@ -463,6 +473,16 @@ public class FWGUI implements ActionListener {
     
             JOptionPane.showMessageDialog(myFrame, rowsInserted + " events written to the database.", 
                     "Database Write", JOptionPane.INFORMATION_MESSAGE);
+        } else if (source.equals(add10Item)) {
+            // Add 10 events to the event table for testing
+            for (int i = 0; i < 10; i++) {
+                myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder", "TESTEVENT", ".test", LocalDateTime.now().toString()));
+            }
+        } else if (source.equals(add100Item)) {
+            // Add 10 events to the event table for testing
+            for (int i = 0; i < 100; i++) {
+                myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder", "TESTEVENT", ".test", LocalDateTime.now().toString()));
+            }
         }
     }
     
