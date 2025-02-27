@@ -8,6 +8,8 @@ public class FWPanel extends JPanel {
     private JTextField directoryField;
     // Combo box for selecting the extension to query or write to the database.
     private JComboBox<String> queryExtensionDropdown;
+    // Combo box for the query window to select the queries.
+    private JComboBox<String> querySelectionDropdown;
     // Text field for the database to write to.
     private JTextField myDatabaseField;
     // Buttons for starting, stopping, and browsing for a directory to monitor.
@@ -37,6 +39,29 @@ public class FWPanel extends JPanel {
         setUpDatabaseBox();
 
         add(myMainPanel, BorderLayout.CENTER);
+    }
+
+    public JPanel FWQueryPanel(){
+        JPanel queryPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints queryGBC = new GridBagConstraints();
+        JLabel queryLabel = new JLabel("Query to Select: ");
+        queryGBC.insets = new Insets(5, 5, 5, 5);
+        queryPanelGBC(queryGBC, 0, 0, 0.0);
+        queryPanel.add(queryLabel, queryGBC);
+
+        querySelectionDropdown = new JComboBox<>(new String[] { "Choose query", "Query 1", "Query 2", "Query 3" });
+        queryGBC.insets = new Insets(5, 5, 5, 5);
+        queryPanelGBC(queryGBC, 1, 0, 1.0);
+        queryPanel.add(querySelectionDropdown, queryGBC);
+
+        return queryPanel;
+    }
+
+    private void queryPanelGBC(GridBagConstraints theGBC, int theX, int theY, double theWeightx){
+        theGBC.fill = GridBagConstraints.HORIZONTAL;
+        theGBC.gridx = theX;
+        theGBC.gridy = theY;
+        theGBC.weightx = theWeightx;
     }
 
     /**
@@ -215,6 +240,14 @@ public class FWPanel extends JPanel {
      */
     public JButton getResetButton() {
         return myResetButton;
+    }
+
+    /**
+     * Gets the query button.
+     * @return The query button.
+     */
+    public JButton getQueryButton(){
+        return myQueryButton;
     }
 
     /**

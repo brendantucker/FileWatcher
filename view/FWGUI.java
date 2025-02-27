@@ -56,7 +56,7 @@ public class FWGUI implements ActionListener {
     private JTextField myDirectoryField, myDatabaseField, myExtensionField;
     // Buttons for the GUI.
     private JButton myDirectoryStartButton, myDirectoryStopButton, myWriteDbButton, myDirectoryBrowseButton,
-            myResetDirectoryButton;
+            myResetDirectoryButton, myQueryButton;
     // Buttons for the image icons.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // The main panel for the GUI.
@@ -121,6 +121,7 @@ public class FWGUI implements ActionListener {
         myDirectoryStopButton = addButtonActionListener(myMainPanel.getStopButton());
         myDirectoryBrowseButton = addButtonActionListener(myMainPanel.getBrowseButton());
         myResetDirectoryButton = addButtonActionListener(myMainPanel.getResetButton());
+        myQueryButton = addButtonActionListener(myMainPanel.getQueryButton());
 
         myWriteDbButton = addButtonActionListener(myMainPanel.getMyWriteDBButton());
         myWriteDbButton.setEnabled(false); // 🔹 Ensure "Write to Database" starts disabled
@@ -371,7 +372,6 @@ public class FWGUI implements ActionListener {
                 FileEventDAO.insertFileEvents(unsavedEvents);
             }
         }
-
         System.exit(0);
     }
 
@@ -453,6 +453,8 @@ public class FWGUI implements ActionListener {
                 myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
                         "TESTEVENT", ".test", LocalDateTime.now().toString()));
             }
+        } else if (source.equals(myQueryButton)) {
+            guiWindow();
         } else if (source.equals(add100Item)) {
             // Add 10 events to the event table for testing
             for (int i = 0; i < 100; i++) {
@@ -460,6 +462,34 @@ public class FWGUI implements ActionListener {
                         "TESTEVENT", ".test", LocalDateTime.now().toString()));
             }
         }
+    }
+
+    private void guiWindow() {
+        FWFrame queryFrame = new FWFrame();
+        queryFrame.queryFrameSize(.8,.3);
+        queryFrame.setLocationRelativeTo(null);
+        queryFrame.setTitle("Query Window");
+        queryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        queryFrame.setLayout(new BorderLayout());
+
+        JPanel queryGUI = new FWPanel().FWQueryPanel();
+        queryFrame.add(queryGUI, BorderLayout.NORTH);
+
+        FWEventTable queryEventTable = new FWEventTable();
+        for(FileEvent event : myEventTable.getData()){
+            queryEventTable.addEvent(event);
+        }
+
+        JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, queryEventTable);
+        queryPane.setResizeWeight(splitPaneResizeWeight);
+        queryPane.setDividerSize(0);
+
+        // Add the JSplitPane to the frame
+        queryFrame.add(queryPane, BorderLayout.CENTER);
+
+        queryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        queryFrame.setVisible(true);
     }
 
     /**

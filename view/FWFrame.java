@@ -35,4 +35,11 @@ public class FWFrame extends JFrame {
         return fileFrame;
     }
 
+    public void queryFrameSize(double theHorizontal, double theVertical){
+        double localHeight = SCREEN_HEIGHT;
+        double localWidth = SCREEN_WIDTH;
+        
+        this.setSize((int) (localHeight * theHorizontal), (int) (localWidth * theVertical));
+    }
+
 }
