@@ -55,6 +55,7 @@ public class FWPanel extends JPanel {
         myImgStopButton = new JButton(stopImageIcon);
         myImgStopButton.setEnabled(false);
         myImgDBButton = new JButton(dbImageIcon);
+        myImgDBButton.setEnabled(false);
         myImgClearButton = new JButton(clearImageIcon);
     }
 
@@ -272,18 +273,6 @@ public class FWPanel extends JPanel {
     private void adjustGridBagConstraints(int theX, int theY) {
         myGBC.gridx = theX;
         myGBC.gridy = theY;
-    }
-
-    /**
-     * Helper constructor to clean up code above, adjusting gridbag with X, Y, and width values.
-     * @param theX The X value to be adjusted for the gridbag.
-     * @param theY The Y value to be adjusted for the gridbag.
-     * @param theWidth The width value to be adjusted for the gridbag. MUST USE GridBagConstraints ENUM.
-     */
-    private void adjustGridBagConstraints(int theX, int theY, int theWidth) {
-        myGBC.gridx = theX;
-        myGBC.gridy = theY;
-        myGBC.gridwidth = theWidth;
     }
 
     /**

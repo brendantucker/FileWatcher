@@ -53,15 +53,6 @@ public class FileWatcher implements Runnable {
                     Path filePath = myDirectory.resolve((Path) event.context());
 
                     System.out.println(" Detected Event: " + filePath + " -> " + kind.name());
-
-                    // Process event
-                    EventType eventType = getEventType(kind);
-                    FileEvent fileEvent = new FileEvent(
-                            filePath.getFileName().toString(),
-                            filePath.toString(),
-                            eventType.toString(),
-                            getFileExtension(filePath.toString()),
-                            LocalDateTime.now().toString());
                 }
                 key.reset();
             }

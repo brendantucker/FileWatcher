@@ -67,6 +67,8 @@ public class FWGUI implements ActionListener {
     private DirectoryWatchService myDirectoryWatchService;
     // Boolean value for if the database is active.
     private boolean myDatabaseActive;
+    // Label to display whether or not the database is connected.
+    private JLabel myDatabaseConnectionLabel;
 
     private JMenuItem add10Item;
 
@@ -88,7 +90,7 @@ public class FWGUI implements ActionListener {
         // Methods to help break up the constructor and make it easier to read.
         setUpButtons();
         createMenuBar();
-        timeKeeper();
+        timeAndDbLabel();
         setUpDocumentListeners();
         setUpFileViewer();
 
@@ -114,21 +116,20 @@ public class FWGUI implements ActionListener {
             }
         });
         myExtensionComboBox.addActionListener(this);
-    
+
         myDirectoryStartButton = addButtonActionListener(myMainPanel.getStartButton());
         myDirectoryStopButton = addButtonActionListener(myMainPanel.getStopButton());
         myDirectoryBrowseButton = addButtonActionListener(myMainPanel.getBrowseButton());
         myResetDirectoryButton = addButtonActionListener(myMainPanel.getResetButton());
-    
+
         myWriteDbButton = addButtonActionListener(myMainPanel.getMyWriteDBButton());
         myWriteDbButton.setEnabled(false); // 🔹 Ensure "Write to Database" starts disabled
-    
+
         myImgStartButton = addButtonActionListener(myMainPanel.getMyImgStarButton());
         myImgStopButton = addButtonActionListener(myMainPanel.getMyImgStopButton());
         myImgDBButton = addButtonActionListener(myMainPanel.getMyImgDBButton());
         myImgClearButton = addButtonActionListener(myMainPanel.getMyImgClearButton());
     }
-    
 
     /**
      * Helper method for the setUpButtons method. This will add an action listener
@@ -159,6 +160,7 @@ public class FWGUI implements ActionListener {
     private void createFileMenu() {
         JMenu fileMenu = new JMenu("File");
         myTimeLabel = new JLabel("Time not started.");
+        myDatabaseConnectionLabel = new JLabel("Database not connected.");
         myMenuStart = new JMenuItem("Start");
         myMenuStop = new JMenuItem("Stop");
         JMenuItem queryItem = new JMenuItem("Query Database(file extension)");
@@ -183,7 +185,7 @@ public class FWGUI implements ActionListener {
         watcherMenu.add(add10Item);
         watcherMenu.add(add100Item);
         add10Item.addActionListener(this);
-        add100Item.addActionListener(this);  
+        add100Item.addActionListener(this);
         watcherMenu.add(add10Item);
         watcherMenu.add(add100Item);
         myMenuBar.add(watcherMenu);
@@ -194,10 +196,6 @@ public class FWGUI implements ActionListener {
      */
     private void createDatabaseMenu() {
         JMenu databaseMenu = new JMenu("Database");
-        // JMenuItem startWatcherItem = new JMenuItem("Start Watching");
-        // JMenuItem stopWatcherItem = new JMenuItem("Stop Watching");
-        // watcherMenu.add(startWatcherItem);
-        // watcherMenu.add(stopWatcherItem);
 
         JMenuItem connectDbItem = new JMenuItem("Connect to Database");
         JMenuItem disconnectDbItem = new JMenuItem("Disconnect Database");
@@ -236,7 +234,7 @@ public class FWGUI implements ActionListener {
      * This method will keep track of the time that the user has been monitoring
      * files.
      */
-    private void timeKeeper() {
+    private void timeAndDbLabel() {
         myTimer = new Timer(1000, (ActionEvent e) -> {
             runningTime++;
             timerLabelExtended();
@@ -244,9 +242,17 @@ public class FWGUI implements ActionListener {
         myMenuStart.addActionListener(this);
         myMenuStop.addActionListener(this);
         // Create a panel for the time label
-        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        timePanel.add(myTimeLabel);
-        myFrame.add(timePanel, BorderLayout.SOUTH);
+        JPanel bottomGuiPanel = new JPanel(new BorderLayout());
+
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftPanel.add(myDatabaseConnectionLabel);
+
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        rightPanel.add(myTimeLabel);
+
+        bottomGuiPanel.add(leftPanel, BorderLayout.WEST);
+        bottomGuiPanel.add(rightPanel, BorderLayout.EAST);
+        myFrame.add(bottomGuiPanel, BorderLayout.SOUTH);
     }
 
     /**
@@ -322,20 +328,19 @@ public class FWGUI implements ActionListener {
 
     private void handleExit() {
         List<FileEvent> unsavedEvents = myEventTable.getData();
-    
+
         if (!unsavedEvents.isEmpty()) {
             int choice = JOptionPane.showConfirmDialog(
                     myFrame,
                     "You have unsaved file events. Would you like to save them to the database before exiting?",
                     "Unsaved Data",
                     JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE
-            );
-    
+                    JOptionPane.WARNING_MESSAGE);
+
             if (choice == JOptionPane.CANCEL_OPTION) {
                 return; // Stop exit, let user stay
             }
-    
+
             if (choice == JOptionPane.YES_OPTION) {
                 if (DatabaseConnection.getMyConnection() == null) {
                     int dbChoice = JOptionPane.showConfirmDialog(
@@ -343,35 +348,32 @@ public class FWGUI implements ActionListener {
                             "Database is not connected. Would you like to connect now?",
                             "Database Not Connected",
                             JOptionPane.YES_NO_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE
-                    );
-    
+                            JOptionPane.WARNING_MESSAGE);
+
                     if (dbChoice == JOptionPane.CANCEL_OPTION) {
                         return; // Stop exit
                     }
-    
+
                     if (dbChoice == JOptionPane.YES_OPTION) {
                         if (!DatabaseConnection.connect()) {
                             JOptionPane.showMessageDialog(
                                     myFrame,
                                     "Failed to connect to the database. Events will not be saved.",
                                     "Database Connection Error",
-                                    JOptionPane.ERROR_MESSAGE
-                            );
+                                    JOptionPane.ERROR_MESSAGE);
                             System.exit(0);
                         }
                     } else {
                         System.exit(0);
                     }
                 }
-    
+
                 FileEventDAO.insertFileEvents(unsavedEvents);
             }
         }
-    
+
         System.exit(0);
     }
-    
 
     /**
      * This method will handle the actions of the user when they click on the menu
@@ -381,112 +383,84 @@ public class FWGUI implements ActionListener {
     public void actionPerformed(final ActionEvent theEvent) {
         Object source = theEvent.getSource();
         String command = theEvent.getActionCommand();
-    
+
         // Start Monitoring
         if (source.equals(myMenuStart) || source.equals(myDirectoryStartButton) || source.equals(myImgStartButton)) {
             startMonitoring();
-        } 
+        }
         // Stop Monitoring
         else if (source.equals(myMenuStop) || source.equals(myDirectoryStopButton) || source.equals(myImgStopButton)) {
             stopMonitoring();
-        } 
+        }
         // Close Application
         else if (command.equals("Close")) {
             System.exit(0);
-        } 
+        }
         // Show About Dialog
         else if (command.equals("About")) {
             showAboutDialog();
-        } 
+        }
         // Connect to Database
         else if (command.equals("Connect to Database")) {
             boolean success = DatabaseConnection.connect();
             if (success) {
                 setDatabaseConnected(true);
-                JOptionPane.showMessageDialog(myFrame, "Connected to the database successfully!", 
+                JOptionPane.showMessageDialog(myFrame, "Connected to the database successfully!",
                         "Database Connection", JOptionPane.INFORMATION_MESSAGE);
+                myDatabaseConnectionLabel.setText("Database connected.");
             } else {
-                JOptionPane.showMessageDialog(myFrame, "Failed to connect to the database.", 
+                JOptionPane.showMessageDialog(myFrame, "Failed to connect to the database.",
                         "Database Connection Error", JOptionPane.ERROR_MESSAGE);
             }
-        } 
+        }
         // Disconnect from Database
         else if (command.equals("Disconnect Database")) {
             DatabaseConnection.disconnect();
             setDatabaseConnected(false);
-            JOptionPane.showMessageDialog(myFrame, "Disconnected from the database.", 
+            JOptionPane.showMessageDialog(myFrame, "Disconnected from the database.",
                     "Database Disconnection", JOptionPane.INFORMATION_MESSAGE);
-        } 
+            myDatabaseConnectionLabel.setText("Database not connected.");
+        }
         // Extension Selection
         else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
                 && !myExtensionComboBox.getSelectedItem().equals("Enter an extension")
                 && myExtensionComboBox.getEditor().getEditorComponent().hasFocus()) {
             checkFields();
             JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
-        } 
+        }
         // Browse Directory
         else if (source.equals(myDirectoryBrowseButton)) {
             browseDirectory();
-        } 
+        }
         // Clear Fields
         else if (source.equals(myResetDirectoryButton) || source.equals(myImgClearButton)) {
             clearFields();
-        } 
+        }
         // Write to Database
         else if (source.equals(myWriteDbButton) || source.equals(myImgDBButton)) {
-            if (DatabaseConnection.getMyConnection() == null) {
-                int choice = JOptionPane.showConfirmDialog(
-                        myFrame,
-                        "Database is not connected. Would you like to connect now?",
-                        "Database Not Connected",
-                        JOptionPane.YES_NO_CANCEL_OPTION,
-                        JOptionPane.WARNING_MESSAGE
-                );
-    
-                if (choice == JOptionPane.CANCEL_OPTION) {
-                    return; // Stop execution if the user cancels
-                }
-    
-                if (choice == JOptionPane.YES_OPTION) {
-                    boolean success = DatabaseConnection.connect();
-                    if (!success) {
-                        JOptionPane.showMessageDialog(
-                                myFrame,
-                                "Failed to connect to the database. Events will not be saved.",
-                                "Database Connection Error",
-                                JOptionPane.ERROR_MESSAGE
-                        );
-                        return; // Stop execution if connection fails
-                    }
-                    setDatabaseConnected(true);
-                } else {
-                    return; // Stop execution if the user chooses "No"
-                }
-            }
-    
             // Write all stored events to the database
             int rowsInserted = 0;
             for (FileEvent event : myEventTable.getData()) {
                 FileEventDAO.insertFileEvent(event);
                 rowsInserted++;
             }
-    
-            JOptionPane.showMessageDialog(myFrame, rowsInserted + " events written to the database.", 
+
+            JOptionPane.showMessageDialog(myFrame, rowsInserted + " events written to the database.",
                     "Database Write", JOptionPane.INFORMATION_MESSAGE);
         } else if (source.equals(add10Item)) {
             // Add 10 events to the event table for testing
             for (int i = 0; i < 10; i++) {
-                myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder", "TESTEVENT", ".test", LocalDateTime.now().toString()));
+                myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
+                        "TESTEVENT", ".test", LocalDateTime.now().toString()));
             }
         } else if (source.equals(add100Item)) {
             // Add 10 events to the event table for testing
             for (int i = 0; i < 100; i++) {
-                myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder", "TESTEVENT", ".test", LocalDateTime.now().toString()));
+                myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
+                        "TESTEVENT", ".test", LocalDateTime.now().toString()));
             }
         }
     }
-    
-    
 
     /**
      * Method for if the user has hit the start button and all the correct fields
@@ -573,14 +547,6 @@ public class FWGUI implements ActionListener {
         checkFields();
     }
 
-    /**
-     * Method to connect to the database, used for button press.
-     */
-    private void connectDatabase() {
-        myDatabaseActive = DatabaseConnection.connect();
-        checkFields();
-    }
-
     /* Helper method - Flips state of start and stop buttons */
     private void buttonReverse(boolean theValue) {
         myMenuStart.setEnabled(theValue);
@@ -630,17 +596,20 @@ public class FWGUI implements ActionListener {
     }
 
     /**
-     * Checks if the required fields are filled out correctly and enables/disables Start buttons accordingly.
+     * Checks if the required fields are filled out correctly and enables/disables
+     * Start buttons accordingly.
      */
     private void checkFields() {
-        // Prevent the pressing of the stop buttons if DirectoryWatchService isnt monitoring
+        // Prevent the pressing of the stop buttons if DirectoryWatchService isnt
+        // monitoring
         if (!myIsMonitoring) {
             myMenuStop.setEnabled(false);
             myDirectoryStopButton.setEnabled(false);
             myImgStopButton.setEnabled(false);
         }
         boolean hasDirectory = !myDirectoryField.getText().trim().isEmpty();
-        boolean hasExtension = !myExtensionField.getText().trim().isEmpty() && !myExtensionField.getText().equals("Enter an extension");
+        boolean hasExtension = !myExtensionField.getText().trim().isEmpty()
+                && !myExtensionField.getText().equals("Enter an extension");
         boolean hasDatabase = myDatabaseActive && !myDatabaseField.getText().trim().isEmpty();
 
         boolean enableStart = (hasDirectory && hasExtension) || hasDatabase;
@@ -657,4 +626,3 @@ public class FWGUI implements ActionListener {
         }
     }
 }
-
