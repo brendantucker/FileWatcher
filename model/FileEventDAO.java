@@ -14,14 +14,15 @@ public class FileEventDAO {
             return;
         }
 
-        String sql = "INSERT INTO file_events (file_name, file_path, event_type, file_extension, event_time) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO file_events (file_name, file_path, event_type, file_extension, event_date, event_time) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, theEvent.getFileName());
             pstmt.setString(2, theEvent.getFilePath());
             pstmt.setString(3, theEvent.getEventType());
             pstmt.setString(4, theEvent.getExtension());
-            pstmt.setString(5, theEvent.getEventTime());
+            pstmt.setString(5, theEvent.getEventDate());
+            pstmt.setString(6, theEvent.getEventTime());
 
             int rowsInserted = pstmt.executeUpdate();
             if (rowsInserted > 0) {
@@ -51,7 +52,8 @@ public class FileEventDAO {
                 pstmt.setString(2, event.getFilePath());
                 pstmt.setString(3, event.getEventType());
                 pstmt.setString(4, event.getExtension());
-                pstmt.setString(5, event.getEventTime());
+                pstmt.setString(5, event.getEventDate());
+                pstmt.setString(6, event.getEventTime());
                 pstmt.addBatch(); // Add to batch execution
             }
             int[] rowsInserted = pstmt.executeBatch();

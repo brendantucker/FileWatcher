@@ -48,6 +48,7 @@ public class DatabaseConnection {
                 "file_path TEXT NOT NULL, " +
                 "event_type TEXT NOT NULL, " +
                 "file_extension TEXT, " +
+                "event_date TEXT NOT NULL, " +
                 "event_time TEXT NOT NULL);";
 
         try (Statement stmt = getMyConnection().createStatement()) {

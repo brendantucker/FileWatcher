@@ -17,7 +17,7 @@ public class FWEventTable extends JPanel {
     /** ArrayList to hold the data for the JTable. */
     private ArrayList<FileEvent> myData;
     /** Array of default column widths for the JTable. */
-    private int[] myDefaultColumnWidths = { 100, 250, 50, 25, 100 }; // Default column widths for the table
+    private int[] myDefaultColumnWidths = { 100, 250, 50, 25, 100, 100 }; // Default column widths for the table
 
     /**
      * Constructor for the FWEventTable. This will create the table and set up the
@@ -25,7 +25,7 @@ public class FWEventTable extends JPanel {
      */
     public FWEventTable() {
         super(new BorderLayout()); // Ensure that the panel is using a BorderLayout.
-        String[] myColumnNames = { "File Name", "File Path", "Event Type", "Extension", "Time" };
+        String[] myColumnNames = { "File Name", "File Path", "Event Type", "Extension", "Date", "Time" };
 
         myTableModel = new DefaultTableModel(myColumnNames, 0) {
             @Override
@@ -64,6 +64,7 @@ public class FWEventTable extends JPanel {
                 theEvent.getFilePath(),
                 theEvent.getEventType(),
                 theEvent.getExtension(),
+                theEvent.getEventDate(),
                 theEvent.getEventTime()
         });
 

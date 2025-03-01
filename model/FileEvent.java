@@ -11,6 +11,8 @@ public class FileEvent {
     private String myEventType;
     /** A String representing the time that the event occured */
     private String myEventTime;
+    /** A String representing the date that the event occured */
+    private String myEventDate;
     /** A string representing the extension of the file */
     private String myExtension;
 
@@ -22,13 +24,14 @@ public class FileEvent {
      * @param eventType The type of event that occured to the file.
      * @param extension The extension of the file that the event occured to.
      * @param eventTime The time that the event occured.
-     * @param eventTime The time that the event occured.
      */
     public FileEvent(String theFileName, String theFilePath, String theEventType, String theExtension,
-            String theEventTime) {
-        myFileName = theFileName;
+            String theEventDate, String theEventTime) {
+        final int fileExtensionRemove = theFileName.indexOf('.');
+        myFileName = theFileName.substring(0, fileExtensionRemove);
         myFilePath = theFilePath;
         myEventType = theEventType;
+        myEventDate = theEventDate;
         myEventTime = theEventTime;
         myExtension = theExtension;
     }
@@ -76,6 +79,15 @@ public class FileEvent {
      */
     public String getExtension() {
         return myExtension;
+    }
+
+    /**
+     * Returns the date that the event occured.
+     * 
+     * @return The date of the event.
+     */
+    public String getEventDate() {
+        return myEventDate;
     }
 
 }
