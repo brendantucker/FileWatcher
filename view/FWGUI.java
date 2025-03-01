@@ -6,6 +6,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.Box;
 import java.util.List;
@@ -438,6 +439,33 @@ public class FWGUI implements ActionListener {
         }
         // Write to Database
         else if (source.equals(myWriteDbButton) || source.equals(myImgDBButton)) {
+            if (DatabaseConnection.getMyConnection() == null) {
+                int choice = JOptionPane.showConfirmDialog(
+                        myFrame,
+                        "Database is not connected. Would you like to connect now?",
+                        "Database Not Connected",
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+
+                if (choice == JOptionPane.CANCEL_OPTION) {
+                    return; // Stop execution if the user cancels
+                }
+
+                if (choice == JOptionPane.YES_OPTION) {
+                    boolean success = DatabaseConnection.connect();
+                    if (!success) {
+                        JOptionPane.showMessageDialog(
+                                myFrame,
+                                "Failed to connect to the database. Events will not be saved.",
+                                "Database Connection Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return; // Stop execution if connection fails
+                    }
+                    setDatabaseConnected(true);
+                } else {
+                    return; // Stop execution if the user chooses "No"
+                }
+            }
             // Write all stored events to the database
             int rowsInserted = 0;
             for (FileEvent event : myEventTable.getData()) {
@@ -451,15 +479,37 @@ public class FWGUI implements ActionListener {
             // Add 10 events to the event table for testing
             for (int i = 0; i < 10; i++) {
                 myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
-                        "TESTEVENT", ".test", LocalDateTime.now().toString()));
+                        "TESTEVENT", ".test", createDateString(), createTimeString()));
             }
         } else if (source.equals(add100Item)) {
             // Add 10 events to the event table for testing
             for (int i = 0; i < 100; i++) {
                 myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
-                        "TESTEVENT", ".test", LocalDateTime.now().toString()));
+                        "TESTEVENT", ".test", createDateString(), createTimeString()));
             }
         }
+    }
+
+    /**
+     * Creates a date string in the format of yyyy-MM-dd HH:mm:ss
+     * 
+     * @return String representation of the current date
+     */
+    private String createDateString() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return now.format(formatter);
+    }
+
+    /**
+     * Creates a time string in the format of HH:mm:ss
+     * 
+     * @return String representation of the current time.
+     */
+    private String createTimeString() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        return now.format(formatter);
     }
 
     /**
@@ -574,7 +624,6 @@ public class FWGUI implements ActionListener {
      */
     public void setDatabaseConnected(boolean theValue) {
         myWriteDbButton.setEnabled(theValue);
-        myImgDBButton.setEnabled(theValue);
     }
 
     /**
