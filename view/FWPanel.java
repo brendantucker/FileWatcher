@@ -55,7 +55,6 @@ public class FWPanel extends JPanel {
         myImgStopButton = new JButton(stopImageIcon);
         myImgStopButton.setEnabled(false);
         myImgDBButton = new JButton(dbImageIcon);
-        myImgDBButton.setEnabled(false);
         myImgClearButton = new JButton(clearImageIcon);
     }
 
