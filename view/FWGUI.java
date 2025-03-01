@@ -21,10 +21,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -51,8 +54,12 @@ public class FWGUI implements ActionListener {
     private double splitPaneResizeWeight = 0.2;
     // Table that houses all the logged events.
     private FWEventTable myEventTable;
+    // Table that will house all the results from query window.
+    private FWEventTable myQueryTable;
     // The types of extensions for users to monitor.
     private JComboBox<String> myExtensionComboBox;
+    // The different queries to be ran in query window.
+    private JComboBox<String> myQueryComboBox;
     // Text fields for the directory, database, and extensions.
     private JTextField myDirectoryField, myDatabaseField, myExtensionField;
     // Buttons for the GUI.
@@ -62,6 +69,8 @@ public class FWGUI implements ActionListener {
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // The main panel for the GUI.
     private FWPanel myMainPanel;
+    // Panel for the query window
+    private FWPanel myQueryPanel;
     // Boolean value for if the service is being watched and recorded.
     private boolean myIsMonitoring;
     // The directory watch service to monitor the directory and files.
@@ -86,7 +95,9 @@ public class FWGUI implements ActionListener {
 
         // Create the main panel and event table
         myMainPanel = new FWPanel();
+        myQueryPanel = new FWPanel();
         myEventTable = new FWEventTable();
+        myQueryTable = new FWEventTable();
         myIsMonitoring = false;
         // Methods to help break up the constructor and make it easier to read.
         setUpButtons();
@@ -483,6 +494,26 @@ public class FWGUI implements ActionListener {
             }
         } else if (source.equals(myQueryButton)) {
             guiWindow();
+            myQueryTable.clearTable();
+            myQueryTable.revalidate();
+            myQueryTable.repaint();
+        } else if (source.equals(myQueryComboBox)) {
+            myQueryTable.clearTable();
+            if(myQueryComboBox.getSelectedItem().equals("Query 1")){
+                FWEventTable queryResults = FileEventDAO.queryTxtFiles();
+
+                for(FileEvent event : queryResults.getData()){
+                    myQueryTable.addEvent(event);
+                }
+                myQueryTable.updateTable();
+            } else if(myQueryComboBox.getSelectedItem().equals("Query 2")){
+                System.out.println("Query2");
+            } else if(myQueryComboBox.getSelectedItem().equals("Query 3")){
+                System.out.println("Query3");
+            }
+            // Adding in the new table values.
+            myQueryTable.revalidate();
+            myQueryTable.repaint();
         } else if (source.equals(add100Item)) {
             // Add 10 events to the event table for testing
             for (int i = 0; i < 100; i++) {
@@ -494,26 +525,29 @@ public class FWGUI implements ActionListener {
 
     private void guiWindow() {
         FWFrame queryFrame = new FWFrame();
-        queryFrame.queryFrameSize(.8,.3);
+        queryFrame.queryFrameSize(.8, .3);
         queryFrame.setLocationRelativeTo(null);
         queryFrame.setTitle("Query Window");
         queryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         queryFrame.setLayout(new BorderLayout());
 
-        JPanel queryGUI = new FWPanel().FWQueryPanel();
+        JPanel queryGUI = myQueryPanel.FWQueryPanel();
         queryFrame.add(queryGUI, BorderLayout.NORTH);
 
-        FWEventTable queryEventTable = new FWEventTable();
-        for(FileEvent event : myEventTable.getData()){
-            queryEventTable.addEvent(event);
-        }
+        //FWEventTable queryEventTable = new FWEventTable();
+        // for (FileEvent event : myEventTable.getData()) {
+        //     queryEventTable.addEvent(event);
+        // }
 
-        JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, queryEventTable);
+        JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, myQueryTable);
         queryPane.setResizeWeight(splitPaneResizeWeight);
         queryPane.setDividerSize(0);
 
         // Add the JSplitPane to the frame
         queryFrame.add(queryPane, BorderLayout.CENTER);
+
+        myQueryComboBox = myQueryPanel.getQueryPopupSelection();
+        myQueryComboBox.addActionListener(this);
 
         queryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -654,6 +688,7 @@ public class FWGUI implements ActionListener {
      */
     public void setDatabaseConnected(boolean theValue) {
         myWriteDbButton.setEnabled(theValue);
+        myQueryButton.setEnabled(theValue);
     }
 
     /**

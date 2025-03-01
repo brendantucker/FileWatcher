@@ -114,8 +114,8 @@ public class DirectoryWatchService {
                                     eventPath.toString(),
                                     eventTypeFormatter(event.kind()),
                                     getExtension(event).toString(),
-                                    createTimeString(),
-                                    createDateString()));
+                                    createDateString(),
+                                    createTimeString()));
                         }
                     }
                     key.reset(); // Reset the key to receive further events

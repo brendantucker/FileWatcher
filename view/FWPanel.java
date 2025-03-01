@@ -161,6 +161,7 @@ public class FWPanel extends JPanel {
 
         myWriteDbButton = createModernButton("Write to database");
         myQueryButton = createModernButton("Query");
+        myQueryButton.setEnabled(false);
         myResetButton = createModernButton("Reset");
         adjustGridBagConstraints(0, 6, 1, 1);
         myGBC.fill = GridBagConstraints.HORIZONTAL; // Reset fill
@@ -199,6 +200,14 @@ public class FWPanel extends JPanel {
      */
     public JComboBox<String> getExtensionBox() {
         return extensionDropdown;
+    }
+
+    /**
+     * Gets the query extension box.
+     * @return The query extension box.
+     */
+    public JComboBox<String> getQueryPopupSelection() {
+        return querySelectionDropdown;
     }
 
     /**

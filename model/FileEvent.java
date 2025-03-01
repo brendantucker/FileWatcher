@@ -28,7 +28,10 @@ public class FileEvent {
     public FileEvent(String theFileName, String theFilePath, String theEventType, String theExtension,
             String theEventDate, String theEventTime) {
         final int fileExtensionRemove = theFileName.indexOf('.');
-        myFileName = theFileName.substring(0, fileExtensionRemove);
+        if(fileExtensionRemove != -1){
+            theFileName = theFileName.substring(0, fileExtensionRemove);
+        }
+        myFileName = theFileName;
         myFilePath = theFilePath;
         myEventType = theEventType;
         myEventDate = theEventDate;

@@ -1,5 +1,6 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -26,7 +27,8 @@ public class FileEventDAO {
 
             int rowsInserted = pstmt.executeUpdate();
             if (rowsInserted > 0) {
-                System.out.println("File event inserted: " + theEvent.getFileName() + " (" + theEvent.getEventType() + ")");
+                System.out.println(
+                        "File event inserted: " + theEvent.getFileName() + " (" + theEvent.getEventType() + ")");
             } else {
                 System.out.println("File event NOT inserted.");
             }
@@ -36,7 +38,6 @@ public class FileEventDAO {
         }
     }
 
-    
     public static void insertFileEvents(List<FileEvent> events) {
         Connection conn = DatabaseConnection.getMyConnection();
         if (conn == null) {
@@ -44,7 +45,7 @@ public class FileEventDAO {
             return;
         }
 
-        String sql = "INSERT INTO file_events (file_name, file_path, event_type, file_extension, event_time) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO file_events (file_name, file_path, event_type, file_extension, event_date, event_time) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (FileEvent event : events) {
@@ -62,5 +63,34 @@ public class FileEventDAO {
             e.printStackTrace();
             System.out.println("Error inserting file events.");
         }
+    }
+
+    public static FWEventTable queryTxtFiles() {
+        FWEventTable theResultsTable = new FWEventTable();
+        Connection conn = DatabaseConnection.getMyConnection();
+        if (conn == null) {
+            System.out.println("Database is not connected!");
+        } else {
+            String sql = "SELECT * FROM file_events WHERE file_extension = '.txt'";
+
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                ResultSet resultElements = pstmt.executeQuery();
+                while (resultElements.next()) {
+                    FileEvent theEvent = new FileEvent(
+                            resultElements.getString("file_name"),
+                            resultElements.getString("file_path"),
+                            resultElements.getString("event_type"),
+                            resultElements.getString("file_extension"),
+                            resultElements.getString("event_date"),
+                            resultElements.getString("event_time"));
+
+                    theResultsTable.addEvent(theEvent);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Error querying txt files.");
+            }
+        }
+        return theResultsTable;
     }
 }

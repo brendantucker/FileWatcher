@@ -88,7 +88,7 @@ public class FWEventTable extends JPanel {
         myTableModel.setRowCount(0);
         for (FileEvent event : myData) {
             myTableModel.addRow(new Object[] { event.getFileName(), event.getFilePath(), event.getEventType(),
-                    event.getExtension(), event.getEventTime() });
+                    event.getExtension(), event.getEventDate(), event.getEventTime() });
         }
     }
 
