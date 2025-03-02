@@ -1,6 +1,6 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-
+import javax.swing.table.TableRowSorter;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -16,6 +16,8 @@ public class FWEventTable extends JPanel {
     private DefaultTableModel myTableModel;
     /** ArrayList to hold the data for the JTable. */
     private ArrayList<FileEvent> myData;
+    /** The sorter for handling file event sorting */
+    private TableRowSorter<DefaultTableModel> sorter;
     /** Array of default column widths for the JTable. */
     private int[] myDefaultColumnWidths = { 100, 250, 50, 25, 100, 100 }; // Default column widths for the table
 
@@ -39,6 +41,10 @@ public class FWEventTable extends JPanel {
         myEventTable = new JTable(myTableModel);
         myEventTable.getTableHeader().setReorderingAllowed(true); // Allow column reordering
 
+        sorter = new TableRowSorter<>(myTableModel);
+        
+        myEventTable.setRowSorter(sorter);
+
         JScrollPane scrollPane = new JScrollPane(myEventTable);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         
@@ -59,6 +65,7 @@ public class FWEventTable extends JPanel {
      */
     public void addEvent(FileEvent theEvent) {
         myData.add(theEvent);
+
         myTableModel.addRow(new Object[] {
                 theEvent.getFileName(),
                 theEvent.getFilePath(),
@@ -67,9 +74,9 @@ public class FWEventTable extends JPanel {
                 theEvent.getEventDate(),
                 theEvent.getEventTime()
         });
-
-        int rowIndex = myTableModel.getRowCount() - 1;
-        myTableModel.fireTableRowsInserted(rowIndex, rowIndex);
+        
+        //int rowIndex = myTableModel.getRowCount() - 1;
+        //myTableModel.fireTableRowsInserted(rowIndex, rowIndex);
     }
 
     /**
@@ -87,8 +94,14 @@ public class FWEventTable extends JPanel {
     public void updateTable() {
         myTableModel.setRowCount(0);
         for (FileEvent event : myData) {
-            myTableModel.addRow(new Object[] { event.getFileName(), event.getFilePath(), event.getEventType(),
-                    event.getExtension(), event.getEventTime() });
+            myTableModel.addRow(new Object[] { 
+                event.getFileName(),
+                event.getFilePath(),
+                event.getEventType(),
+                event.getExtension(),
+                event.getEventDate(),
+                event.getEventTime()
+            });
         }
     }
 
