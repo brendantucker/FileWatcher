@@ -109,6 +109,7 @@ public class DirectoryWatchService {
                                 invalidDirectoryError();
                             }
                         }
+                        // Filter out modify directory events -- this kind of event is created any time the contents of a directory change
                         if (!Files.isDirectory(eventPath) || event.kind() != StandardWatchEventKinds.ENTRY_MODIFY) {
                             myEventTable.addEvent(new FileEvent(event.context().toString(),
                                     eventPath.toString(),

@@ -591,6 +591,11 @@ public class FWGUI implements ActionListener {
         myTimeLabel.setText("Time not started.");
         myTimer.start();
         buttonReverse(false);
+        //Disable ability to modify directory and extension fields while monitoring
+        myDirectoryField.setEditable(false);
+        myExtensionField.setEditable(false);
+        myExtensionComboBox.setEditable(false);
+
     }
 
     /**
@@ -601,6 +606,10 @@ public class FWGUI implements ActionListener {
         myIsMonitoring = false;
         buttonReverse(true);
         myDirectoryWatchService.stop();
+        //Enable ability to modify directory and extension fields while not monitoring
+        myDirectoryField.setEditable(true);
+        myExtensionField.setEditable(true);
+        myExtensionComboBox.setEditable(true);
     }
 
     /**
@@ -730,6 +739,12 @@ public class FWGUI implements ActionListener {
 
         // If conditions are not met, disable the start buttons
         if (!enableStart) {
+            myDirectoryStartButton.setEnabled(false);
+            myMenuStart.setEnabled(false);
+            myImgStartButton.setEnabled(false);
+        }
+        //Do not enable start buttons if already monitoring
+        if (myIsMonitoring) {
             myDirectoryStartButton.setEnabled(false);
             myMenuStart.setEnabled(false);
             myImgStartButton.setEnabled(false);
