@@ -6,12 +6,8 @@ public class FWPanel extends JPanel {
     private JComboBox<String> extensionDropdown;
     // Text field for the directory to monitor.
     private JTextField directoryField;
-    // Combo box for selecting the extension to query or write to the database.
-    private JComboBox<String> queryExtensionDropdown;
     // Combo box for the query window to select the queries.
     private JComboBox<String> querySelectionDropdown;
-    // Text field for the database to write to.
-    private JTextField myDatabaseField;
     // Buttons for starting, stopping, and browsing for a directory to monitor.
     private JButton myWriteDbButton, myQueryButton, myResetButton, myBrowseButton, myStartButton, myStopButton;
     // Buttons for the image icons.
@@ -92,7 +88,7 @@ public class FWPanel extends JPanel {
         myMainPanel.add(monitorLabel, myGBC);
 
         extensionDropdown = new JComboBox<>(
-                new String[] { "Enter an extension", "All extensions", "DOCX", "PDF", "TXT", "PNG", "JPG", "JPEG",
+                new String[] { "All extensions", "Enter an extension", "TEST", "DOCX", "PDF", "TXT", "PNG", "JPG", "JPEG",
                         "GIF", "MP3", "MP4", "WAV",
                         "AVI", "MOV", "CSV" });
         adjustGridBagConstraints(1, 1, GridBagConstraints.REMAINDER, 1.0);
@@ -142,23 +138,6 @@ public class FWPanel extends JPanel {
      * Sets up the database box for the panel.
      */
     private void setUpDatabaseBox() {
-        JLabel queryLabel = new JLabel("Query or Write by extension");
-        adjustGridBagConstraints(0, 4, GridBagConstraints.RELATIVE, 0.0);
-        myMainPanel.add(queryLabel, myGBC);
-
-        queryExtensionDropdown = new JComboBox<>(new String[] { "txt", "log", "csv" });
-        adjustGridBagConstraints(1, 4, GridBagConstraints.REMAINDER, 1.0);
-        myMainPanel.add(queryExtensionDropdown, myGBC);
-
-        JLabel databaseLabel = new JLabel("Database");
-        adjustGridBagConstraints(0, 5, GridBagConstraints.RELATIVE, 0.0);
-        myMainPanel.add(databaseLabel, myGBC);
-
-        myDatabaseField = new JTextField(30); // Increase the size of the text field
-        adjustGridBagConstraints(1, 5, GridBagConstraints.REMAINDER, 1.0);
-        myGBC.fill = GridBagConstraints.HORIZONTAL; // Make the text field fill the available space
-        myMainPanel.add(myDatabaseField, myGBC);
-
         myWriteDbButton = createModernButton("Write to database");
         myQueryButton = createModernButton("Query");
         myQueryButton.setEnabled(false);
@@ -296,14 +275,6 @@ public class FWPanel extends JPanel {
      */
     public JButton getMyImgClearButton() {
         return myImgClearButton;
-    }
-
-    /**
-     * Gets the database textfield.
-     * @return The database textfield.
-     */
-    public JTextField getMyDatabaseField() {
-        return myDatabaseField;
     }
 
     /**
