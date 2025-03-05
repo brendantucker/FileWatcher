@@ -99,4 +99,16 @@ public class FWEventTable extends JPanel {
         myData.clear();
         myTableModel.setRowCount(0);
     }
+
+    public void filterTable(String theFilter){
+        myTableModel.setRowCount(0);
+        if(!theFilter.equals("All Extensions")){
+            for (FileEvent event : myData) {
+                if(event.getExtension().contains(theFilter)){
+                    myTableModel.addRow(new Object[] { event.getFileName(), event.getFilePath(), event.getEventType(),
+                            event.getExtension(), event.getEventDate(), event.getEventTime() });
+                }
+            }
+        }
+    }
 }

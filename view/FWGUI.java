@@ -21,12 +21,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -61,7 +59,7 @@ public class FWGUI implements ActionListener {
     // The different queries to be ran in query window.
     private JComboBox<String> myQueryComboBox;
     // Text fields for the directory, database, and extensions.
-    private JTextField myDirectoryField, myDatabaseField, myExtensionField;
+    private JTextField myDirectoryField, myExtensionField;
     // Buttons for the GUI.
     private JButton myDirectoryStartButton, myDirectoryStopButton, myWriteDbButton, myDirectoryBrowseButton,
             myResetDirectoryButton, myQueryButton;
@@ -115,7 +113,6 @@ public class FWGUI implements ActionListener {
 
     private void setUpButtons() {
         myExtensionComboBox = myMainPanel.getExtensionBox();
-        myExtensionComboBox.setEditable(true);
         myExtensionComboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -305,9 +302,9 @@ public class FWGUI implements ActionListener {
 
         myDirectoryField = myMainPanel.getDirectoryField();
         myDirectoryField.getDocument().addDocumentListener(theListener);
-        myDatabaseField = myMainPanel.getMyDatabaseField();
-        myDatabaseField.getDocument().addDocumentListener(theListener);
         myExtensionField = (JTextField) myExtensionComboBox.getEditor().getEditorComponent();
+        //Was starting out blank for some reason.
+        myExtensionField.setText(("All extensions"));
         myExtensionField.getDocument().addDocumentListener(theListener);
     }
 
@@ -436,9 +433,14 @@ public class FWGUI implements ActionListener {
         // Extension Selection
         else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
                 && !myExtensionComboBox.getSelectedItem().equals("Enter an extension")
-                && myExtensionComboBox.getEditor().getEditorComponent().hasFocus()) {
+                //&& myExtensionComboBox.getEditor().getEditorComponent().hasFocus() Possibly unnecessary?
+                ) {
             checkFields();
-            JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
+            //JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
+            myEventTable.filterTable('.' + myExtensionComboBox.getSelectedItem().toString().toLowerCase());
+            if(myExtensionComboBox.getSelectedItem().equals("All extensions")){
+                myEventTable.updateTable();
+            }
         }
         // Browse Directory
         else if (source.equals(myDirectoryBrowseButton)) {
@@ -499,16 +501,16 @@ public class FWGUI implements ActionListener {
             myQueryTable.repaint();
         } else if (source.equals(myQueryComboBox)) {
             myQueryTable.clearTable();
-            if(myQueryComboBox.getSelectedItem().equals("Query 1")){
+            if (myQueryComboBox.getSelectedItem().equals("Query 1")) {
                 FWEventTable queryResults = FileEventDAO.queryTxtFiles();
 
-                for(FileEvent event : queryResults.getData()){
+                for (FileEvent event : queryResults.getData()) {
                     myQueryTable.addEvent(event);
                 }
                 myQueryTable.updateTable();
-            } else if(myQueryComboBox.getSelectedItem().equals("Query 2")){
+            } else if (myQueryComboBox.getSelectedItem().equals("Query 2")) {
                 System.out.println("Query2");
-            } else if(myQueryComboBox.getSelectedItem().equals("Query 3")){
+            } else if (myQueryComboBox.getSelectedItem().equals("Query 3")) {
                 System.out.println("Query3");
             }
             // Adding in the new table values.
@@ -533,12 +535,7 @@ public class FWGUI implements ActionListener {
 
         JPanel queryGUI = myQueryPanel.FWQueryPanel();
         queryFrame.add(queryGUI, BorderLayout.NORTH);
-
-        //FWEventTable queryEventTable = new FWEventTable();
-        // for (FileEvent event : myEventTable.getData()) {
-        //     queryEventTable.addEvent(event);
-        // }
-
+        
         JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, myQueryTable);
         queryPane.setResizeWeight(splitPaneResizeWeight);
         queryPane.setDividerSize(0);
@@ -650,7 +647,6 @@ public class FWGUI implements ActionListener {
     private void clearFields() {
         myDirectoryField.setText("");
         myExtensionComboBox.setSelectedItem("Enter an extension");
-        myDatabaseField.setText("");
         resetTimer();
         DatabaseConnection.disconnect();
         myDatabaseActive = false;
@@ -724,7 +720,7 @@ public class FWGUI implements ActionListener {
         boolean hasDirectory = !myDirectoryField.getText().trim().isEmpty();
         boolean hasExtension = !myExtensionField.getText().trim().isEmpty()
                 && !myExtensionField.getText().equals("Enter an extension");
-        boolean hasDatabase = myDatabaseActive && !myDatabaseField.getText().trim().isEmpty();
+        boolean hasDatabase = myDatabaseActive;
 
         boolean enableStart = (hasDirectory && hasExtension) || hasDatabase;
 
