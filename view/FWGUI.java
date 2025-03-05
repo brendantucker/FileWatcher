@@ -5,7 +5,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.Box;
@@ -191,13 +193,14 @@ public class FWGUI implements ActionListener {
     private void createWatcherMenu() {
         JMenu watcherMenu = new JMenu("Debug");
         add10Item = new JMenuItem("Add 10 Events");
-        add100Item = new JMenuItem("Add 100 Events");
-        watcherMenu.add(add10Item);
-        watcherMenu.add(add100Item);
         add10Item.addActionListener(this);
-        add100Item.addActionListener(this);
         watcherMenu.add(add10Item);
+        add100Item = new JMenuItem("Add 100 Events");
         watcherMenu.add(add100Item);
+        add100Item.addActionListener(this);
+        myAdd1OfEachItem = new JMenuItem("Add one of each file type");watcherMenu.add(myAdd1OfEachItem);
+        myAdd1OfEachItem.addActionListener(this);
+        watcherMenu.add(myAdd1OfEachItem);
         myMenuBar.add(watcherMenu);
     }
 
@@ -522,6 +525,29 @@ public class FWGUI implements ActionListener {
                 myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
                         "TESTEVENT", ".test", createDateString(), createTimeString()));
             }
+        } else if (source.equals(myAdd1OfEachItem)){
+        String dummyDate = LocalDate.now().toString();
+        String dummyDatePlus3 = LocalDate.now().plusDays(3).toString();
+        String dummyDatePlus10 = LocalDate.now().plusDays(10).toString();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String dummyTime = LocalTime.now().format(formatter).toString();
+        String dummyTimePlus6 = LocalTime.now().plusHours(6).format(formatter).toString();
+        String dummyTimeMinus6 = LocalTime.now().plusHours(-6).format(formatter).toString();
+        addDummyData("Dummy DUMB", "C:\\Users\\test\\subfolder\\subfolder", "TRASH", ".dumb", dummyDate, dummyTime);
+        addDummyData("Dummy TEST", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".test", dummyDate, dummyTimePlus6);
+        addDummyData("Dummy DOCX", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".docx", dummyDatePlus3, dummyTime);
+        addDummyData("Dummy PDF", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".pdf", dummyDate, dummyTimePlus6);
+        addDummyData("Dummy TXT", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".txt", dummyDatePlus10, dummyTime);
+        addDummyData("Dummy PNG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".png", dummyDatePlus10, dummyTimePlus6);
+        addDummyData("Dummy JPG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpg", dummyDatePlus3, dummyTimeMinus6);
+        addDummyData("Dummy JPEG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpeg", dummyDatePlus3, dummyTime);
+        addDummyData("Dummy GIF", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".gif", dummyDatePlus10, dummyTime);
+        addDummyData("Dummy MP3", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mp3", dummyDatePlus10, dummyTimePlus6);
+        addDummyData("Dummy MP4", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".mp4", dummyDate, dummyTimePlus6);
+        addDummyData("Dummy WAV", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".wav", dummyDatePlus3, dummyTimeMinus6);
+        addDummyData("Dummy AVI", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".avi", dummyDate, dummyTimeMinus6);
+        addDummyData("Dummy MOV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mov", dummyDatePlus3, dummyTimeMinus6);
+        addDummyData("Dummy CSV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".csv", dummyDatePlus10, dummyTime);
         }
     }
 
@@ -674,6 +700,12 @@ public class FWGUI implements ActionListener {
         myMenuStop.setEnabled(!theValue);
         myDirectoryStopButton.setEnabled(!theValue);
         myImgStopButton.setEnabled(!theValue);
+    }
+
+    private void addDummyData(String theFileName, String theFilePath, String theEventType, String theExtension,
+        String theDate, String theTime){
+        //Adding one of every item into the menu to help show off the filtering functions.
+        myEventTable.addEvent(new FileEvent(theFileName,theFilePath,theEventType,theExtension,theDate,theTime));
     }
 
     /**
