@@ -79,8 +79,8 @@ public class FWGUI implements ActionListener {
     private JLabel myDatabaseConnectionLabel;
 
     private JMenuItem add10Item;
-
     private JMenuItem add100Item;
+    private JMenuItem myAdd1OfEachItem;
 
     private static FWGUI myInstance;
 
