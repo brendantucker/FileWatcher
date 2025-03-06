@@ -93,4 +93,22 @@ public class FileEventDAO {
         }
         return theResultsTable;
     }
+
+    public static void resetEntireDatabase(){
+        Connection conn = DatabaseConnection.getMyConnection();
+        if (conn == null) {
+            System.out.println("Database is not connected!");
+            return;
+        }
+
+        String sql = "DELETE FROM file_events";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            int rowsDeleted = pstmt.executeUpdate();
+            System.out.println("Deleted " + rowsDeleted + " rows from the database.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Error deleting rows from the database.");
+        }
+    }
 }

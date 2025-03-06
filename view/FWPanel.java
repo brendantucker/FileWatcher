@@ -9,7 +9,7 @@ public class FWPanel extends JPanel {
     // Combo box for the query window to select the queries.
     private JComboBox<String> querySelectionDropdown;
     // Buttons for starting, stopping, and browsing for a directory to monitor.
-    private JButton myWriteDbButton, myQueryButton, myResetButton, myBrowseButton, myStartButton, myStopButton;
+    private JButton myWriteDbButton, myQueryButton, myDatabaseReseButton, myResetButton, myBrowseButton, myStartButton, myStopButton;
     // Buttons for the image icons.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // GridBagConstraint for the layout.
@@ -40,16 +40,20 @@ public class FWPanel extends JPanel {
     public JPanel FWQueryPanel(){
         JPanel queryPanel = new JPanel(new GridBagLayout());
         GridBagConstraints queryGBC = new GridBagConstraints();
-        JLabel queryLabel = new JLabel("Query to Select: ");
         queryGBC.insets = new Insets(5, 5, 5, 5);
+    
+        JLabel queryLabel = new JLabel("Query to Select: ");
         queryPanelGBC(queryGBC, 0, 0, 0.0);
         queryPanel.add(queryLabel, queryGBC);
-
+    
         querySelectionDropdown = new JComboBox<>(new String[] { "Choose query", "Query 1", "Query 2", "Query 3" });
-        queryGBC.insets = new Insets(5, 5, 5, 5);
         queryPanelGBC(queryGBC, 1, 0, 1.0);
         queryPanel.add(querySelectionDropdown, queryGBC);
-
+    
+        myDatabaseReseButton = createModernButton("Reset Database");
+        queryPanelGBC(queryGBC, 2, 0, 0.0); // Move button to the right of the dropdown
+        queryPanel.add(myDatabaseReseButton, queryGBC);
+    
         return queryPanel;
     }
 
@@ -235,6 +239,14 @@ public class FWPanel extends JPanel {
      */
     public JButton getQueryButton(){
         return myQueryButton;
+    }
+
+    /**
+     * Gets the button that will reset the database.
+     * @return The button that will reset the database.
+     */
+    public JButton getDatabaseResetButton(){
+        return myDatabaseReseButton;
     }
 
     /**

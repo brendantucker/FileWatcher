@@ -64,7 +64,7 @@ public class FWGUI implements ActionListener {
     private JTextField myDirectoryField, myExtensionField;
     // Buttons for the GUI.
     private JButton myDirectoryStartButton, myDirectoryStopButton, myWriteDbButton, myDirectoryBrowseButton,
-            myResetDirectoryButton, myQueryButton;
+            myResetDirectoryButton, myQueryButton, myDatabaseResetButton;
     // Buttons for the image icons.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // The main panel for the GUI.
@@ -79,10 +79,10 @@ public class FWGUI implements ActionListener {
     private boolean myDatabaseActive;
     // Label to display whether or not the database is connected.
     private JLabel myDatabaseConnectionLabel;
-
-    private JMenuItem add10Item;
-    private JMenuItem add100Item;
-    private JMenuItem myAdd1OfEachItem;
+    // Debug buttons created to make fake data for quicker testing.
+    private JMenuItem add10Item,add100Item,myAdd1OfEachItem;
+    // Connect and disconnect from the database buttons.
+    private JMenuItem myConnectDbItem, myDisconnectDbItem;
 
     private static FWGUI myInstance;
 
@@ -210,12 +210,14 @@ public class FWGUI implements ActionListener {
     private void createDatabaseMenu() {
         JMenu databaseMenu = new JMenu("Database");
 
-        JMenuItem connectDbItem = new JMenuItem("Connect to Database");
-        JMenuItem disconnectDbItem = new JMenuItem("Disconnect Database");
-        databaseMenu.add(connectDbItem);
-        databaseMenu.add(disconnectDbItem);
-        connectDbItem.addActionListener(this);
-        disconnectDbItem.addActionListener(this);
+        myConnectDbItem = new JMenuItem("Connect to Database");
+        myDisconnectDbItem = new JMenuItem("Disconnect Database");
+        //Disabling until database connection is established.
+        myDisconnectDbItem.setEnabled(false);
+        databaseMenu.add(myConnectDbItem);
+        databaseMenu.add(myDisconnectDbItem);
+        myConnectDbItem.addActionListener(this);
+        myDisconnectDbItem.addActionListener(this);
 
         myMenuBar.add(databaseMenu);
     }
@@ -380,7 +382,6 @@ public class FWGUI implements ActionListener {
                         System.exit(0);
                     }
                 }
-
                 FileEventDAO.insertFileEvents(unsavedEvents);
             }
         }
@@ -416,6 +417,8 @@ public class FWGUI implements ActionListener {
         else if (command.equals("Connect to Database")) {
             boolean success = DatabaseConnection.connect();
             if (success) {
+                myConnectDbItem.setEnabled(false);
+                myDisconnectDbItem.setEnabled(true);
                 setDatabaseConnected(true);
                 JOptionPane.showMessageDialog(myFrame, "Connected to the database successfully!",
                         "Database Connection", JOptionPane.INFORMATION_MESSAGE);
@@ -427,6 +430,8 @@ public class FWGUI implements ActionListener {
         }
         // Disconnect from Database
         else if (command.equals("Disconnect Database")) {
+            myConnectDbItem.setEnabled(true);
+            myDisconnectDbItem.setEnabled(false);
             DatabaseConnection.disconnect();
             setDatabaseConnected(false);
             JOptionPane.showMessageDialog(myFrame, "Disconnected from the database.",
@@ -491,13 +496,7 @@ public class FWGUI implements ActionListener {
 
             JOptionPane.showMessageDialog(myFrame, rowsInserted + " events written to the database.",
                     "Database Write", JOptionPane.INFORMATION_MESSAGE);
-        } else if (source.equals(add10Item)) {
-            // Add 10 events to the event table for testing
-            for (int i = 0; i < 10; i++) {
-                myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
-                        "TESTEVENT", ".test", createDateString(), createTimeString()));
-            }
-        } else if (source.equals(myQueryButton)) {
+        }else if (source.equals(myQueryButton)) {
             guiWindow();
             myQueryTable.clearTable();
             myQueryTable.revalidate();
@@ -519,6 +518,22 @@ public class FWGUI implements ActionListener {
             // Adding in the new table values.
             myQueryTable.revalidate();
             myQueryTable.repaint();
+        } else if(source.equals(myDatabaseResetButton)){
+            int choice = JOptionPane.showConfirmDialog(
+                    myQueryPanel,
+                    "This will remove all data from the database,resetting it. Are you sure you want to continue?",
+                    "Reset Database",
+                    JOptionPane.YES_NO_OPTION);
+            if(choice == JOptionPane.YES_OPTION){
+                FileEventDAO.resetEntireDatabase();
+                myQueryTable.clearTable();
+            }
+        } else if (source.equals(add10Item)) {
+            // Add 10 events to the event table for testing
+            for (int i = 0; i < 10; i++) {
+                myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
+                        "TESTEVENT", ".test", createDateString(), createTimeString()));
+            }
         } else if (source.equals(add100Item)) {
             // Add 10 events to the event table for testing
             for (int i = 0; i < 100; i++) {
@@ -526,28 +541,7 @@ public class FWGUI implements ActionListener {
                         "TESTEVENT", ".test", createDateString(), createTimeString()));
             }
         } else if (source.equals(myAdd1OfEachItem)){
-        String dummyDate = LocalDate.now().toString();
-        String dummyDatePlus3 = LocalDate.now().plusDays(3).toString();
-        String dummyDatePlus10 = LocalDate.now().plusDays(10).toString();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        String dummyTime = LocalTime.now().format(formatter).toString();
-        String dummyTimePlus6 = LocalTime.now().plusHours(6).format(formatter).toString();
-        String dummyTimeMinus6 = LocalTime.now().plusHours(-6).format(formatter).toString();
-        addDummyData("Dummy DUMB", "C:\\Users\\test\\subfolder\\subfolder", "TRASH", ".dumb", dummyDate, dummyTime);
-        addDummyData("Dummy TEST", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".test", dummyDate, dummyTimePlus6);
-        addDummyData("Dummy DOCX", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".docx", dummyDatePlus3, dummyTime);
-        addDummyData("Dummy PDF", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".pdf", dummyDate, dummyTimePlus6);
-        addDummyData("Dummy TXT", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".txt", dummyDatePlus10, dummyTime);
-        addDummyData("Dummy PNG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".png", dummyDatePlus10, dummyTimePlus6);
-        addDummyData("Dummy JPG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpg", dummyDatePlus3, dummyTimeMinus6);
-        addDummyData("Dummy JPEG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpeg", dummyDatePlus3, dummyTime);
-        addDummyData("Dummy GIF", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".gif", dummyDatePlus10, dummyTime);
-        addDummyData("Dummy MP3", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mp3", dummyDatePlus10, dummyTimePlus6);
-        addDummyData("Dummy MP4", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".mp4", dummyDate, dummyTimePlus6);
-        addDummyData("Dummy WAV", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".wav", dummyDatePlus3, dummyTimeMinus6);
-        addDummyData("Dummy AVI", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".avi", dummyDate, dummyTimeMinus6);
-        addDummyData("Dummy MOV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mov", dummyDatePlus3, dummyTimeMinus6);
-        addDummyData("Dummy CSV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".csv", dummyDatePlus10, dummyTime);
+            runDummyInsertion();
         }
     }
 
@@ -571,6 +565,9 @@ public class FWGUI implements ActionListener {
 
         myQueryComboBox = myQueryPanel.getQueryPopupSelection();
         myQueryComboBox.addActionListener(this);
+
+        myDatabaseResetButton = myQueryPanel.getDatabaseResetButton();
+        myDatabaseResetButton.addActionListener(this);
 
         queryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -700,6 +697,31 @@ public class FWGUI implements ActionListener {
         myMenuStop.setEnabled(!theValue);
         myDirectoryStopButton.setEnabled(!theValue);
         myImgStopButton.setEnabled(!theValue);
+    }
+
+    private void runDummyInsertion(){
+        String dummyDate = LocalDate.now().toString();
+        String dummyDatePlus3 = LocalDate.now().plusDays(3).toString();
+        String dummyDatePlus10 = LocalDate.now().plusDays(10).toString();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String dummyTime = LocalTime.now().format(formatter).toString();
+        String dummyTimePlus6 = LocalTime.now().plusHours(6).format(formatter).toString();
+        String dummyTimeMinus6 = LocalTime.now().plusHours(-6).format(formatter).toString();
+        addDummyData("Dummy DUMB", "C:\\Users\\test\\subfolder\\subfolder", "TRASH", ".dumb", dummyDate, dummyTime);
+        addDummyData("Dummy TEST", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".test", dummyDate, dummyTimePlus6);
+        addDummyData("Dummy DOCX", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".docx", dummyDatePlus3, dummyTime);
+        addDummyData("Dummy PDF", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".pdf", dummyDate, dummyTimePlus6);
+        addDummyData("Dummy TXT", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".txt", dummyDatePlus10, dummyTime);
+        addDummyData("Dummy PNG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".png", dummyDatePlus10, dummyTimePlus6);
+        addDummyData("Dummy JPG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpg", dummyDatePlus3, dummyTimeMinus6);
+        addDummyData("Dummy JPEG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpeg", dummyDatePlus3, dummyTime);
+        addDummyData("Dummy GIF", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".gif", dummyDatePlus10, dummyTime);
+        addDummyData("Dummy MP3", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mp3", dummyDatePlus10, dummyTimePlus6);
+        addDummyData("Dummy MP4", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".mp4", dummyDate, dummyTimePlus6);
+        addDummyData("Dummy WAV", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".wav", dummyDatePlus3, dummyTimeMinus6);
+        addDummyData("Dummy AVI", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".avi", dummyDate, dummyTimeMinus6);
+        addDummyData("Dummy MOV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mov", dummyDatePlus3, dummyTimeMinus6);
+        addDummyData("Dummy CSV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".csv", dummyDatePlus10, dummyTime);
     }
 
     private void addDummyData(String theFileName, String theFilePath, String theEventType, String theExtension,
