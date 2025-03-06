@@ -80,7 +80,7 @@ public class FWGUI implements ActionListener {
     // Label to display whether or not the database is connected.
     private JLabel myDatabaseConnectionLabel;
     // Debug buttons created to make fake data for quicker testing.
-    private JMenuItem add10Item,add100Item,myAdd1OfEachItem;
+    private JMenuItem add10Item, add100Item, myAdd1OfEachItem;
     // Connect and disconnect from the database buttons.
     private JMenuItem myConnectDbItem, myDisconnectDbItem;
 
@@ -198,7 +198,8 @@ public class FWGUI implements ActionListener {
         add100Item = new JMenuItem("Add 100 Events");
         watcherMenu.add(add100Item);
         add100Item.addActionListener(this);
-        myAdd1OfEachItem = new JMenuItem("Add one of each file type");watcherMenu.add(myAdd1OfEachItem);
+        myAdd1OfEachItem = new JMenuItem("Add one of each file type");
+        watcherMenu.add(myAdd1OfEachItem);
         myAdd1OfEachItem.addActionListener(this);
         watcherMenu.add(myAdd1OfEachItem);
         myMenuBar.add(watcherMenu);
@@ -212,7 +213,7 @@ public class FWGUI implements ActionListener {
 
         myConnectDbItem = new JMenuItem("Connect to Database");
         myDisconnectDbItem = new JMenuItem("Disconnect Database");
-        //Disabling until database connection is established.
+        // Disabling until database connection is established.
         myDisconnectDbItem.setEnabled(false);
         databaseMenu.add(myConnectDbItem);
         databaseMenu.add(myDisconnectDbItem);
@@ -308,7 +309,7 @@ public class FWGUI implements ActionListener {
         myDirectoryField = myMainPanel.getDirectoryField();
         myDirectoryField.getDocument().addDocumentListener(theListener);
         myExtensionField = (JTextField) myExtensionComboBox.getEditor().getEditorComponent();
-        //Was starting out blank for some reason.
+        // Was starting out blank for some reason.
         myExtensionField.setText(("All extensions"));
         myExtensionField.getDocument().addDocumentListener(theListener);
     }
@@ -441,12 +442,14 @@ public class FWGUI implements ActionListener {
         // Extension Selection
         else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
                 && !myExtensionComboBox.getSelectedItem().equals("Enter an extension")
-                //&& myExtensionComboBox.getEditor().getEditorComponent().hasFocus() Possibly unnecessary?
-                ) {
+        // && myExtensionComboBox.getEditor().getEditorComponent().hasFocus() Possibly
+        // unnecessary?
+        ) {
             checkFields();
-            //JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
+            // JOptionPane.showMessageDialog(myFrame, (String)
+            // myExtensionComboBox.getSelectedItem());
             myEventTable.filterTable('.' + myExtensionComboBox.getSelectedItem().toString().toLowerCase());
-            if(myExtensionComboBox.getSelectedItem().equals("All extensions")){
+            if (myExtensionComboBox.getSelectedItem().equals("All extensions")) {
                 myEventTable.updateTable();
             }
         }
@@ -496,35 +499,37 @@ public class FWGUI implements ActionListener {
 
             JOptionPane.showMessageDialog(myFrame, rowsInserted + " events written to the database.",
                     "Database Write", JOptionPane.INFORMATION_MESSAGE);
-        }else if (source.equals(myQueryButton)) {
+        } else if (source.equals(myQueryButton)) {
             guiWindow();
             myQueryTable.clearTable();
             myQueryTable.revalidate();
             myQueryTable.repaint();
         } else if (source.equals(myQueryComboBox)) {
             myQueryTable.clearTable();
-            if (myQueryComboBox.getSelectedItem().equals("Query 1")) {
-                FWEventTable queryResults = FileEventDAO.queryTxtFiles();
-
+            if (myQueryComboBox.getSelectedItem().equals("Query 1 - All events from today")) {
+                FWEventTable queryResults = FileEventDAO.fileEventsFromToday();
                 for (FileEvent event : queryResults.getData()) {
                     myQueryTable.addEvent(event);
                 }
-                myQueryTable.updateTable();
-            } else if (myQueryComboBox.getSelectedItem().equals("Query 2")) {
-                System.out.println("Query2");
-            } else if (myQueryComboBox.getSelectedItem().equals("Query 3")) {
+            } else if (myQueryComboBox.getSelectedItem().equals("Query 2 - Top 5 frequently modified file types")) {
+                FWEventTable queryResults = FileEventDAO.topFiveExtensions();
+                for (FileEvent event : queryResults.getData()) {
+                    myQueryTable.addEvent(event);
+                }
+            } else if (myQueryComboBox.getSelectedItem().equals("Query 3 - Choose extensions to view")) {
                 System.out.println("Query3");
             }
             // Adding in the new table values.
+            myQueryTable.updateTable();
             myQueryTable.revalidate();
             myQueryTable.repaint();
-        } else if(source.equals(myDatabaseResetButton)){
+        } else if (source.equals(myDatabaseResetButton)) {
             int choice = JOptionPane.showConfirmDialog(
                     myQueryPanel,
                     "This will remove all data from the database,resetting it. Are you sure you want to continue?",
                     "Reset Database",
                     JOptionPane.YES_NO_OPTION);
-            if(choice == JOptionPane.YES_OPTION){
+            if (choice == JOptionPane.YES_OPTION) {
                 FileEventDAO.resetEntireDatabase();
                 myQueryTable.clearTable();
             }
@@ -540,7 +545,7 @@ public class FWGUI implements ActionListener {
                 myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
                         "TESTEVENT", ".test", createDateString(), createTimeString()));
             }
-        } else if (source.equals(myAdd1OfEachItem)){
+        } else if (source.equals(myAdd1OfEachItem)) {
             runDummyInsertion();
         }
     }
@@ -555,7 +560,7 @@ public class FWGUI implements ActionListener {
 
         JPanel queryGUI = myQueryPanel.FWQueryPanel();
         queryFrame.add(queryGUI, BorderLayout.NORTH);
-        
+
         JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, myQueryTable);
         queryPane.setResizeWeight(splitPaneResizeWeight);
         queryPane.setDividerSize(0);
@@ -614,7 +619,7 @@ public class FWGUI implements ActionListener {
         myTimeLabel.setText("Time not started.");
         myTimer.start();
         buttonReverse(false);
-        //Disable ability to modify directory and extension fields while monitoring
+        // Disable ability to modify directory and extension fields while monitoring
         myDirectoryField.setEditable(false);
         myExtensionField.setEditable(false);
         myExtensionComboBox.setEditable(false);
@@ -629,7 +634,7 @@ public class FWGUI implements ActionListener {
         myIsMonitoring = false;
         buttonReverse(true);
         myDirectoryWatchService.stop();
-        //Enable ability to modify directory and extension fields while not monitoring
+        // Enable ability to modify directory and extension fields while not monitoring
         myDirectoryField.setEditable(true);
         myExtensionField.setEditable(true);
         myExtensionComboBox.setEditable(true);
@@ -699,7 +704,7 @@ public class FWGUI implements ActionListener {
         myImgStopButton.setEnabled(!theValue);
     }
 
-    private void runDummyInsertion(){
+    private void runDummyInsertion() {
         String dummyDate = LocalDate.now().toString();
         String dummyDatePlus3 = LocalDate.now().plusDays(3).toString();
         String dummyDatePlus10 = LocalDate.now().plusDays(10).toString();
@@ -708,26 +713,41 @@ public class FWGUI implements ActionListener {
         String dummyTimePlus6 = LocalTime.now().plusHours(6).format(formatter).toString();
         String dummyTimeMinus6 = LocalTime.now().plusHours(-6).format(formatter).toString();
         addDummyData("Dummy DUMB", "C:\\Users\\test\\subfolder\\subfolder", "TRASH", ".dumb", dummyDate, dummyTime);
-        addDummyData("Dummy TEST", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".test", dummyDate, dummyTimePlus6);
-        addDummyData("Dummy DOCX", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".docx", dummyDatePlus3, dummyTime);
-        addDummyData("Dummy PDF", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".pdf", dummyDate, dummyTimePlus6);
-        addDummyData("Dummy TXT", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".txt", dummyDatePlus10, dummyTime);
-        addDummyData("Dummy PNG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".png", dummyDatePlus10, dummyTimePlus6);
-        addDummyData("Dummy JPG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpg", dummyDatePlus3, dummyTimeMinus6);
-        addDummyData("Dummy JPEG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpeg", dummyDatePlus3, dummyTime);
-        addDummyData("Dummy GIF", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".gif", dummyDatePlus10, dummyTime);
-        addDummyData("Dummy MP3", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mp3", dummyDatePlus10, dummyTimePlus6);
-        addDummyData("Dummy MP4", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".mp4", dummyDate, dummyTimePlus6);
-        addDummyData("Dummy WAV", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".wav", dummyDatePlus3, dummyTimeMinus6);
-        addDummyData("Dummy AVI", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".avi", dummyDate, dummyTimeMinus6);
-        addDummyData("Dummy MOV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mov", dummyDatePlus3, dummyTimeMinus6);
-        addDummyData("Dummy CSV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".csv", dummyDatePlus10, dummyTime);
+        addDummyData("Dummy TEST", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".test", dummyDate,
+                dummyTimePlus6);
+        addDummyData("Dummy DOCX", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".docx", dummyDatePlus3,
+                dummyTime);
+        addDummyData("Dummy PDF", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".pdf", dummyDate,
+                dummyTimePlus6);
+        addDummyData("Dummy TXT", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".txt", dummyDatePlus10,
+                dummyTime);
+        addDummyData("Dummy PNG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".png", dummyDatePlus10,
+                dummyTimePlus6);
+        addDummyData("Dummy JPG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpg", dummyDatePlus3,
+                dummyTimeMinus6);
+        addDummyData("Dummy JPEG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpeg", dummyDatePlus3,
+                dummyTime);
+        addDummyData("Dummy GIF", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".gif", dummyDatePlus10,
+                dummyTime);
+        addDummyData("Dummy MP3", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mp3", dummyDatePlus10,
+                dummyTimePlus6);
+        addDummyData("Dummy MP4", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".mp4", dummyDate,
+                dummyTimePlus6);
+        addDummyData("Dummy WAV", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".wav", dummyDatePlus3,
+                dummyTimeMinus6);
+        addDummyData("Dummy AVI", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".avi", dummyDate,
+                dummyTimeMinus6);
+        addDummyData("Dummy MOV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mov", dummyDatePlus3,
+                dummyTimeMinus6);
+        addDummyData("Dummy CSV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".csv", dummyDatePlus10,
+                dummyTime);
     }
 
     private void addDummyData(String theFileName, String theFilePath, String theEventType, String theExtension,
-        String theDate, String theTime){
-        //Adding one of every item into the menu to help show off the filtering functions.
-        myEventTable.addEvent(new FileEvent(theFileName,theFilePath,theEventType,theExtension,theDate,theTime));
+            String theDate, String theTime) {
+        // Adding one of every item into the menu to help show off the filtering
+        // functions.
+        myEventTable.addEvent(new FileEvent(theFileName, theFilePath, theEventType, theExtension, theDate, theTime));
     }
 
     /**
@@ -797,7 +817,7 @@ public class FWGUI implements ActionListener {
             myMenuStart.setEnabled(false);
             myImgStartButton.setEnabled(false);
         }
-        //Do not enable start buttons if already monitoring
+        // Do not enable start buttons if already monitoring
         if (myIsMonitoring) {
             myDirectoryStartButton.setEnabled(false);
             myMenuStart.setEnabled(false);
