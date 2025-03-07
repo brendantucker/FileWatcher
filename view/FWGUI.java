@@ -159,6 +159,7 @@ public class FWGUI implements ActionListener {
         createFileMenu();
         createWatcherMenu();
         createDatabaseMenu();
+        createEmailMenu();
         createAboutMenu();
         createImgButtons();
         myFrame.setJMenuBar(myMenuBar);
@@ -238,6 +239,16 @@ public class FWGUI implements ActionListener {
         myMenuBar.add(myImgStopButton);
         myMenuBar.add(myImgDBButton);
         myMenuBar.add(myImgClearButton);
+    }
+    
+    private void createEmailMenu() {
+        JMenu emailMenu = new JMenu("Email");
+        JMenuItem sendEmailItem = new JMenuItem("Send File via Email");
+        sendEmailItem.addActionListener(this);
+        emailMenu.add(sendEmailItem);
+        myMenuBar.add(emailMenu);
+
+        
     }
 
     /**
@@ -440,6 +451,19 @@ public class FWGUI implements ActionListener {
             myEventTable.filterTable('.' + myExtensionComboBox.getSelectedItem().toString().toLowerCase());
             if(myExtensionComboBox.getSelectedItem().equals("All extensions")){
                 myEventTable.updateTable();
+            }
+        }
+        // Send File via Email
+        else if (command.equals("Send File via Email")) {
+            String recipient = JOptionPane.showInputDialog(myFrame, "Enter recipient email:", "Send Email", JOptionPane.QUESTION_MESSAGE);
+            if (recipient != null && !recipient.isEmpty()) {
+                JFileChooser fileChooser = new JFileChooser();
+                int returnValue = fileChooser.showOpenDialog(null);
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+                    EmailSender.sendEmailWithAttachment(recipient, "File Watcher Report", "Please find the attached file.", filePath);
+                    JOptionPane.showMessageDialog(myFrame, "Email Sent Successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         }
         // Browse Directory
