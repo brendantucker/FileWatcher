@@ -11,19 +11,25 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.Box;
+
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -36,7 +42,7 @@ import java.awt.event.WindowEvent;
  * main frame and sets up the menu bar, buttons, and event table.
  */
 public class FWGUI implements ActionListener {
-    // Frame to hold all of the GUI portions.
+    // Frame to hold all of the GUI portions, and the query popup.
     private JFrame myFrame;
     // Menu bar for the GUI.
     private JMenuBar myMenuBar;
@@ -83,6 +89,12 @@ public class FWGUI implements ActionListener {
     private JMenuItem add10Item, add100Item, myAdd1OfEachItem;
     // Connect and disconnect from the database buttons.
     private JMenuItem myConnectDbItem, myDisconnectDbItem;
+    // Checkboxes for querying the database for specific extensions.
+    private JPanel myQueryCheckBoxPanel;
+    // Frame for the query panel pop up window.
+    private FWFrame myQueryFrame;
+    // Array for holding all the checkbox options
+    private JCheckBox[] myExtensionCheckBox;
 
     private static FWGUI myInstance;
 
@@ -442,13 +454,10 @@ public class FWGUI implements ActionListener {
         // Extension Selection
         else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
                 && !myExtensionComboBox.getSelectedItem().equals("Enter an extension")
-        // && myExtensionComboBox.getEditor().getEditorComponent().hasFocus() Possibly
-        // unnecessary?
+        // && myExtensionComboBox.getEditor().getEditorComponent().hasFocus() Possibly unnecessary?
         ) {
             checkFields();
-            // JOptionPane.showMessageDialog(myFrame, (String)
-            // myExtensionComboBox.getSelectedItem());
-            myEventTable.filterTable('.' + myExtensionComboBox.getSelectedItem().toString().toLowerCase());
+            myEventTable.filterTable('.' + myExtensionComboBox.getSelectedItem().toString());
             if (myExtensionComboBox.getSelectedItem().equals("All extensions")) {
                 myEventTable.updateTable();
             }
@@ -501,28 +510,38 @@ public class FWGUI implements ActionListener {
                     "Database Write", JOptionPane.INFORMATION_MESSAGE);
         } else if (source.equals(myQueryButton)) {
             guiWindow();
-            myQueryTable.clearTable();
-            myQueryTable.revalidate();
-            myQueryTable.repaint();
         } else if (source.equals(myQueryComboBox)) {
             myQueryTable.clearTable();
+            FWEventTable queryResults = new FWEventTable();
+            myQueryCheckBoxPanel.setVisible(false);
+            myQueryFrame.revalidate(); 
+            myQueryFrame.repaint(); 
+            //Erasing the selected checkboxes as a precaution
+            for(JCheckBox checkBox: myExtensionCheckBox){
+                checkBox.setSelected(false);
+            }
             if (myQueryComboBox.getSelectedItem().equals("Query 1 - All events from today")) {
-                FWEventTable queryResults = FileEventDAO.fileEventsFromToday();
-                for (FileEvent event : queryResults.getData()) {
-                    myQueryTable.addEvent(event);
-                }
+                queryResults = FileEventDAO.fileEventsFromToday();
             } else if (myQueryComboBox.getSelectedItem().equals("Query 2 - Top 5 frequently modified file types")) {
-                FWEventTable queryResults = FileEventDAO.topFiveExtensions();
-                for (FileEvent event : queryResults.getData()) {
-                    myQueryTable.addEvent(event);
-                }
-            } else if (myQueryComboBox.getSelectedItem().equals("Query 3 - Choose extensions to view")) {
-                System.out.println("Query3");
+                queryResults = FileEventDAO.topFiveExtensions();
+            } else if (myQueryComboBox.getSelectedItem().equals("Query 3 - Most Common Events for Each Extension")) {
+                queryResults = FileEventDAO.mostCommonEventsPerExtension();
+            } else if (myQueryComboBox.getSelectedItem().equals("Select specific extensions")) {
+                myQueryCheckBoxPanel.setVisible(true);
+                myQueryFrame.revalidate();   // Revalidate all components within the frame
+                myQueryFrame.repaint();      // Repaint the frame to update the UI
+                myQueryFrame.pack();         // Resizes the frame to fit the components
+                myQueryFrame.queryFrameSize(.8, .3);
             }
             // Adding in the new table values.
-            myQueryTable.updateTable();
-            myQueryTable.revalidate();
-            myQueryTable.repaint();
+            if (queryResults.getData().size() != 0) {
+                for (FileEvent event : queryResults.getData()) {
+                    myQueryTable.addEvent(event);
+                }
+                myQueryTable.updateTable();
+                myQueryTable.revalidate();
+                myQueryTable.repaint();
+            }
         } else if (source.equals(myDatabaseResetButton)) {
             int choice = JOptionPane.showConfirmDialog(
                     myQueryPanel,
@@ -551,22 +570,30 @@ public class FWGUI implements ActionListener {
     }
 
     private void guiWindow() {
-        FWFrame queryFrame = new FWFrame();
-        queryFrame.queryFrameSize(.8, .3);
-        queryFrame.setLocationRelativeTo(null);
-        queryFrame.setTitle("Query Window");
-        queryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        queryFrame.setLayout(new BorderLayout());
+        myQueryFrame = new FWFrame();
+        myQueryFrame.queryFrameSize(.8, .3);
+        myQueryFrame.setLocationRelativeTo(null);
+        myQueryFrame.setTitle("Query Window");
+        myQueryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        myQueryFrame.setLayout(new BorderLayout());
 
         JPanel queryGUI = myQueryPanel.FWQueryPanel();
-        queryFrame.add(queryGUI, BorderLayout.NORTH);
+        myQueryFrame.add(queryGUI, BorderLayout.NORTH);
 
-        JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, myQueryTable);
+        myQueryCheckBoxPanel = setUpQueryCheckBoxes();
+
+        myQueryCheckBoxPanel.setVisible(false);
+
+        JSplitPane middleQueryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myQueryCheckBoxPanel, myQueryTable);
+        middleQueryPane.setResizeWeight(splitPaneResizeWeight);
+        middleQueryPane.setDividerSize(2);
+
+        JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, middleQueryPane);
         queryPane.setResizeWeight(splitPaneResizeWeight);
         queryPane.setDividerSize(0);
 
         // Add the JSplitPane to the frame
-        queryFrame.add(queryPane, BorderLayout.CENTER);
+        myQueryFrame.add(queryPane, BorderLayout.CENTER);
 
         myQueryComboBox = myQueryPanel.getQueryPopupSelection();
         myQueryComboBox.addActionListener(this);
@@ -574,9 +601,46 @@ public class FWGUI implements ActionListener {
         myDatabaseResetButton = myQueryPanel.getDatabaseResetButton();
         myDatabaseResetButton.addActionListener(this);
 
-        queryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        myQueryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        queryFrame.setVisible(true);
+        myQueryFrame.setVisible(true);
+    }
+
+    private JPanel setUpQueryCheckBoxes() {
+        JPanel queryCheckboxesPanel = new JPanel();
+        String[] extensions = { "test", "docx", "pdf", "txt", "png", "jpg", "jpeg", "gif", "mp3", "mp4", "wav", "avi",
+                "mov", "csv" };
+        List<String> extensionList = new ArrayList<>();
+
+        myExtensionCheckBox = new JCheckBox[extensions.length];
+        for (int i = 0; i < extensions.length; i++) {
+            myExtensionCheckBox[i] = new JCheckBox(extensions[i]);
+
+            myExtensionCheckBox[i].addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    JCheckBox curCheckBox = (JCheckBox) e.getSource();
+                    String curExtension = curCheckBox.getText();
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        if(!extensionList.contains(curExtension)) {
+                            extensionList.add(curExtension);
+                        }
+                    } else {
+                        extensionList.remove(curExtension);
+                    }
+                    FWEventTable tempQueryResults = FileEventDAO.querySpecificExtensions(extensionList);
+                    myQueryTable.clearTable();
+                    for(FileEvent event: tempQueryResults.getData()){
+                        myQueryTable.addEvent(event);
+                    }
+                    myQueryTable.updateTable();
+                    myQueryTable.revalidate();
+                    myQueryTable.repaint();
+                }
+            });
+            queryCheckboxesPanel.add(myExtensionCheckBox[i]);
+        }
+        return queryCheckboxesPanel;
     }
 
     /**

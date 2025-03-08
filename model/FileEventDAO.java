@@ -71,7 +71,7 @@ public class FileEventDAO {
         if (conn == null) {
             System.out.println("Database is not connected!");
         } else {
-            String sql = "SELECT * FROM file_events WHERE DATE(event_date) = DATE('now');";
+            String sql = "SELECT * FROM file_events WHERE DATE(event_date) = DATE('now', 'localtime');";
 
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 ResultSet resultElements = pstmt.executeQuery();
@@ -94,14 +94,14 @@ public class FileEventDAO {
         return theResultsTable;
     }
 
-    public static FWEventTable topFiveExtensions(){
+    public static FWEventTable topFiveExtensions() {
         FWEventTable theResultsTable = new FWEventTable();
         Connection conn = DatabaseConnection.getMyConnection();
         if (conn == null) {
             System.out.println("Database is not connected!");
         } else {
             String sql = "SELECT * FROM file_events WHERE file_extension in(SELECT file_extension FROM file_events " +
-            "GROUP BY file_extension ORDER BY COUNT(*) DESC LIMIT 5);";
+                    "GROUP BY file_extension ORDER BY COUNT(*) DESC LIMIT 5);";
 
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 ResultSet resultElements = pstmt.executeQuery();
@@ -119,6 +119,75 @@ public class FileEventDAO {
             } catch (SQLException e) {
                 e.printStackTrace();
                 System.out.println("Error querying txt files.");
+            }
+        }
+        return theResultsTable;
+    }
+
+    public static FWEventTable querySpecificExtensions(List<String> theList) {
+        FWEventTable theResultsTable = new FWEventTable();
+        Connection conn = DatabaseConnection.getMyConnection();
+        if (conn == null) {
+            System.out.println("Database is not connected!");
+        } else {
+            StringBuilder whereExtensionClause = new StringBuilder();
+            for (String extension : theList) {
+                whereExtensionClause.append("'.").append(extension).append("',");
+            }
+            // Remove the trailing comma
+            if (whereExtensionClause.length() > 0) {
+                whereExtensionClause.setLength(whereExtensionClause.length() - 1);
+            }
+            String sql = "SELECT * FROM file_events WHERE file_extension IN (" + whereExtensionClause + ")";
+
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                ResultSet resultElements = pstmt.executeQuery();
+                while (resultElements.next()) {
+                    FileEvent theEvent = new FileEvent(
+                            resultElements.getString("file_name"),
+                            resultElements.getString("file_path"),
+                            resultElements.getString("event_type"),
+                            resultElements.getString("file_extension"),
+                            resultElements.getString("event_date"),
+                            resultElements.getString("event_time"));
+
+                    theResultsTable.addEvent(theEvent);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Error querying txt files.");
+            }
+        }
+        return theResultsTable;
+    }
+
+    public static FWEventTable mostCommonEventsPerExtension() {
+        FWEventTable theResultsTable = new FWEventTable();
+        Connection conn = DatabaseConnection.getMyConnection();
+        if (conn == null) {
+            System.out.println("Database is not connected!");
+        } else {
+            String sql = "SELECT file_extension, event_type, COUNT(*) as event_count " +
+                    "FROM file_events " +
+                    "GROUP BY file_extension, event_type " +
+                    "ORDER BY event_count DESC;";
+
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                ResultSet resultElements = pstmt.executeQuery();
+                while (resultElements.next()) {
+                    FileEvent theEvent = new FileEvent(
+                            "", // file_name is not necessary for this query
+                            "", // file_path is not necessary for this query
+                            resultElements.getString("event_type"),
+                            resultElements.getString("file_extension"),
+                            "", // event_date not necessary
+                            ""); // event_time not necessary
+
+                    theResultsTable.addEvent(theEvent);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Error querying most common event types per extension.");
             }
         }
         return theResultsTable;
