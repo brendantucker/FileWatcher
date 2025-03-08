@@ -48,8 +48,9 @@ public class FWPanel extends JPanel {
         queryPanelGBC(queryGBC, 0, 0, 0.0);
         queryPanel.add(queryLabel, queryGBC);
 
-        querySelectionDropdown = new JComboBox<>(new String[] { "Choose query", "Query 1 - All events from today",
-                "Query 2 - Top 5 frequently modified file types", "Query 3 - Choose extensions to view" });
+        querySelectionDropdown = new JComboBox<>(
+                new String[] { "Choose query", "Select specific extensions", "Query 1 - All events from today",
+                        "Query 2 - Top 5 frequently modified file types", "Query 3 - Most Common Events for Each Extension", });
         queryPanelGBC(queryGBC, 1, 0, 1.0);
         queryPanel.add(querySelectionDropdown, queryGBC);
 
@@ -95,10 +96,8 @@ public class FWPanel extends JPanel {
         myMainPanel.add(monitorLabel, myGBC);
 
         extensionDropdown = new JComboBox<>(
-                new String[] { "All extensions", "Enter an extension", "TEST", "DOCX", "PDF", "TXT", "PNG", "JPG",
-                        "JPEG",
-                        "GIF", "MP3", "MP4", "WAV",
-                        "AVI", "MOV", "CSV" });
+                new String[] { "All extensions", "Enter an extension", "test", "docx", "pdf", "txt", "png", "jpg",
+                        "jpeg", "gif", "mp3", "mp4", "wav", "avi", "mov", "csv" });
         adjustGridBagConstraints(1, 1, GridBagConstraints.REMAINDER, 1.0);
         myMainPanel.add(extensionDropdown, myGBC);
     }
