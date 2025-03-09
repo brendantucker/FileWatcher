@@ -8,7 +8,8 @@
     "java.project.referencedLibraries": [
         "libs\\activation-1.1.1.jar",
         "libs\\javax.mail.jar",
-        "libs\\sqlite.jar"
+        "libs\\sqlite.jar",
+        "test-lib\\**\\*.jar"
     ],
     "java.import.maven.disableTestClasspathFlag": false
 }

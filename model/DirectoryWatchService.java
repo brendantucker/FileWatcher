@@ -249,4 +249,13 @@ public class DirectoryWatchService {
         return null;
     }
 
+    /**
+     * Returns the directory being watched.
+     * 
+     * @return The directory being watched
+     */
+    public boolean isRunning() {
+        return myRunning;
+    }
+
 }
