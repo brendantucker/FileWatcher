@@ -1,0 +1,175 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36" version="26.1.0">
+  <diagram name="Page-1" id="7AiujLia3BrwarBfl7hj">
+    <mxGraphModel dx="2760" dy="2163" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-1" value="FWMain" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="790" y="20" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-3" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="kjhKShKTyzqzqqCBpNzS-1" vertex="1">
+          <mxGeometry y="26" width="160" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-4" value="+ main(String[] args): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-1" vertex="1">
+          <mxGeometry y="34" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-13" value="java.awt.event.ActionListener" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="475" y="30" width="180" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-15" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="kjhKShKTyzqzqqCBpNzS-13" vertex="1">
+          <mxGeometry y="26" width="180" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-17" value="FWFrame" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="160" width="230" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-18" value="&lt;u&gt;- KIT : Toolkit&amp;nbsp;&lt;/u&gt;&lt;div&gt;&lt;u&gt;- SCREEN_SIZE : Dimension&lt;/u&gt;&lt;/div&gt;&lt;div&gt;&lt;u&gt;- SCREEN_WIDTH : int&lt;/u&gt;&lt;/div&gt;&lt;div&gt;&lt;u&gt;- SCREEN_HEIGHT : int&lt;/u&gt;&lt;/div&gt;&lt;div&gt;&lt;u&gt;- VERTICAL_SCALE: double&lt;/u&gt;&lt;/div&gt;&lt;div&gt;&lt;u&gt;- HORIZONTAL_SCALE: double&lt;/u&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-17" vertex="1">
+          <mxGeometry y="26" width="230" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-19" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="kjhKShKTyzqzqqCBpNzS-17" vertex="1">
+          <mxGeometry y="120" width="230" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-20" value="+ frameOutline() : JFrame&lt;div&gt;+ queryFrameSize(double,double) : void&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-17" vertex="1">
+          <mxGeometry y="128" width="230" height="92" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-25" value="FWGUI" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="450" y="125" width="250" height="920" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-26" value="- myFrame : JFrame&lt;div&gt;- myMenuBar : JMenuBar&lt;/div&gt;&lt;div&gt;- runningTime : int&lt;/div&gt;&lt;div&gt;- myTimer : Timer&lt;/div&gt;&lt;div&gt;- myTimeLabel : JLabel&lt;/div&gt;&lt;div&gt;- myMenuStart : JMenuItem&lt;/div&gt;&lt;div&gt;- myMenuStop : JMenuItem&lt;/div&gt;&lt;div&gt;&lt;u&gt;- splitPanelResizeWeight : int&lt;/u&gt;&lt;/div&gt;&lt;div&gt;- FWEventTable : MyEventTable&lt;/div&gt;&lt;div&gt;-&amp;nbsp;myDirectoryField : JTextField&lt;/div&gt;&lt;div&gt;-&amp;nbsp;myDatabaseField: JTextField&lt;/div&gt;&lt;div&gt;- myExtensionField : JTextField&lt;/div&gt;&lt;div&gt;- myDirectoryStartButton : JButton&lt;/div&gt;&lt;div&gt;-&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;myDirectoryStopButton : JButton&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;- myWriteDbButton : JButton&lt;/div&gt;&lt;/div&gt;&lt;div&gt;-&amp;nbsp;myDirectoryBrowseButton : JButton&lt;/div&gt;&lt;div&gt;-&amp;nbsp;myResetDirectoryButton : JButton&lt;/div&gt;&lt;div&gt;&lt;div&gt;- myImgStartButton : JButton&lt;/div&gt;&lt;div&gt;- myImgStopButton : JButton&lt;/div&gt;&lt;div&gt;- myImgDBButton : JButton&lt;/div&gt;&lt;div&gt;- myImgClearButton : JButton&lt;/div&gt;&lt;div&gt;- myMainPanel : FWPanel&lt;/div&gt;&lt;div&gt;- myIsMonitoring : boolean&lt;/div&gt;&lt;div&gt;- myDirectoryWatchService : DirectoryWatchService&lt;/div&gt;&lt;div&gt;- myDatabaseActive : boolean&lt;/div&gt;&lt;div&gt;- myDatabaseConnectionLabel : JLabel&lt;/div&gt;&lt;div&gt;- add10Item : JMenuItem&lt;/div&gt;&lt;div&gt;- add100Item : JMenuItem&lt;/div&gt;&lt;div&gt;&lt;u&gt;- myInstance : FWGUI&lt;/u&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-25" vertex="1">
+          <mxGeometry y="26" width="250" height="444" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-27" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="kjhKShKTyzqzqqCBpNzS-25" vertex="1">
+          <mxGeometry y="470" width="250" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-28" value="+ FWGUI() : FWGUI&lt;div&gt;- setUpButtons() : void&lt;/div&gt;&lt;div&gt;- addButtonActionListener(JButton) : JButton&lt;div&gt;- createMenuBar() : void&lt;/div&gt;&lt;div&gt;- createFileMenu() : void&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;- createWatcherMenu() : void&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;- createDatabaseMenu() : void&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;- createAboutMenu() : void&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;- createImageButtons() : void&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;- timeAndDbLabel() : void&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;- timerLabelExtended() : void&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;- setUpDocumentListener() : void&lt;/div&gt;&lt;/div&gt;&lt;div&gt;- setUpFileViewer() : void&lt;/div&gt;&lt;div&gt;&lt;div&gt;- setUpExitListener() : void&lt;/div&gt;&lt;/div&gt;&lt;div&gt;- handleExit() : void&lt;/div&gt;&lt;div&gt;+ actionPerformed(ActionEvent) : void&lt;/div&gt;&lt;div&gt;- createDateString() : String&lt;/div&gt;&lt;div&gt;- createTimeString() : String&lt;/div&gt;&lt;div&gt;- startMonitoring() : void&lt;/div&gt;&lt;div&gt;- stopMonitoring() : void&lt;/div&gt;&lt;div&gt;- showAboutDialog() : void&lt;/div&gt;&lt;div&gt;- browseDirectory() : void&lt;/div&gt;&lt;div&gt;- resetTimer() : void&lt;/div&gt;&lt;div&gt;- clearFields() : void&lt;/div&gt;&lt;div&gt;- buttonReverse(boolean) : void&lt;/div&gt;&lt;div&gt;+ isMonitoring() : boolean&lt;/div&gt;&lt;div&gt;+ setDatabaseConnected(boolean) : void&lt;/div&gt;&lt;div&gt;+ getEventTable() : FWEventTable&lt;/div&gt;&lt;div&gt;+ getMyInstance() : FWGUI&lt;/div&gt;&lt;div&gt;- checkFields() : void&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-25" vertex="1">
+          <mxGeometry y="478" width="250" height="442" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-29" value="javax.swing.JFrame" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="220" y="30" width="160" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-31" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="kjhKShKTyzqzqqCBpNzS-29" vertex="1">
+          <mxGeometry y="26" width="160" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-34" value="" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1.064;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" edge="1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="299.5" y="164.34000000000003" as="sourcePoint" />
+            <mxPoint x="299.5" y="84.00399999999999" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-40" value="" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="kjhKShKTyzqzqqCBpNzS-70" target="kjhKShKTyzqzqqCBpNzS-67" edge="1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="100" y="166" as="sourcePoint" />
+            <mxPoint x="100" y="80.00000000000023" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-41" value="FileEvent" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="130" y="-385" width="360" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-42" value="- myFilePath : String&lt;div&gt;- myFileName : String&lt;br&gt;&lt;div&gt;- myEventType : String&lt;/div&gt;&lt;div&gt;- myEventTime : String&lt;/div&gt;&lt;div&gt;- myEventDate : String&lt;/div&gt;&lt;div&gt;- myExtension : String&lt;/div&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-41" vertex="1">
+          <mxGeometry y="26" width="360" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-43" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="kjhKShKTyzqzqqCBpNzS-41" vertex="1">
+          <mxGeometry y="120" width="360" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-44" value="+ FileEvent(String, String, String, String, String, String) : FileEvent&lt;div&gt;+ getFileName() : String&lt;/div&gt;&lt;div&gt;+ getFilePath() : String&lt;/div&gt;&lt;div&gt;+ getEventType() : String&lt;/div&gt;&lt;div&gt;+ getEventTime() : String&lt;/div&gt;&lt;div&gt;+ getExtension() : String&lt;/div&gt;&lt;div&gt;+ getEventDate() : String&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-41" vertex="1">
+          <mxGeometry y="128" width="360" height="112" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-58" value="view" style="shape=umlFrame;whiteSpace=wrap;html=1;pointerEvents=0;" parent="1" vertex="1">
+          <mxGeometry x="-480" y="-10" width="1190" height="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-59" value="controller" style="shape=umlFrame;whiteSpace=wrap;html=1;pointerEvents=0;" parent="1" vertex="1">
+          <mxGeometry x="770" y="-30" width="210" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-61" value="model" style="shape=umlFrame;whiteSpace=wrap;html=1;pointerEvents=0;" parent="1" vertex="1">
+          <mxGeometry x="-480" y="-520" width="1030" height="470" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-62" value="FWEventTable" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-460" y="145" width="280" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-63" value="- myEventTable : JTable&lt;div&gt;- myTableModel : DefaultTableModel&lt;/div&gt;&lt;div&gt;- myData : ArrayList&amp;lt;FileEvent&amp;gt;&amp;nbsp;&lt;/div&gt;&lt;div&gt;- mySorter : TableRowSorter&amp;lt;DefaultTableModel&amp;gt;&lt;/div&gt;&lt;div&gt;- myDefaultColumnWidths : int[]&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-62" vertex="1">
+          <mxGeometry y="26" width="280" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-64" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="kjhKShKTyzqzqqCBpNzS-62" vertex="1">
+          <mxGeometry y="110" width="280" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-65" value="+ FWEventTable() : FWEventTable&lt;div&gt;+ addEvent() : void&lt;/div&gt;&lt;div&gt;+ getData : ArrayList&amp;lt;FileEvent&amp;gt;&lt;/div&gt;&lt;div&gt;+ updateTable() : void&lt;/div&gt;&lt;div&gt;+ clearTable() : void&lt;/div&gt;&lt;div&gt;+ filterTable(String) : void&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-62" vertex="1">
+          <mxGeometry y="118" width="280" height="102" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-67" value="javax.swing.JPanel" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-210" y="30" width="160" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-68" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="kjhKShKTyzqzqqCBpNzS-67" vertex="1">
+          <mxGeometry y="26" width="160" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-69" value="" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="kjhKShKTyzqzqqCBpNzS-62" target="kjhKShKTyzqzqqCBpNzS-67" edge="1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="-110.34000000000003" y="152.34000000000003" as="sourcePoint" />
+            <mxPoint x="-110.34000000000003" y="72.00400000000002" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-70" value="FWPanel" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-170" y="145" width="370" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-71" value="- myExtensionDropdown : JComboBox&amp;lt;String&amp;gt;&lt;div&gt;-&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;myDirectoryField :&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;JTextField&lt;/span&gt;&lt;/div&gt;&lt;div&gt;- myStartButton, myStopButton, myBrowseButton, myResetButton, myQueryButton, myWriteDbButton, myImgStartButton, myImgStopButton, myImageDBButton, myImgClearButton : JButton&lt;/div&gt;&lt;div&gt;-&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;myQueryExtensionDropdown :&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;JComboBox&amp;lt;String&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;-myGBC : GridBagConstraints&lt;/div&gt;&lt;div&gt;- myMainPanel : JPanel&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-70" vertex="1">
+          <mxGeometry y="26" width="370" height="134" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-72" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="kjhKShKTyzqzqqCBpNzS-70" vertex="1">
+          <mxGeometry y="160" width="370" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-73" value="+ FWPanel() : FWPanel&lt;div&gt;+ FWQueryPanel() : JPanel&lt;/div&gt;&lt;div&gt;- queryPanelGBC(GridBagContraints, int, int, double) : void&lt;/div&gt;&lt;div&gt;- createButtonBar() : void&lt;/div&gt;&lt;div&gt;- setUpDirectoryBox() : void&lt;/div&gt;&lt;div&gt;- setUpDirectoryButtons() : void&lt;/div&gt;&lt;div&gt;- setUpDatabaseBox() : void&lt;/div&gt;&lt;div&gt;&lt;div&gt;- createModernButton(String) : JButton&lt;/div&gt;&lt;/div&gt;&lt;div&gt;+ getExtensionBox() : JComboBox&amp;lt;String&amp;gt;&lt;/div&gt;&lt;div&gt;+ getQueryPopupSelection() : JComboBox&amp;lt;String&amp;gt;&lt;/div&gt;&lt;div&gt;+ getDirectoryField() : JTextField&lt;/div&gt;&lt;div&gt;+ getStartButton() : JButton&lt;/div&gt;&lt;div&gt;+ getStopButton() : JButton&lt;/div&gt;&lt;div&gt;+ getBrowseButton() : JButton&lt;/div&gt;&lt;div&gt;+ getResetButton() : JButton&lt;/div&gt;&lt;div&gt;+ getMyWriteDBButton() : JButton&lt;/div&gt;&lt;div&gt;+ getMyImgStartButton() : JButton&lt;/div&gt;&lt;div&gt;+ getMyImgStopButton() : JButton&lt;/div&gt;&lt;div&gt;+ getMyImgDBButton() : JButton&lt;/div&gt;&lt;div&gt;+ getMyImgClearButton() : JButton&lt;/div&gt;&lt;div&gt;- adjustGridBagConstraints(int, int) : void&lt;/div&gt;&lt;div&gt;- adjustGridBagConstraints(int, int, int, double) : void&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-70" vertex="1">
+          <mxGeometry y="168" width="370" height="332" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-79" value="FileEventDAO" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-140" y="-480" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-81" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="kjhKShKTyzqzqqCBpNzS-79" vertex="1">
+          <mxGeometry y="26" width="230" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-82" value="&lt;u&gt;+ insertFileEvent(FileEvent) : void&lt;/u&gt;&lt;div&gt;&lt;u&gt;+ insertFileEvents(List&amp;lt;FileEvent&amp;gt;) : void&lt;/u&gt;&lt;/div&gt;&lt;div&gt;&lt;u&gt;+ queryTxtFiles() : FWEventTable&lt;/u&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-79" vertex="1">
+          <mxGeometry y="34" width="230" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-83" value="DirectoryWatchService" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-450" y="-430" width="260" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-84" value="- myDirectory : Path&lt;div&gt;- myWatchService : WatchService&lt;/div&gt;&lt;div&gt;- myRunning : boolean&lt;/div&gt;&lt;div&gt;- myKey : WatchKey&lt;/div&gt;&lt;div&gt;- myEventTable : FWEventTable&lt;/div&gt;&lt;div&gt;- myGUI : FWGUI&lt;/div&gt;&lt;div&gt;- myWatchThread : Thread&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-83" vertex="1">
+          <mxGeometry y="26" width="260" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-85" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="kjhKShKTyzqzqqCBpNzS-83" vertex="1">
+          <mxGeometry y="150" width="260" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-86" value="+ DirectoryWatchService(String, FWGUI) : DirectoryWatchService&lt;div&gt;+ start() : void&lt;/div&gt;&lt;div&gt;+ stop() : void&lt;/div&gt;&lt;div&gt;+ invalidDirectoryError()) : void&lt;/div&gt;&lt;div&gt;- registerAllFolders(Path) : void&lt;/div&gt;&lt;div&gt;- getExtension(WatchEvent&amp;lt;?&amp;gt;) : String&lt;/div&gt;&lt;div&gt;- createDateString() : String&lt;/div&gt;&lt;div&gt;- createTimeString() : String&lt;/div&gt;&lt;div&gt;- eventTypeFormatter() : String&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="kjhKShKTyzqzqqCBpNzS-83" vertex="1">
+          <mxGeometry y="158" width="260" height="172" as="geometry" />
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-87" value="" style="endArrow=block;endFill=0;endSize=12;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" target="kjhKShKTyzqzqqCBpNzS-13" edge="1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="565" y="125" as="sourcePoint" />
+            <mxPoint x="560" y="55" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kjhKShKTyzqzqqCBpNzS-88" value="" style="endArrow=none;endFill=1;endSize=12;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=-0.024;exitY=0.545;exitDx=0;exitDy=0;exitPerimeter=0;strokeColor=default;startFill=0;" parent="1" target="kjhKShKTyzqzqqCBpNzS-25" edge="1" source="kjhKShKTyzqzqqCBpNzS-59">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="710" y="110" as="sourcePoint" />
+            <mxPoint x="770" y="-30.336000000000013" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ErGckKzOF6BhmeM4XZn6-1" value="DatabaseConnection" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-135" y="-320" width="220" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="ErGckKzOF6BhmeM4XZn6-2" value="&lt;div&gt;&lt;u&gt;- myURL : String&lt;/u&gt;&lt;/div&gt;&lt;div&gt;&lt;u&gt;- myConnection : Connection&lt;/u&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="ErGckKzOF6BhmeM4XZn6-1">
+          <mxGeometry y="26" width="220" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="ErGckKzOF6BhmeM4XZn6-3" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="ErGckKzOF6BhmeM4XZn6-1">
+          <mxGeometry y="60" width="220" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="ErGckKzOF6BhmeM4XZn6-4" value="&lt;u&gt;+ connect() : boolean&lt;/u&gt;&lt;div&gt;&lt;u&gt;- initializeDatabase() : void&lt;/u&gt;&lt;/div&gt;&lt;div&gt;&lt;u&gt;+ disconnect() : void&lt;/u&gt;&lt;/div&gt;&lt;div&gt;&lt;u&gt;+ getMyConnection : Connection&lt;/u&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="ErGckKzOF6BhmeM4XZn6-1">
+          <mxGeometry y="68" width="220" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="ErGckKzOF6BhmeM4XZn6-5" value="" style="endArrow=none;endFill=1;endSize=12;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startFill=0;" edge="1" parent="1" target="ErGckKzOF6BhmeM4XZn6-1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="-25" y="-386" as="sourcePoint" />
+            <mxPoint x="-151.5" y="-435" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
