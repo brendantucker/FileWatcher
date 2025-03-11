@@ -9,8 +9,8 @@ public class FWPanel extends JPanel {
     // Combo box for the query window to select the queries.
     private JComboBox<String> querySelectionDropdown;
     // Buttons for starting, stopping, and browsing for a directory to monitor.
-    private JButton myWriteDbButton, myQueryButton, myDatabaseReseButton, myResetButton, myBrowseButton, myStartButton,
-            myStopButton;
+    private JButton myWriteDbButton, myQueryButton, myDatabaseResetButton, myResetButton, myBrowseButton, myStartButton,
+            myStopButton, myExportCSVButton;
     // Buttons for the image icons.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // GridBagConstraint for the layout.
@@ -54,9 +54,13 @@ public class FWPanel extends JPanel {
         queryPanelGBC(queryGBC, 1, 0, 1.0);
         queryPanel.add(querySelectionDropdown, queryGBC);
 
-        myDatabaseReseButton = createModernButton("Reset Database");
-        queryPanelGBC(queryGBC, 2, 0, 0.0); // Move button to the right of the dropdown
-        queryPanel.add(myDatabaseReseButton, queryGBC);
+        myExportCSVButton = createModernButton("Export to CSV");
+        queryPanelGBC(queryGBC, 2, 0, 0.0);
+        queryPanel.add(myExportCSVButton, queryGBC);
+
+        myDatabaseResetButton = createModernButton("Reset Database");
+        queryPanelGBC(queryGBC, 3, 0, 0.0);
+        queryPanel.add(myDatabaseResetButton, queryGBC);
 
         return queryPanel;
     }
@@ -261,7 +265,15 @@ public class FWPanel extends JPanel {
      * @return The button that will reset the database.
      */
     public JButton getDatabaseResetButton() {
-        return myDatabaseReseButton;
+        return myDatabaseResetButton;
+    }
+
+    /**
+     * Gets the button that will export the database query list as a CSV.
+     * @return The button that will export the database query list as a CSV.
+     */
+    public JButton getCSVButton(){
+        return myExportCSVButton;
     }
 
     /**

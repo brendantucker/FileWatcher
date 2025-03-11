@@ -22,16 +22,13 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -72,7 +69,7 @@ public class FWGUI implements ActionListener {
     private JTextField myDirectoryField, myExtensionField;
     // Buttons for the GUI.
     private JButton myDirectoryStartButton, myDirectoryStopButton, myWriteDbButton, myDirectoryBrowseButton,
-            myResetDirectoryButton, myQueryButton, myDatabaseResetButton;
+            myResetDirectoryButton, myQueryButton, myDatabaseResetButton, myExportCSVButton;
     // Buttons for the image icons.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // The main panel for the GUI.
@@ -474,7 +471,8 @@ public class FWGUI implements ActionListener {
         // Extension Selection
         else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
                 && !myExtensionComboBox.getSelectedItem().equals("Enter an extension")
-        // && myExtensionComboBox.getEditor().getEditorComponent().hasFocus() Possibly unnecessary?
+        // && myExtensionComboBox.getEditor().getEditorComponent().hasFocus() Possibly
+        // unnecessary?
         ) {
             checkFields();
             myEventTable.filterTable('.' + myExtensionComboBox.getSelectedItem().toString());
@@ -507,10 +505,9 @@ public class FWGUI implements ActionListener {
             clearFields();
         }
         // Export Query Results to CSV
-        else if (command.equals("Export to CSV")) {
+        else if (source.equals(myExportCSVButton)) {
             exportQueryResultsToCSV();
         }
-        
 
         // Write to Database
         else if (source.equals(myWriteDbButton) || source.equals(myImgDBButton)) {
@@ -556,10 +553,10 @@ public class FWGUI implements ActionListener {
             myQueryTable.clearTable();
             FWEventTable queryResults = new FWEventTable();
             myQueryCheckBoxPanel.setVisible(false);
-            myQueryFrame.revalidate(); 
-            myQueryFrame.repaint(); 
-            //Erasing the selected checkboxes as a precaution
-            for(JCheckBox checkBox: myExtensionCheckBox){
+            myQueryFrame.revalidate();
+            myQueryFrame.repaint();
+            // Erasing the selected checkboxes as a precaution
+            for (JCheckBox checkBox : myExtensionCheckBox) {
                 checkBox.setSelected(false);
             }
             if (myQueryComboBox.getSelectedItem().equals("Query 1 - All events from today")) {
@@ -570,9 +567,9 @@ public class FWGUI implements ActionListener {
                 queryResults = FileEventDAO.mostCommonEventsPerExtension();
             } else if (myQueryComboBox.getSelectedItem().equals("Select specific extensions")) {
                 myQueryCheckBoxPanel.setVisible(true);
-                myQueryFrame.revalidate();   // Revalidate all components within the frame
-                myQueryFrame.repaint();      // Repaint the frame to update the UI
-                myQueryFrame.pack();         // Resizes the frame to fit the components
+                myQueryFrame.revalidate(); // Revalidate all components within the frame
+                myQueryFrame.repaint(); // Repaint the frame to update the UI
+                myQueryFrame.pack(); // Resizes the frame to fit the components
                 myQueryFrame.queryFrameSize(.8, .3);
             }
             // Adding in the new table values.
@@ -581,10 +578,18 @@ public class FWGUI implements ActionListener {
                     myQueryTable.addEvent(event);
                 }
                 myQueryTable.updateTable();
-            } else if (myQueryComboBox.getSelectedItem().equals("Query 2")) {
-                System.out.println("Query2");
-            } else if (myQueryComboBox.getSelectedItem().equals("Query 3")) {
-                System.out.println("Query3");
+                myQueryTable.revalidate();
+                myQueryTable.repaint();
+            }
+        } else if (source.equals(myDatabaseResetButton)) {
+            int choice = JOptionPane.showConfirmDialog(
+                    myQueryPanel,
+                    "This will remove all data from the database,resetting it. Are you sure you want to continue?",
+                    "Reset Database",
+                    JOptionPane.YES_NO_OPTION);
+            if (choice == JOptionPane.YES_OPTION) {
+                FileEventDAO.resetEntireDatabase();
+                myQueryTable.clearTable();
             }
         } else if (source.equals(add10Item)) {
             // Add 10 events to the event table for testing
@@ -622,13 +627,9 @@ public class FWGUI implements ActionListener {
         middleQueryPane.setResizeWeight(splitPaneResizeWeight);
         middleQueryPane.setDividerSize(2);
 
-        JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, middleQueryPane);
-        queryFrame.add(queryGUI, BorderLayout.NORTH);
-
-         // Create Export Button
-        JButton exportCsvButton = new JButton("Export to CSV");
-        exportCsvButton.addActionListener(this);
-        queryGUI.add(exportCsvButton); // Add button to the panel
+        // Create Export Button
+        myExportCSVButton = myQueryPanel.getCSVButton();
+        myExportCSVButton.addActionListener(this);
 
         JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, myQueryTable);
         queryPane.setResizeWeight(splitPaneResizeWeight);
@@ -664,7 +665,7 @@ public class FWGUI implements ActionListener {
                     JCheckBox curCheckBox = (JCheckBox) e.getSource();
                     String curExtension = curCheckBox.getText();
                     if (e.getStateChange() == ItemEvent.SELECTED) {
-                        if(!extensionList.contains(curExtension)) {
+                        if (!extensionList.contains(curExtension)) {
                             extensionList.add(curExtension);
                         }
                     } else {
@@ -672,7 +673,7 @@ public class FWGUI implements ActionListener {
                     }
                     FWEventTable tempQueryResults = FileEventDAO.querySpecificExtensions(extensionList);
                     myQueryTable.clearTable();
-                    for(FileEvent event: tempQueryResults.getData()){
+                    for (FileEvent event : tempQueryResults.getData()) {
                         myQueryTable.addEvent(event);
                     }
                     myQueryTable.updateTable();
@@ -932,34 +933,37 @@ public class FWGUI implements ActionListener {
             myImgStartButton.setEnabled(false);
         }
     }
+
     private void exportQueryResultsToCSV() {
         List<FileEvent> events = myQueryTable.getData();
-    
+
         if (events.isEmpty()) {
-            JOptionPane.showMessageDialog(myFrame, "No query results available for export. Run a query first.", "Export Failed", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myQueryFrame, "No query results available for export. Run a query first.",
+                    "Export Failed", JOptionPane.ERROR_MESSAGE);
             return;
         }
-    
+
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Save CSV File");
         fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("CSV Files", "csv"));
-    
+
         int userSelection = fileChooser.showSaveDialog(myFrame);
         if (userSelection != JFileChooser.APPROVE_OPTION) {
             return;
         }
-    
+
         String filePath = fileChooser.getSelectedFile().getAbsolutePath();
         if (!filePath.endsWith(".csv")) {
             filePath += ".csv";
         }
-    
+
         try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
             writer.println("File Watcher Query Results");
-            writer.println("Export Date: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            writer.println(
+                    "Export Date: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             writer.println();
             writer.println("File Name,File Path,Event Type,Extension,Event Time");
-    
+
             for (FileEvent event : events) {
                 writer.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n",
                         event.getFileName(),
@@ -968,17 +972,14 @@ public class FWGUI implements ActionListener {
                         event.getExtension(),
                         event.getEventTime());
             }
-    
-            JOptionPane.showMessageDialog(myFrame, "Export successful: " + filePath, "Export Complete", JOptionPane.INFORMATION_MESSAGE);
+
+            JOptionPane.showMessageDialog(myFrame, "Export successful: " + filePath, "Export Complete",
+                    JOptionPane.INFORMATION_MESSAGE);
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(myFrame, "Error writing to file.", "Export Failed", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myFrame, "Error writing to file.", "Export Failed",
+                    JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
-    
-    
-    
-
-    
 
 }
