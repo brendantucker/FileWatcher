@@ -84,6 +84,7 @@ public class FWEventTable extends JPanel {
      * 
      * @return The data in the table.
      */
+    
     public ArrayList<FileEvent> getData() {
         return myData;
     }
@@ -115,13 +116,40 @@ public class FWEventTable extends JPanel {
 
     public void filterTable(String theFilter){
         myTableModel.setRowCount(0);
+        ArrayList<FileEvent> filteredData = new ArrayList<>();
+    
         if(!theFilter.equals("All Extensions")){
             for (FileEvent event : myData) {
-                if(event.getExtension().contains(theFilter)){
-                    myTableModel.addRow(new Object[] { event.getFileName(), event.getFilePath(), event.getEventType(),
-                            event.getExtension(), event.getEventDate(), event.getEventTime() });
+                if(event.getExtension().equals(theFilter)){
+                    filteredData.add(event);
+                    myTableModel.addRow(new Object[] { 
+                        event.getFileName(), 
+                        event.getFilePath(), 
+                        event.getEventType(),
+                        event.getExtension(), 
+                        event.getEventDate(), 
+                        event.getEventTime() 
+                    });
                 }
             }
+        } else {
+            // If "All Extensions" is selected, restore all events
+            for (FileEvent event : myData) {
+                myTableModel.addRow(new Object[] { 
+                    event.getFileName(), 
+                    event.getFilePath(), 
+                    event.getEventType(),
+                    event.getExtension(), 
+                    event.getEventDate(), 
+                    event.getEventTime() 
+                });
+            }
+            filteredData = new ArrayList<>(myData);
         }
+    
+        // Replace myData with filtered results
+        myData = filteredData;
     }
+    
+    
 }
