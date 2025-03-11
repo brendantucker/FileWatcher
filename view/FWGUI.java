@@ -4,7 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -184,6 +186,11 @@ public class FWGUI implements ActionListener {
         fileMenu.add(closeItem);
         closeItem.addActionListener(this);
         myMenuBar.add(fileMenu);
+
+        JMenuItem exportCsvItem = new JMenuItem("Export Query Results to CSV");
+        fileMenu.add(exportCsvItem);
+        exportCsvItem.addActionListener(this);
+
     }
 
     /**
@@ -240,7 +247,7 @@ public class FWGUI implements ActionListener {
         myMenuBar.add(myImgDBButton);
         myMenuBar.add(myImgClearButton);
     }
-    
+
     private void createEmailMenu() {
         JMenu emailMenu = new JMenu("Email");
         JMenuItem sendEmailItem = new JMenuItem("Send File via Email");
@@ -248,7 +255,6 @@ public class FWGUI implements ActionListener {
         emailMenu.add(sendEmailItem);
         myMenuBar.add(emailMenu);
 
-        
     }
 
     /**
@@ -314,7 +320,7 @@ public class FWGUI implements ActionListener {
         myDirectoryField = myMainPanel.getDirectoryField();
         myDirectoryField.getDocument().addDocumentListener(theListener);
         myExtensionField = (JTextField) myExtensionComboBox.getEditor().getEditorComponent();
-        //Was starting out blank for some reason.
+        // Was starting out blank for some reason.
         myExtensionField.setText(("All extensions"));
         myExtensionField.getDocument().addDocumentListener(theListener);
     }
@@ -444,25 +450,30 @@ public class FWGUI implements ActionListener {
         // Extension Selection
         else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
                 && !myExtensionComboBox.getSelectedItem().equals("Enter an extension")
-                //&& myExtensionComboBox.getEditor().getEditorComponent().hasFocus() Possibly unnecessary?
-                ) {
+        // && myExtensionComboBox.getEditor().getEditorComponent().hasFocus() Possibly
+        // unnecessary?
+        ) {
             checkFields();
-            //JOptionPane.showMessageDialog(myFrame, (String) myExtensionComboBox.getSelectedItem());
+            // JOptionPane.showMessageDialog(myFrame, (String)
+            // myExtensionComboBox.getSelectedItem());
             myEventTable.filterTable('.' + myExtensionComboBox.getSelectedItem().toString().toLowerCase());
-            if(myExtensionComboBox.getSelectedItem().equals("All extensions")){
+            if (myExtensionComboBox.getSelectedItem().equals("All extensions")) {
                 myEventTable.updateTable();
             }
         }
         // Send File via Email
         else if (command.equals("Send File via Email")) {
-            String recipient = JOptionPane.showInputDialog(myFrame, "Enter recipient email:", "Send Email", JOptionPane.QUESTION_MESSAGE);
+            String recipient = JOptionPane.showInputDialog(myFrame, "Enter recipient email:", "Send Email",
+                    JOptionPane.QUESTION_MESSAGE);
             if (recipient != null && !recipient.isEmpty()) {
                 JFileChooser fileChooser = new JFileChooser();
                 int returnValue = fileChooser.showOpenDialog(null);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-                    EmailSender.sendEmailWithAttachment(recipient, "File Watcher Report", "Please find the attached file.", filePath);
-                    JOptionPane.showMessageDialog(myFrame, "Email Sent Successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    EmailSender.sendEmailWithAttachment(recipient, "File Watcher Report",
+                            "Please find the attached file.", filePath);
+                    JOptionPane.showMessageDialog(myFrame, "Email Sent Successfully!", "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         }
@@ -474,6 +485,12 @@ public class FWGUI implements ActionListener {
         else if (source.equals(myResetDirectoryButton) || source.equals(myImgClearButton)) {
             clearFields();
         }
+        // Export Query Results to CSV
+        else if (command.equals("Export to CSV")) {
+            exportQueryResultsToCSV();
+        }
+        
+
         // Write to Database
         else if (source.equals(myWriteDbButton) || source.equals(myImgDBButton)) {
             if (DatabaseConnection.getMyConnection() == null) {
@@ -559,7 +576,12 @@ public class FWGUI implements ActionListener {
 
         JPanel queryGUI = myQueryPanel.FWQueryPanel();
         queryFrame.add(queryGUI, BorderLayout.NORTH);
-        
+
+         // Create Export Button
+        JButton exportCsvButton = new JButton("Export to CSV");
+        exportCsvButton.addActionListener(this);
+        queryGUI.add(exportCsvButton); // Add button to the panel
+
         JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, myQueryTable);
         queryPane.setResizeWeight(splitPaneResizeWeight);
         queryPane.setDividerSize(0);
@@ -615,7 +637,7 @@ public class FWGUI implements ActionListener {
         myTimeLabel.setText("Time not started.");
         myTimer.start();
         buttonReverse(false);
-        //Disable ability to modify directory and extension fields while monitoring
+        // Disable ability to modify directory and extension fields while monitoring
         myDirectoryField.setEditable(false);
         myExtensionField.setEditable(false);
         myExtensionComboBox.setEditable(false);
@@ -630,7 +652,7 @@ public class FWGUI implements ActionListener {
         myIsMonitoring = false;
         buttonReverse(true);
         myDirectoryWatchService.stop();
-        //Enable ability to modify directory and extension fields while not monitoring
+        // Enable ability to modify directory and extension fields while not monitoring
         myDirectoryField.setEditable(true);
         myExtensionField.setEditable(true);
         myExtensionComboBox.setEditable(true);
@@ -767,11 +789,60 @@ public class FWGUI implements ActionListener {
             myMenuStart.setEnabled(false);
             myImgStartButton.setEnabled(false);
         }
-        //Do not enable start buttons if already monitoring
+        // Do not enable start buttons if already monitoring
         if (myIsMonitoring) {
             myDirectoryStartButton.setEnabled(false);
             myMenuStart.setEnabled(false);
             myImgStartButton.setEnabled(false);
         }
     }
+    private void exportQueryResultsToCSV() {
+        List<FileEvent> events = myQueryTable.getData();
+    
+        if (events.isEmpty()) {
+            JOptionPane.showMessageDialog(myFrame, "No query results available for export. Run a query first.", "Export Failed", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save CSV File");
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("CSV Files", "csv"));
+    
+        int userSelection = fileChooser.showSaveDialog(myFrame);
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+    
+        String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+        if (!filePath.endsWith(".csv")) {
+            filePath += ".csv";
+        }
+    
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
+            writer.println("File Watcher Query Results");
+            writer.println("Export Date: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            writer.println();
+            writer.println("File Name,File Path,Event Type,Extension,Event Time");
+    
+            for (FileEvent event : events) {
+                writer.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n",
+                        event.getFileName(),
+                        event.getFilePath(),
+                        event.getEventType(),
+                        event.getExtension(),
+                        event.getEventTime());
+            }
+    
+            JOptionPane.showMessageDialog(myFrame, "Export successful: " + filePath, "Export Complete", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(myFrame, "Error writing to file.", "Export Failed", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+    
+    
+    
+
+    
+
 }

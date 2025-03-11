@@ -11,11 +11,11 @@ public class FileEventDAOTest {
 
     @Before
     public void setUp() throws SQLException {
-        // ✅ Initialize connection properly
+        // Initialize connection properly
         connection = DriverManager.getConnection("jdbc:sqlite::memory:");
         DatabaseConnection.setConnection(connection);
 
-        // ✅ Ensure connection is used for table creation
+        // Ensure connection is used for table creation
         String createTableSQL = "CREATE TABLE file_events (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "file_name TEXT NOT NULL, " +
@@ -29,7 +29,7 @@ public class FileEventDAOTest {
 
     @After
     public void tearDown() throws SQLException {
-        // ✅ Prevent NullPointerException if setUp() fails
+        // Prevent NullPointerException if setUp() fails
         if (connection != null) {
             connection.close();
         }
