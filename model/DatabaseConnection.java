@@ -67,9 +67,8 @@ public class DatabaseConnection {
         try {
             if (myConnection != null && !myConnection.isClosed()) {
                 myConnection.close();
-                System.out.println(" Disconnected from SQLite database.");
-
-                // Set the GUI to show that the database is disconnected
+                myConnection = null; // 🔹 Ensure the connection is set to null
+                
                 FWGUI gui = FWGUI.getMyInstance();
                 if (gui != null) {
                     gui.setDatabaseConnected(false);
@@ -77,9 +76,9 @@ public class DatabaseConnection {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println(" Error disconnecting from database.");
         }
     }
+    
 
     /**
      * Returns the current database connection.
@@ -89,4 +88,9 @@ public class DatabaseConnection {
     public static Connection getMyConnection() {
         return myConnection;
     }
+
+    public static void setConnection(Connection connection) {
+        myConnection = connection;
+    }
+    
 }

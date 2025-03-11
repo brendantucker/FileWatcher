@@ -1,13 +1,16 @@
 {
     "java.project.sourcePaths": [
         "controller",
+        "libs",
         "model",
-        "view",
-        "libs"
+        "view"
     ],
     "java.project.referencedLibraries": [
-        "libs/sqlite.jar"
-
-    ]
+        "libs\\activation-1.1.1.jar",
+        "libs\\javax.mail.jar",
+        "libs\\sqlite.jar",
+        "test-lib\\**\\*.jar"
+    ],
+    "java.import.maven.disableTestClasspathFlag": false
 }
   
