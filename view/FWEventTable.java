@@ -90,10 +90,9 @@ public class FWEventTable extends JPanel {
     }
 
     /**
-     * Updates the table with the current data.
+     * Updates the table with information stored in the data arraylist.
      */
     public void updateTable() {
-        myTableModel.setRowCount(0);
         for (FileEvent event : myData) {
             myTableModel.addRow(new Object[] { 
                 event.getFileName(),

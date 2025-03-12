@@ -210,8 +210,6 @@ public class FWGUI implements ActionListener {
     private void createWatcherMenu() {
         JMenu watcherMenu = new JMenu("Debug");
         add10Item = new JMenuItem("Add 10 Events");
-        add100Item = new JMenuItem("Add 100 Events");
-        watcherMenu.add(add100Item);
         add10Item.addActionListener(this);
         watcherMenu.add(add10Item);
         add100Item = new JMenuItem("Add 100 Events");
@@ -792,7 +790,7 @@ public class FWGUI implements ActionListener {
      */
     private void clearFields() {
         myDirectoryField.setText("");
-        myExtensionComboBox.setSelectedItem("Enter an extension");
+        myExtensionComboBox.setSelectedItem("All extensions");
         resetTimer();
         DatabaseConnection.disconnect();
         myDatabaseActive = false;
