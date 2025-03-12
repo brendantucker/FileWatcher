@@ -100,7 +100,7 @@ public class FWPanel extends JPanel {
         myMainPanel.add(monitorLabel, myGBC);
 
         extensionDropdown = new JComboBox<>(
-                new String[] { "All extensions", "Enter an extension", "test", "docx", "pdf", "txt", "png", "jpg",
+                new String[] { "All extensions", "Custom extension", "test", "docx", "pdf", "txt", "png", "jpg",
                         "jpeg", "gif", "mp3", "mp4", "wav", "avi", "mov", "csv" });
         adjustGridBagConstraints(1, 1, GridBagConstraints.REMAINDER, 1.0);
         myMainPanel.add(extensionDropdown, myGBC);

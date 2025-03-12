@@ -97,6 +97,8 @@ public class FWGUI implements ActionListener {
 
     private static FWGUI myInstance;
 
+    private static String myCustomExtensionString = "Custom extension";
+
     /*
      * Constructor for the GUI. This will create the GUI and set up the menu bar.
      */
@@ -130,7 +132,7 @@ public class FWGUI implements ActionListener {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 Object theDropdowObject = myExtensionComboBox.getSelectedItem();
-                if (theDropdowObject.equals("Enter an extension")) {
+                if (theDropdowObject.equals(myCustomExtensionString)) {
                     myExtensionComboBox.setEditable(true);
                 } else {
                     myExtensionComboBox.setEditable(false);
@@ -468,7 +470,7 @@ public class FWGUI implements ActionListener {
         }
         // Extension Selection
         else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
-                && !myExtensionComboBox.getSelectedItem().equals("Enter an extension")
+                && !myExtensionComboBox.getSelectedItem().equals(myCustomExtensionString)
         // && myExtensionComboBox.getEditor().getEditorComponent().hasFocus() Possibly
         // unnecessary?
         ) {
@@ -909,7 +911,7 @@ public class FWGUI implements ActionListener {
         }
         boolean hasDirectory = !myDirectoryField.getText().trim().isEmpty();
         boolean hasExtension = !myExtensionField.getText().trim().isEmpty()
-                && !myExtensionField.getText().equals("Enter an extension");
+                && !myExtensionField.getText().equals(myCustomExtensionString);
         boolean hasDatabase = myDatabaseActive;
 
         boolean enableStart = (hasDirectory && hasExtension) || hasDatabase;
