@@ -469,8 +469,7 @@ public class FWGUI implements ActionListener {
         // Extension Selection
         else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
                 && !myExtensionComboBox.getSelectedItem().equals("Enter an extension")
-        // && myExtensionComboBox.getEditor().getEditorComponent().hasFocus() Possibly
-        // unnecessary?
+        // && myExtensionComboBox.getEditor().getEditorComponent().hasFocus() Possibly unnecessary?
         ) {
             checkFields();
             myEventTable.filterTable('.' + myExtensionComboBox.getSelectedItem().toString());
@@ -542,7 +541,6 @@ public class FWGUI implements ActionListener {
                 FileEventDAO.insertFileEvent(event);
                 rowsInserted++;
             }
-
             JOptionPane.showMessageDialog(myFrame, rowsInserted + " events written to the database.",
                     "Database Write", JOptionPane.INFORMATION_MESSAGE);
         } else if (source.equals(myQueryButton)) {
@@ -629,7 +627,7 @@ public class FWGUI implements ActionListener {
         myExportCSVButton = myQueryPanel.getCSVButton();
         myExportCSVButton.addActionListener(this);
 
-        JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, myQueryTable);
+        JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, middleQueryPane);
         queryPane.setResizeWeight(splitPaneResizeWeight);
         queryPane.setDividerSize(0);
 
