@@ -980,5 +980,35 @@ public class FWGUI implements ActionListener {
             e.printStackTrace();
         }
     }
+    /**
+     * Returns the main panel for the GUI.
+     * 
+     * @return The main panel for the GUI
+     */
+    public FWPanel getMainPanel() {
+        return myMainPanel;
+    }
+    
+    /**
+     * Returns the frame for the GUI.
+     * 
+     * @return The frame for the GUI
+     */
+    public JFrame getFrame() {
+        return myFrame;
+    }
+    
+    /**
+     * Returns the start button for the directory.
+     * 
+     * @return The start button for the directory
+     */
+    public JButton getStopButton() {
+        return myDirectoryStopButton;
+    }
+
+
+    
+    
 
 }
