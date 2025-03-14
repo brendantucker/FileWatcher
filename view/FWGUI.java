@@ -78,7 +78,7 @@ public class FWGUI implements ActionListener {
     // The directory watch service to monitor the directory and files.
     private DirectoryWatchService myDirectoryWatchService;
     // Boolean value for if the database is active.
-    private boolean myDatabaseActive;
+    private boolean myDatabaseActive, myFilteringOn;
     // Label to display whether or not the database is connected.
     private JLabel myDatabaseConnectionLabel;
     // Debug buttons created to make fake data for quicker testing.
@@ -423,7 +423,7 @@ public class FWGUI implements ActionListener {
     public void actionPerformed(final ActionEvent theEvent) {
         Object source = theEvent.getSource();
         String command = theEvent.getActionCommand();
-        //Table was necessary to expand its scope in order to be used.
+        // Table was necessary to expand its scope in order to be used.
         FWEventTable queryResults = new FWEventTable();
 
         // Start Monitoring
@@ -469,14 +469,12 @@ public class FWGUI implements ActionListener {
         }
         // Extension Selection
         else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
-                && !myExtensionComboBox.getSelectedItem().equals(myCustomExtensionString)
-        // && myExtensionComboBox.getEditor().getEditorComponent().hasFocus() Possibly
-        // unnecessary?
-        ) {
+                && !myExtensionComboBox.getSelectedItem().equals(myCustomExtensionString)) {
             checkFields();
-            myEventTable.filterTable('.' + myExtensionComboBox.getSelectedItem().toString());
+            myFilteringOn = true;
             if (myExtensionComboBox.getSelectedItem().equals("All extensions")) {
                 myEventTable.updateTable();
+                myFilteringOn = false;
             }
         }
         // Send File via Email
@@ -557,34 +555,35 @@ public class FWGUI implements ActionListener {
             }
             if (myAutomaticQueryComboBox.getSelectedItem().equals("Query 1 - All events from today")) {
                 queryResults = FileEventDAO.fileEventsFromToday();
-            } else if (myAutomaticQueryComboBox.getSelectedItem().equals("Query 2 - Top 5 frequently modified file types")) {
+            } else if (myAutomaticQueryComboBox.getSelectedItem()
+                    .equals("Query 2 - Top 5 frequently modified file types")) {
                 queryResults = FileEventDAO.topFiveExtensions();
-            } else if (myAutomaticQueryComboBox.getSelectedItem().equals("Query 3 - Most Common Events for Each Extension")) {
+            } else if (myAutomaticQueryComboBox.getSelectedItem()
+                    .equals("Query 3 - Most Common Events for Each Extension")) {
                 queryResults = FileEventDAO.mostCommonEventsPerExtension();
             } else if (myAutomaticQueryComboBox.getSelectedItem().equals("Manually query")) {
                 myManualQueryComboBox.setVisible(true);
                 queryFrameFixSize();
                 myQueryFrame.pack();
             }
-        } else if (source.equals(myManualQueryComboBox)){
-                myQueryTable.clearTable();
-                myQueryCheckBoxPanel.setVisible(false);
-                Object manualComboBoxShort = myManualQueryComboBox.getSelectedItem();
-            if (manualComboBoxShort.equals("File Extension")){
+        } else if (source.equals(myManualQueryComboBox)) {
+            myQueryTable.clearTable();
+            myQueryCheckBoxPanel.setVisible(false);
+            Object manualComboBoxShort = myManualQueryComboBox.getSelectedItem();
+            if (manualComboBoxShort.equals("File Extension")) {
                 myQueryCheckBoxPanel.setVisible(true);
                 queryFrameFixSize();
                 myQueryFrame.pack(); // Resizes the frame to fit the components
                 myQueryFrame.queryFrameSize(.8, .3);
-            }
-            else if(manualComboBoxShort.equals("Path to File Location")){
+            } else if (manualComboBoxShort.equals("Path to File Location")) {
                 myFilePathFilterLabel.setVisible(true);
                 myFilePathFilterText.setVisible(true);
                 myFilePathFilterButton.setVisible(true);
                 queryFrameFixSize();
             }
-        } else if(source.equals(myFilePathFilterButton)){
+        } else if (source.equals(myFilePathFilterButton)) {
             browseDirectory(myFilePathFilterText);
-            if(!myFilePathFilterText.getText().isEmpty()){
+            if (!myFilePathFilterText.getText().isEmpty()) {
                 queryResults = FileEventDAO.manualQueryResults("file_path", myFilePathFilterText.getText());
             }
         } else if (source.equals(myDatabaseResetButton)) {
@@ -611,17 +610,18 @@ public class FWGUI implements ActionListener {
             }
         } else if (source.equals(myAdd1OfEachItem)) {
             runDummyInsertion();
-        } // Adding in the new table values.
-        if (queryResults.getData().size() != 0) {
+        } if(myFilteringOn){ 
+            myEventTable.filterTable('.' + myExtensionComboBox.getSelectedItem().toString());
+        } if (queryResults.getData().size() != 0) {
             for (FileEvent event : queryResults.getData()) {
                 myQueryTable.addEvent(event);
             }
             myQueryTable.updateTable();
             queryFrameFixSize();
-        } 
+        }
     }
 
-    private void resetQueryFrame(){
+    private void resetQueryFrame() {
         myQueryTable.clearTable();
         myQueryCheckBoxPanel.setVisible(false);
         myManualQueryComboBox.setVisible(false);
@@ -666,7 +666,6 @@ public class FWGUI implements ActionListener {
         // Add the JSplitPane to the frame
         myQueryFrame.add(queryPane, BorderLayout.CENTER);
 
-
         setUpQueryFiltering();
 
         myQueryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -674,7 +673,7 @@ public class FWGUI implements ActionListener {
         myQueryFrame.setVisible(true);
     }
 
-    private void setUpQueryFiltering(){
+    private void setUpQueryFiltering() {
         myAutomaticQueryComboBox = myQueryPanel.getQueryPopupSelection();
         myAutomaticQueryComboBox.addActionListener(this);
 
@@ -690,7 +689,7 @@ public class FWGUI implements ActionListener {
         myFilePathFilterText = myQueryPanel.getFileExtensionText();
 
         myFilePathFilterLabel = myQueryPanel.getFileExtensionLabel();
-        
+
     }
 
     private JPanel setUpQueryCheckBoxes() {
