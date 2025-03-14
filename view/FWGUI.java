@@ -11,9 +11,7 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-
 import javax.swing.Box;
-
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
@@ -32,7 +30,6 @@ import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -50,7 +47,7 @@ public class FWGUI implements ActionListener {
     // Timer to keep track of the time the user has been monitoring files.
     private Timer myTimer;
     // Label to display the time the user has been monitoring files.
-    private JLabel myTimeLabel;
+    private JLabel myTimeLabel, myFilePathFilterLabel;
     // Menu item to start monitoring files.
     private JMenuItem myMenuStart;
     // Menu item to stop monitoring files.
@@ -64,12 +61,12 @@ public class FWGUI implements ActionListener {
     // The types of extensions for users to monitor.
     private JComboBox<String> myExtensionComboBox;
     // The different queries to be ran in query window.
-    private JComboBox<String> myQueryComboBox;
+    private JComboBox<String> myAutomaticQueryComboBox, myManualQueryComboBox;
     // Text fields for the directory, database, and extensions.
-    private JTextField myDirectoryField, myExtensionField;
+    private JTextField myDirectoryField, myExtensionField, myFilePathFilterText;
     // Buttons for the GUI.
     private JButton myDirectoryStartButton, myDirectoryStopButton, myWriteDbButton, myDirectoryBrowseButton,
-            myResetDirectoryButton, myQueryButton, myDatabaseResetButton, myExportCSVButton;
+            myResetDirectoryButton, myQueryButton, myDatabaseResetButton, myExportCSVButton, myFilePathFilterButton;
     // Buttons for the image icons.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // The main panel for the GUI.
@@ -334,7 +331,7 @@ public class FWGUI implements ActionListener {
             }
         };
 
-        myDirectoryField = myMainPanel.getDirectoryField();
+        myDirectoryField = myMainPanel.getMyDirectoryField();
         myDirectoryField.getDocument().addDocumentListener(theListener);
         myExtensionField = (JTextField) myExtensionComboBox.getEditor().getEditorComponent();
         // Was starting out blank for some reason.
@@ -426,6 +423,8 @@ public class FWGUI implements ActionListener {
     public void actionPerformed(final ActionEvent theEvent) {
         Object source = theEvent.getSource();
         String command = theEvent.getActionCommand();
+        //Table was necessary to expand its scope in order to be used.
+        FWEventTable queryResults = new FWEventTable();
 
         // Start Monitoring
         if (source.equals(myMenuStart) || source.equals(myDirectoryStartButton) || source.equals(myImgStartButton)) {
@@ -498,7 +497,7 @@ public class FWGUI implements ActionListener {
         }
         // Browse Directory
         else if (source.equals(myDirectoryBrowseButton)) {
-            browseDirectory();
+            browseDirectory(myDirectoryField);
         }
         // Clear Fields
         else if (source.equals(myResetDirectoryButton) || source.equals(myImgClearButton)) {
@@ -548,37 +547,45 @@ public class FWGUI implements ActionListener {
                     "Database Write", JOptionPane.INFORMATION_MESSAGE);
         } else if (source.equals(myQueryButton)) {
             guiWindow();
-        } else if (source.equals(myQueryComboBox)) {
             myQueryTable.clearTable();
-            FWEventTable queryResults = new FWEventTable();
-            myQueryCheckBoxPanel.setVisible(false);
-            myQueryFrame.revalidate();
-            myQueryFrame.repaint();
+        } else if (source.equals(myAutomaticQueryComboBox)) {
+            resetQueryFrame();
+            queryFrameFixSize();
             // Erasing the selected checkboxes as a precaution
             for (JCheckBox checkBox : myExtensionCheckBox) {
                 checkBox.setSelected(false);
             }
-            if (myQueryComboBox.getSelectedItem().equals("Query 1 - All events from today")) {
+            if (myAutomaticQueryComboBox.getSelectedItem().equals("Query 1 - All events from today")) {
                 queryResults = FileEventDAO.fileEventsFromToday();
-            } else if (myQueryComboBox.getSelectedItem().equals("Query 2 - Top 5 frequently modified file types")) {
+            } else if (myAutomaticQueryComboBox.getSelectedItem().equals("Query 2 - Top 5 frequently modified file types")) {
                 queryResults = FileEventDAO.topFiveExtensions();
-            } else if (myQueryComboBox.getSelectedItem().equals("Query 3 - Most Common Events for Each Extension")) {
+            } else if (myAutomaticQueryComboBox.getSelectedItem().equals("Query 3 - Most Common Events for Each Extension")) {
                 queryResults = FileEventDAO.mostCommonEventsPerExtension();
-            } else if (myQueryComboBox.getSelectedItem().equals("Select specific extensions")) {
+            } else if (myAutomaticQueryComboBox.getSelectedItem().equals("Manually query")) {
+                myManualQueryComboBox.setVisible(true);
+                queryFrameFixSize();
+                myQueryFrame.pack();
+            }
+        } else if (source.equals(myManualQueryComboBox)){
+                myQueryTable.clearTable();
+                myQueryCheckBoxPanel.setVisible(false);
+                Object manualComboBoxShort = myManualQueryComboBox.getSelectedItem();
+            if (manualComboBoxShort.equals("File Extension")){
                 myQueryCheckBoxPanel.setVisible(true);
-                myQueryFrame.revalidate(); // Revalidate all components within the frame
-                myQueryFrame.repaint(); // Repaint the frame to update the UI
+                queryFrameFixSize();
                 myQueryFrame.pack(); // Resizes the frame to fit the components
                 myQueryFrame.queryFrameSize(.8, .3);
             }
-            // Adding in the new table values.
-            if (queryResults.getData().size() != 0) {
-                for (FileEvent event : queryResults.getData()) {
-                    myQueryTable.addEvent(event);
-                }
-                myQueryTable.updateTable();
-                myQueryTable.revalidate();
-                myQueryTable.repaint();
+            else if(manualComboBoxShort.equals("Path to File Location")){
+                myFilePathFilterLabel.setVisible(true);
+                myFilePathFilterText.setVisible(true);
+                myFilePathFilterButton.setVisible(true);
+                queryFrameFixSize();
+            }
+        } else if(source.equals(myFilePathFilterButton)){
+            browseDirectory(myFilePathFilterText);
+            if(!myFilePathFilterText.getText().isEmpty()){
+                queryResults = FileEventDAO.manualQueryResults("file_path", myFilePathFilterText.getText());
             }
         } else if (source.equals(myDatabaseResetButton)) {
             int choice = JOptionPane.showConfirmDialog(
@@ -604,7 +611,29 @@ public class FWGUI implements ActionListener {
             }
         } else if (source.equals(myAdd1OfEachItem)) {
             runDummyInsertion();
-        }
+        } // Adding in the new table values.
+        if (queryResults.getData().size() != 0) {
+            for (FileEvent event : queryResults.getData()) {
+                myQueryTable.addEvent(event);
+            }
+            myQueryTable.updateTable();
+            queryFrameFixSize();
+        } 
+    }
+
+    private void resetQueryFrame(){
+        myQueryTable.clearTable();
+        myQueryCheckBoxPanel.setVisible(false);
+        myManualQueryComboBox.setVisible(false);
+        myFilePathFilterButton.setVisible(false);
+        myFilePathFilterText.setVisible(false);
+        myFilePathFilterText.setText("");
+        myFilePathFilterLabel.setVisible(false);
+    }
+
+    private void queryFrameFixSize() {
+        myQueryFrame.revalidate();
+        myQueryFrame.repaint();
     }
 
     private void guiWindow() {
@@ -637,15 +666,31 @@ public class FWGUI implements ActionListener {
         // Add the JSplitPane to the frame
         myQueryFrame.add(queryPane, BorderLayout.CENTER);
 
-        myQueryComboBox = myQueryPanel.getQueryPopupSelection();
-        myQueryComboBox.addActionListener(this);
 
-        myDatabaseResetButton = myQueryPanel.getDatabaseResetButton();
-        myDatabaseResetButton.addActionListener(this);
+        setUpQueryFiltering();
 
         myQueryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         myQueryFrame.setVisible(true);
+    }
+
+    private void setUpQueryFiltering(){
+        myAutomaticQueryComboBox = myQueryPanel.getQueryPopupSelection();
+        myAutomaticQueryComboBox.addActionListener(this);
+
+        myManualQueryComboBox = myQueryPanel.getManualQueryComboBox();
+        myManualQueryComboBox.addActionListener(this);
+
+        myDatabaseResetButton = myQueryPanel.getDatabaseResetButton();
+        myDatabaseResetButton.addActionListener(this);
+
+        myFilePathFilterButton = myQueryPanel.getFileExtensionFilterButton();
+        myFilePathFilterButton.addActionListener(this);
+
+        myFilePathFilterText = myQueryPanel.getFileExtensionText();
+
+        myFilePathFilterLabel = myQueryPanel.getFileExtensionLabel();
+        
     }
 
     private JPanel setUpQueryCheckBoxes() {
@@ -764,14 +809,14 @@ public class FWGUI implements ActionListener {
      * Method to browse the directory and set the text field to the directory
      * chosen.
      */
-    private void browseDirectory() {
+    private void browseDirectory(JTextField theField) {
         JFileChooser direcChooser = new JFileChooser();
         direcChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         direcChooser.setAcceptAllFileFilterUsed(false);
 
         int directoryValue = direcChooser.showOpenDialog(null);
         if (directoryValue == JFileChooser.APPROVE_OPTION) {
-            myDirectoryField.setText(direcChooser.getSelectedFile().getAbsolutePath());
+            theField.setText(direcChooser.getSelectedFile().getAbsolutePath());
         }
     }
 

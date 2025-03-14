@@ -3,20 +3,22 @@ import javax.swing.*;
 
 public class FWPanel extends JPanel {
     // Combo box for selecting the extension to monitor.
-    private JComboBox<String> extensionDropdown;
+    private JComboBox<String> myExtensionDropdown;
     // Text field for the directory to monitor.
-    private JTextField directoryField;
+    private JTextField myDirectoryField, myFilePathFilterText;
     // Combo box for the query window to select the queries.
-    private JComboBox<String> querySelectionDropdown;
+    private JComboBox<String> myQuerySelectionDropdown, myManualQueryComboBox;
     // Buttons for starting, stopping, and browsing for a directory to monitor.
     private JButton myWriteDbButton, myQueryButton, myDatabaseResetButton, myResetButton, myBrowseButton, myStartButton,
-            myStopButton, myExportCSVButton;
+            myStopButton, myExportCSVButton, myFilePathFilterButton;
     // Buttons for the image icons.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // GridBagConstraint for the layout.
     private GridBagConstraints myGBC;
     // Main panel for the layout.
     private JPanel myMainPanel;
+    // Labels for filtering queries.
+    private JLabel myFilePathFilterLabel;
 
     /**
      * Constructor for the FWPanel. This will create the panel and set up the
@@ -48,21 +50,51 @@ public class FWPanel extends JPanel {
         queryPanelGBC(queryGBC, 0, 0, 0.0);
         queryPanel.add(queryLabel, queryGBC);
 
-        querySelectionDropdown = new JComboBox<>(
-                new String[] { "Choose query", "Select specific extensions", "Query 1 - All events from today",
-                        "Query 2 - Top 5 frequently modified file types", "Query 3 - Most Common Events for Each Extension", });
+        setUpQueryFilterOptions();
+        
         queryPanelGBC(queryGBC, 1, 0, 1.0);
-        queryPanel.add(querySelectionDropdown, queryGBC);
+        queryPanel.add(myQuerySelectionDropdown, queryGBC);
 
-        myExportCSVButton = createModernButton("Export to CSV");
         queryPanelGBC(queryGBC, 2, 0, 0.0);
         queryPanel.add(myExportCSVButton, queryGBC);
 
-        myDatabaseResetButton = createModernButton("Reset Database");
         queryPanelGBC(queryGBC, 3, 0, 0.0);
         queryPanel.add(myDatabaseResetButton, queryGBC);
 
+        queryPanelGBC(queryGBC, 0, 1, 0.0);
+        queryPanel.add(myManualQueryComboBox, queryGBC);
+        
+        queryPanelGBC(queryGBC, 1, 1, 0.0);
+        queryPanel.add(myFilePathFilterLabel, queryGBC);
+        
+        queryPanelGBC(queryGBC, 2, 1, 0.0);
+        queryPanel.add(myFilePathFilterText, queryGBC);
+        
+        queryPanelGBC(queryGBC, 3, 1, 0.0);
+        queryPanel.add(myFilePathFilterButton, queryGBC);
+
         return queryPanel;
+    }
+
+    private void setUpQueryFilterOptions(){
+        myQuerySelectionDropdown = new JComboBox<>(
+                new String[] { "Choose query", "Manually query", "Query 1 - All events from today",
+                        "Query 2 - Top 5 frequently modified file types",
+                        "Query 3 - Most Common Events for Each Extension", });
+        myExportCSVButton = createModernButton("Export to CSV");
+        myDatabaseResetButton = createModernButton("Reset Database");
+        myManualQueryComboBox = new JComboBox<>(
+                new String[] { "Choose file detail", "File Name", "File Extension", "Path to File Location",
+                        "Type of Activity", "Date and Time" });
+        myManualQueryComboBox.setVisible(false);
+
+        myFilePathFilterText = new JTextField(0);
+        myFilePathFilterText.setVisible(false);
+        myFilePathFilterText.setEditable(false);
+        myFilePathFilterLabel = new JLabel("File Extension: ");
+        myFilePathFilterLabel.setVisible(false);
+        myFilePathFilterButton = createModernButton("Browse Directories");
+        myFilePathFilterButton.setVisible(false);
     }
 
     private void queryPanelGBC(GridBagConstraints theGBC, int theX, int theY, double theWeightx) {
@@ -99,11 +131,11 @@ public class FWPanel extends JPanel {
         adjustGridBagConstraints(0, 1, GridBagConstraints.RELATIVE, 0.0);
         myMainPanel.add(monitorLabel, myGBC);
 
-        extensionDropdown = new JComboBox<>(
+        myExtensionDropdown = new JComboBox<>(
                 new String[] { "All extensions", "Custom extension", "test", "docx", "pdf", "txt", "png", "jpg",
                         "jpeg", "gif", "mp3", "mp4", "wav", "avi", "mov", "csv" });
         adjustGridBagConstraints(1, 1, GridBagConstraints.REMAINDER, 1.0);
-        myMainPanel.add(extensionDropdown, myGBC);
+        myMainPanel.add(myExtensionDropdown, myGBC);
     }
 
     /**
@@ -114,10 +146,10 @@ public class FWPanel extends JPanel {
         adjustGridBagConstraints(0, 2, GridBagConstraints.RELATIVE, 0.0);
         myMainPanel.add(directoryLabel, myGBC);
 
-        directoryField = new JTextField(0); // Increase the size of the text field
+        myDirectoryField = new JTextField(0); // Increase the size of the text field
         adjustGridBagConstraints(1, 2, GridBagConstraints.REMAINDER, 1.0);
         myGBC.fill = GridBagConstraints.HORIZONTAL; // Make the text field fill the available space
-        myMainPanel.add(directoryField, myGBC);
+        myMainPanel.add(myDirectoryField, myGBC);
     }
 
     /**
@@ -188,12 +220,37 @@ public class FWPanel extends JPanel {
     }
 
     /**
+     * Gets the file extension query label.
+     * 
+     * @return The File extension query label.
+     */
+    public JLabel getFileExtensionLabel() {
+        return myFilePathFilterLabel;
+    }
+
+    /**
+     * Gets the file extension query textbox.
+     * @return The file extension query textbox.
+     */
+    public JTextField getFileExtensionText() {
+        return myFilePathFilterText;
+    }
+
+    /**
+     * Gets the file extension filter button.
+     * @return The file extension filter button.
+     */
+    public JButton getFileExtensionFilterButton(){
+        return myFilePathFilterButton;
+    }
+
+    /**
      * Gets the extension box.
      * 
      * @return The extension box.
      */
     public JComboBox<String> getExtensionBox() {
-        return extensionDropdown;
+        return myExtensionDropdown;
     }
 
     /**
@@ -202,7 +259,16 @@ public class FWPanel extends JPanel {
      * @return The query extension box.
      */
     public JComboBox<String> getQueryPopupSelection() {
-        return querySelectionDropdown;
+        return myQuerySelectionDropdown;
+    }
+
+    /**
+     * Gets the manual query dropdown.
+     * 
+     * @return The manual query dropdown.
+     */
+    public JComboBox<String> getManualQueryComboBox() {
+        return myManualQueryComboBox;
     }
 
     /**
@@ -210,8 +276,8 @@ public class FWPanel extends JPanel {
      * 
      * @return The directory box.
      */
-    public JTextField getDirectoryField() {
-        return directoryField;
+    public JTextField getMyDirectoryField() {
+        return myDirectoryField;
     }
 
     /**
@@ -270,9 +336,10 @@ public class FWPanel extends JPanel {
 
     /**
      * Gets the button that will export the database query list as a CSV.
+     * 
      * @return The button that will export the database query list as a CSV.
      */
-    public JButton getCSVButton(){
+    public JButton getCSVButton() {
         return myExportCSVButton;
     }
 

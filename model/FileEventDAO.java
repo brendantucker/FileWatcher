@@ -193,6 +193,36 @@ public class FileEventDAO {
         return theResultsTable;
     }
 
+    public static FWEventTable manualQueryResults(String theChoice, String theFilter){
+        FWEventTable theResultsTable = new FWEventTable();
+        Connection conn = DatabaseConnection.getMyConnection();
+        if (conn == null) {
+            System.out.println("Database is not connected!");
+        } else {
+            String sql = "SELECT * FROM file_events WHERE " + theChoice + " = ?";
+
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1,theFilter);
+                ResultSet resultElements = pstmt.executeQuery();
+                while (resultElements.next()) {
+                    FileEvent theEvent = new FileEvent(
+                            resultElements.getString("file_name"),
+                            resultElements.getString("file_path"),
+                            resultElements.getString("event_type"),
+                            resultElements.getString("file_extension"),
+                            resultElements.getString("event_date"),
+                            resultElements.getString("event_time"));
+
+                    theResultsTable.addEvent(theEvent);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Error querying txt files.");
+            }
+        }
+        return theResultsTable;
+    }
+
     public static void resetEntireDatabase() {
         Connection conn = DatabaseConnection.getMyConnection();
         if (conn == null) {
