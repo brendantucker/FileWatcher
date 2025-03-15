@@ -5,12 +5,12 @@ public class FWPanel extends JPanel {
     // Combo box for selecting the extension to monitor.
     private JComboBox<String> myExtensionDropdown;
     // Text field for the directory to monitor.
-    private JTextField myDirectoryField, myFilePathFilterText;
+    private JTextField myDirectoryField, myFilePathFilterText, myFileNameText;
     // Combo box for the query window to select the queries.
-    private JComboBox<String> myQuerySelectionDropdown, myManualQueryComboBox;
+    private JComboBox<String> myQuerySelectionDropdown, myManualQueryComboBox, myEventActivityDropdown;
     // Buttons for starting, stopping, and browsing for a directory to monitor.
     private JButton myWriteDbButton, myQueryButton, myDatabaseResetButton, myResetButton, myBrowseButton, myStartButton,
-            myStopButton, myExportCSVButton, myFilePathFilterButton;
+            myStopButton, myExportCSVButton, myManualQueryButton;
     // Buttons for the image icons.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // GridBagConstraint for the layout.
@@ -18,7 +18,7 @@ public class FWPanel extends JPanel {
     // Main panel for the layout.
     private JPanel myMainPanel;
     // Labels for filtering queries.
-    private JLabel myFilePathFilterLabel;
+    private JLabel myManualQueryLabel;
 
     /**
      * Constructor for the FWPanel. This will create the panel and set up the
@@ -65,13 +65,19 @@ public class FWPanel extends JPanel {
         queryPanel.add(myManualQueryComboBox, queryGBC);
         
         queryPanelGBC(queryGBC, 1, 1, 0.0);
-        queryPanel.add(myFilePathFilterLabel, queryGBC);
+        queryPanel.add(myManualQueryLabel, queryGBC);
         
         queryPanelGBC(queryGBC, 2, 1, 0.0);
         queryPanel.add(myFilePathFilterText, queryGBC);
         
         queryPanelGBC(queryGBC, 3, 1, 0.0);
-        queryPanel.add(myFilePathFilterButton, queryGBC);
+        queryPanel.add(myManualQueryButton, queryGBC);
+
+        queryPanelGBC(queryGBC, 2, 1, 0.0);
+        queryPanel.add(myEventActivityDropdown, queryGBC);
+
+        queryPanelGBC(queryGBC, 2, 1, 0.0);
+        queryPanel.add(myFileNameText,queryGBC);
 
         return queryPanel;
     }
@@ -88,13 +94,19 @@ public class FWPanel extends JPanel {
                         "Type of Activity", "Date and Time" });
         myManualQueryComboBox.setVisible(false);
 
+        myEventActivityDropdown = new JComboBox<>(new String[] {"Choose Activity Type","CREATED", "DELETED", "MODIFIED"});
+        myEventActivityDropdown.setVisible(false);
+
+        myFileNameText = new JTextField(0);
+        myFileNameText.setVisible(false);
+
         myFilePathFilterText = new JTextField(0);
         myFilePathFilterText.setVisible(false);
         myFilePathFilterText.setEditable(false);
-        myFilePathFilterLabel = new JLabel("File Extension: ");
-        myFilePathFilterLabel.setVisible(false);
-        myFilePathFilterButton = createModernButton("Browse Directories");
-        myFilePathFilterButton.setVisible(false);
+        myManualQueryLabel = new JLabel("File Pathway: ");
+        myManualQueryLabel.setVisible(false);
+        myManualQueryButton = createModernButton("Browse Directories");
+        myManualQueryButton.setVisible(false);
     }
 
     private void queryPanelGBC(GridBagConstraints theGBC, int theX, int theY, double theWeightx) {
@@ -225,7 +237,23 @@ public class FWPanel extends JPanel {
      * @return The File extension query label.
      */
     public JLabel getFileExtensionLabel() {
-        return myFilePathFilterLabel;
+        return myManualQueryLabel;
+    }
+
+    /**
+     * Gets the event activity dropdown to be returned.
+     * @return The event activity dropdown.
+     */
+    public JComboBox<String> getEventActivityDropdown(){
+        return myEventActivityDropdown;
+    }
+
+    /**
+     * Gets the JTextField for the file name filter.
+     * @return JTextField for file name filter.
+     */
+    public JTextField getFileNameText(){
+        return myFileNameText;
     }
 
     /**
@@ -241,7 +269,7 @@ public class FWPanel extends JPanel {
      * @return The file extension filter button.
      */
     public JButton getFileExtensionFilterButton(){
-        return myFilePathFilterButton;
+        return myManualQueryButton;
     }
 
     /**

@@ -47,7 +47,7 @@ public class FWGUI implements ActionListener {
     // Timer to keep track of the time the user has been monitoring files.
     private Timer myTimer;
     // Label to display the time the user has been monitoring files.
-    private JLabel myTimeLabel, myFilePathFilterLabel;
+    private JLabel myTimeLabel, myManualQueryLabel;
     // Menu item to start monitoring files.
     private JMenuItem myMenuStart;
     // Menu item to stop monitoring files.
@@ -61,12 +61,12 @@ public class FWGUI implements ActionListener {
     // The types of extensions for users to monitor.
     private JComboBox<String> myExtensionComboBox;
     // The different queries to be ran in query window.
-    private JComboBox<String> myAutomaticQueryComboBox, myManualQueryComboBox;
+    private JComboBox<String> myAutomaticQueryComboBox, myManualQueryComboBox, myEventActivityDropdown;
     // Text fields for the directory, database, and extensions.
-    private JTextField myDirectoryField, myExtensionField, myFilePathFilterText;
+    private JTextField myDirectoryField, myExtensionField, myFilePathFilterText, myFileNameText;
     // Buttons for the GUI.
     private JButton myDirectoryStartButton, myDirectoryStopButton, myWriteDbButton, myDirectoryBrowseButton,
-            myResetDirectoryButton, myQueryButton, myDatabaseResetButton, myExportCSVButton, myFilePathFilterButton;
+            myResetDirectoryButton, myQueryButton, myDatabaseResetButton, myExportCSVButton, myManualQueryButton;
     // Buttons for the image icons.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // The main panel for the GUI.
@@ -335,7 +335,6 @@ public class FWGUI implements ActionListener {
         myDirectoryField.getDocument().addDocumentListener(theListener);
         myExtensionField = (JTextField) myExtensionComboBox.getEditor().getEditorComponent();
         // Was starting out blank for some reason.
-        // Was starting out blank for some reason.
         myExtensionField.setText(("All extensions"));
         myExtensionField.getDocument().addDocumentListener(theListener);
     }
@@ -492,62 +491,24 @@ public class FWGUI implements ActionListener {
                             JOptionPane.INFORMATION_MESSAGE);
                 }
             }
-        }
-        // Browse Directory
+        } // Browse Directory
         else if (source.equals(myDirectoryBrowseButton)) {
             browseDirectory(myDirectoryField);
-        }
-        // Clear Fields
+        } // Clear Fields
         else if (source.equals(myResetDirectoryButton) || source.equals(myImgClearButton)) {
             clearFields();
-        }
-        // Export Query Results to CSV
+        } // Export Query Results to CSV
         else if (source.equals(myExportCSVButton)) {
             exportQueryResultsToCSV();
-        }
-
-        // Write to Database
+        } // Write to Database
         else if (source.equals(myWriteDbButton) || source.equals(myImgDBButton)) {
-            if (DatabaseConnection.getMyConnection() == null) {
-                int choice = JOptionPane.showConfirmDialog(
-                        myFrame,
-                        "Database is not connected. Would you like to connect now?",
-                        "Database Not Connected",
-                        JOptionPane.YES_NO_CANCEL_OPTION,
-                        JOptionPane.WARNING_MESSAGE);
-
-                if (choice == JOptionPane.CANCEL_OPTION) {
-                    return; // Stop execution if the user cancels
-                }
-
-                if (choice == JOptionPane.YES_OPTION) {
-                    boolean success = DatabaseConnection.connect();
-                    if (!success) {
-                        JOptionPane.showMessageDialog(
-                                myFrame,
-                                "Failed to connect to the database. Events will not be saved.",
-                                "Database Connection Error",
-                                JOptionPane.ERROR_MESSAGE);
-                        return; // Stop execution if connection fails
-                    }
-                    setDatabaseConnected(true);
-                } else {
-                    return; // Stop execution if the user chooses "No"
-                }
-            }
-            // Write all stored events to the database
-            int rowsInserted = 0;
-            for (FileEvent event : myEventTable.getData()) {
-                FileEventDAO.insertFileEvent(event);
-                rowsInserted++;
-            }
-            JOptionPane.showMessageDialog(myFrame, rowsInserted + " events written to the database.",
-                    "Database Write", JOptionPane.INFORMATION_MESSAGE);
+            writeToDatabaseHelper();
         } else if (source.equals(myQueryButton)) {
             guiWindow();
             myQueryTable.clearTable();
         } else if (source.equals(myAutomaticQueryComboBox)) {
             resetQueryFrame();
+            myManualQueryComboBox.setVisible(false);
             queryFrameFixSize();
             // Erasing the selected checkboxes as a precaution
             for (JCheckBox checkBox : myExtensionCheckBox) {
@@ -568,23 +529,43 @@ public class FWGUI implements ActionListener {
             }
         } else if (source.equals(myManualQueryComboBox)) {
             myQueryTable.clearTable();
-            myQueryCheckBoxPanel.setVisible(false);
+            resetQueryFrame();
             Object manualComboBoxShort = myManualQueryComboBox.getSelectedItem();
             if (manualComboBoxShort.equals("File Extension")) {
                 myQueryCheckBoxPanel.setVisible(true);
-                queryFrameFixSize();
                 myQueryFrame.pack(); // Resizes the frame to fit the components
                 myQueryFrame.queryFrameSize(.8, .3);
             } else if (manualComboBoxShort.equals("Path to File Location")) {
-                myFilePathFilterLabel.setVisible(true);
+                myManualQueryLabel.setVisible(true);
                 myFilePathFilterText.setVisible(true);
-                myFilePathFilterButton.setVisible(true);
-                queryFrameFixSize();
+                myManualQueryButton.setVisible(true);
+            } else if (manualComboBoxShort.equals("File Name")){
+                myManualQueryLabel.setVisible(true);
+                myManualQueryLabel.setText("File Name to Search: ");
+                myFileNameText.setVisible(true);
+                myManualQueryButton.setVisible(true);
+                myManualQueryButton.setText("Search");
+            } else if (manualComboBoxShort.equals("Type of Activity")){
+                myManualQueryLabel.setVisible(true);
+                myManualQueryLabel.setText("Type of Activity to choose: ");
+                myEventActivityDropdown.setVisible(true);
+            } else if (manualComboBoxShort.equals("Date and Time")){
+                System.out.println("Hi");
             }
-        } else if (source.equals(myFilePathFilterButton)) {
+            queryFrameFixSize();
+        } else if (source.equals(myManualQueryButton) && myManualQueryLabel.getText().equals("File Pathway: ")) {
             browseDirectory(myFilePathFilterText);
             if (!myFilePathFilterText.getText().isEmpty()) {
                 queryResults = FileEventDAO.manualQueryResults("file_path", myFilePathFilterText.getText());
+            }
+        } else if (source.equals(myManualQueryButton) && myManualQueryLabel.getText().equals("File Name to Search: ")){
+            if(!myFileNameText.getText().equals("")){
+                queryResults = FileEventDAO.manualQueryResults("file_name", myFileNameText.getText());
+            }
+        } else if (source.equals(myEventActivityDropdown)){
+            myQueryTable.clearTable();
+            if (!myEventActivityDropdown.getSelectedItem().toString().equals("Choose Activity Type")){
+                queryResults = FileEventDAO.manualQueryResults("event_type", myEventActivityDropdown.getSelectedItem().toString());
             }
         } else if (source.equals(myDatabaseResetButton)) {
             int choice = JOptionPane.showConfirmDialog(
@@ -610,9 +591,11 @@ public class FWGUI implements ActionListener {
             }
         } else if (source.equals(myAdd1OfEachItem)) {
             runDummyInsertion();
-        } if(myFilteringOn){ 
-            myEventTable.filterTable('.' + myExtensionComboBox.getSelectedItem().toString());
-        } if (queryResults.getData().size() != 0) {
+        }
+        if (myFilteringOn) {
+            myEventTable.extensionTableFilter('.' + myExtensionComboBox.getSelectedItem().toString());
+        }
+        if (queryResults.getData().size() != 0) {
             for (FileEvent event : queryResults.getData()) {
                 myQueryTable.addEvent(event);
             }
@@ -624,11 +607,13 @@ public class FWGUI implements ActionListener {
     private void resetQueryFrame() {
         myQueryTable.clearTable();
         myQueryCheckBoxPanel.setVisible(false);
-        myManualQueryComboBox.setVisible(false);
-        myFilePathFilterButton.setVisible(false);
+        myManualQueryButton.setVisible(false);
         myFilePathFilterText.setVisible(false);
         myFilePathFilterText.setText("");
-        myFilePathFilterLabel.setVisible(false);
+        myFileNameText.setVisible(false);
+        myFileNameText.setText("");
+        myManualQueryLabel.setVisible(false);
+        myEventActivityDropdown.setVisible(false);
     }
 
     private void queryFrameFixSize() {
@@ -683,13 +668,55 @@ public class FWGUI implements ActionListener {
         myDatabaseResetButton = myQueryPanel.getDatabaseResetButton();
         myDatabaseResetButton.addActionListener(this);
 
-        myFilePathFilterButton = myQueryPanel.getFileExtensionFilterButton();
-        myFilePathFilterButton.addActionListener(this);
+        myManualQueryButton = myQueryPanel.getFileExtensionFilterButton();
+        myManualQueryButton.addActionListener(this);
+
+        myEventActivityDropdown = myQueryPanel.getEventActivityDropdown();
+        myEventActivityDropdown.addActionListener(this);
+
+        myFileNameText = myQueryPanel.getFileNameText();
 
         myFilePathFilterText = myQueryPanel.getFileExtensionText();
 
-        myFilePathFilterLabel = myQueryPanel.getFileExtensionLabel();
+        myManualQueryLabel = myQueryPanel.getFileExtensionLabel();
+    }
 
+    private void writeToDatabaseHelper() {
+        if (DatabaseConnection.getMyConnection() == null) {
+            int choice = JOptionPane.showConfirmDialog(
+                    myFrame,
+                    "Database is not connected. Would you like to connect now?",
+                    "Database Not Connected",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+
+            if (choice == JOptionPane.CANCEL_OPTION) {
+                return; // Stop execution if the user cancels
+            }
+
+            if (choice == JOptionPane.YES_OPTION) {
+                boolean success = DatabaseConnection.connect();
+                if (!success) {
+                    JOptionPane.showMessageDialog(
+                            myFrame,
+                            "Failed to connect to the database. Events will not be saved.",
+                            "Database Connection Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return; // Stop execution if connection fails
+                }
+                setDatabaseConnected(true);
+            } else {
+                return; // Stop execution if the user chooses "No"
+            }
+        }
+        // Write all stored events to the database
+        int rowsInserted = 0;
+        for (FileEvent event : myEventTable.getData()) {
+            FileEventDAO.insertFileEvent(event);
+            rowsInserted++;
+        }
+        JOptionPane.showMessageDialog(myFrame, rowsInserted + " events written to the database.",
+                "Database Write", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private JPanel setUpQueryCheckBoxes() {
@@ -720,8 +747,7 @@ public class FWGUI implements ActionListener {
                         myQueryTable.addEvent(event);
                     }
                     myQueryTable.updateTable();
-                    myQueryTable.revalidate();
-                    myQueryTable.repaint();
+                    queryFrameFixSize();
                 }
             });
             queryCheckboxesPanel.add(myExtensionCheckBox[i]);

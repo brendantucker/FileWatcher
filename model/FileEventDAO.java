@@ -199,7 +199,13 @@ public class FileEventDAO {
         if (conn == null) {
             System.out.println("Database is not connected!");
         } else {
-            String sql = "SELECT * FROM file_events WHERE " + theChoice + " = ?";
+            String sql = "";
+            if(theChoice.equals("file_name")){
+                sql = "SELECT * FROM file_events WHERE " + theChoice + " LIKE ?";
+                theFilter = "%" + theFilter + "%";
+            } else{
+                sql = "SELECT * FROM file_events WHERE " + theChoice + " = ?";
+            }
 
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1,theFilter);

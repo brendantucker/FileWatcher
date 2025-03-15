@@ -51,7 +51,7 @@ public class FWEventTableTest {
         eventTable.addEvent(event2);
         eventTable.addEvent(event3);
 
-        eventTable.filterTable(".txt");
+        eventTable.extensionTableFilter(".txt");
 
         assertEquals("Only 2 events should be shown for .txt filter", 2, eventTable.getData().size());
     }

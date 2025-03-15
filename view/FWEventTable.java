@@ -113,7 +113,7 @@ public class FWEventTable extends JPanel {
         myTableModel.setRowCount(0);
     }
 
-    public void filterTable(String theFilter){
+    public void extensionTableFilter(String theFilter){
         myTableModel.setRowCount(0);
         if(!theFilter.equals("All Extensions")){
             for (FileEvent event : myData) {
