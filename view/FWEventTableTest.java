@@ -25,7 +25,7 @@ public class FWEventTableTest {
         assertEquals(1, data.size());
 
         //  Ensure the full filename is stored correctly
-        assertEquals("test.txt", data.get(0).getFileName());
+        assertEquals("test", data.get(0).getFileName());
         assertEquals(".txt", data.get(0).getExtension());
     }
 

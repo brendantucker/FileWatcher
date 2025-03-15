@@ -18,6 +18,7 @@ public class FWGUITest {
     public void testGUIInitialization() {
         assertNotNull(fwgui);
         assertNotNull(fwgui.getEventTable());
+        assertTrue(fwgui.getEventTable().getData().isEmpty());
         assertFalse(fwgui.isMonitoring()); // Should not be monitoring on startup
     }
 
@@ -41,15 +42,37 @@ public class FWGUITest {
         assertTrue(stopButton.isEnabled());
     }
     
+    // Does not set directory to valid field, shows a joptionpane error message
+    @Test
+    public void testActionPerformed_StartMonitoring() {
+        JButton startButton = fwgui.getMainPanel().getStartButton();
+        JTextField directoryField = fwgui.getMainPanel().getDirectoryField();
+        directoryField.setText("C:\\"); // Set a valid directory for the test
+        startButton.setEnabled(true); 
+
+        ActionEvent event = new ActionEvent(startButton, ActionEvent.ACTION_PERFORMED, "Start");
+        fwgui.actionPerformed(event);
+
+        assertTrue(fwgui.isMonitoring());
+    }
+
     
-
-
-    
-
+    // Does not set directory to valid field, shows a joptionpane error message
     @Test
     public void testActionPerformed_StopMonitoring() {
-        ActionEvent event = new ActionEvent(fwgui, ActionEvent.ACTION_PERFORMED, "Stop");
-        fwgui.actionPerformed(event);
+        JButton startButton = fwgui.getMainPanel().getStartButton();
+        JTextField directoryField = fwgui.getMainPanel().getDirectoryField();
+        JButton stopButton = fwgui.getMainPanel().getStopButton();
+        directoryField.setText("C:\\"); // Set a valid directory for the test
+        startButton.setEnabled(true); 
+        stopButton.setEnabled(true); 
+        ActionEvent eventStart = new ActionEvent(startButton, ActionEvent.ACTION_PERFORMED, "Start");
+        ActionEvent eventStop = new ActionEvent(stopButton, ActionEvent.ACTION_PERFORMED, "Stop");
+        
+        //fwgui.
+
+        fwgui.actionPerformed(eventStart);
+        fwgui.actionPerformed(eventStop); //Stop a running monitoring session
 
         assertFalse(fwgui.isMonitoring());
     }
