@@ -5,7 +5,7 @@ public class FWPanel extends JPanel {
     // Combo box for selecting the extension to monitor.
     private JComboBox<String> myExtensionDropdown;
     // Text field for the directory to monitor.
-    private JTextField myDirectoryField, myFilePathFilterText, myFileNameText;
+    private JTextField myDirectoryField, myPathOrDateText, myFileNameText;
     // Combo box for the query window to select the queries.
     private JComboBox<String> myQuerySelectionDropdown, myManualQueryComboBox, myEventActivityDropdown;
     // Buttons for starting, stopping, and browsing for a directory to monitor.
@@ -68,7 +68,7 @@ public class FWPanel extends JPanel {
         queryPanel.add(myManualQueryLabel, queryGBC);
         
         queryPanelGBC(queryGBC, 2, 1, 0.0);
-        queryPanel.add(myFilePathFilterText, queryGBC);
+        queryPanel.add(myPathOrDateText, queryGBC);
         
         queryPanelGBC(queryGBC, 3, 1, 0.0);
         queryPanel.add(myManualQueryButton, queryGBC);
@@ -100,12 +100,12 @@ public class FWPanel extends JPanel {
         myFileNameText = new JTextField(0);
         myFileNameText.setVisible(false);
 
-        myFilePathFilterText = new JTextField(0);
-        myFilePathFilterText.setVisible(false);
-        myFilePathFilterText.setEditable(false);
-        myManualQueryLabel = new JLabel("File Pathway: ");
+        myPathOrDateText = new JTextField(0);
+        myPathOrDateText.setVisible(false);
+        myPathOrDateText.setEditable(false);
+        myManualQueryLabel = new JLabel("");
         myManualQueryLabel.setVisible(false);
-        myManualQueryButton = createModernButton("Browse Directories");
+        myManualQueryButton = createModernButton("");
         myManualQueryButton.setVisible(false);
     }
 
@@ -261,7 +261,7 @@ public class FWPanel extends JPanel {
      * @return The file extension query textbox.
      */
     public JTextField getFileExtensionText() {
-        return myFilePathFilterText;
+        return myPathOrDateText;
     }
 
     /**

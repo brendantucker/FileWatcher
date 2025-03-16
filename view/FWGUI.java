@@ -25,8 +25,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -63,7 +65,7 @@ public class FWGUI implements ActionListener {
     // The different queries to be ran in query window.
     private JComboBox<String> myAutomaticQueryComboBox, myManualQueryComboBox, myEventActivityDropdown;
     // Text fields for the directory, database, and extensions.
-    private JTextField myDirectoryField, myExtensionField, myFilePathFilterText, myFileNameText;
+    private JTextField myDirectoryField, myExtensionField, myPathOrDateText, myFileNameText;
     // Buttons for the GUI.
     private JButton myDirectoryStartButton, myDirectoryStopButton, myWriteDbButton, myDirectoryBrowseButton,
             myResetDirectoryButton, myQueryButton, myDatabaseResetButton, myExportCSVButton, myManualQueryButton;
@@ -536,33 +538,35 @@ public class FWGUI implements ActionListener {
                 myQueryFrame.pack(); // Resizes the frame to fit the components
                 myQueryFrame.queryFrameSize(.8, .3);
             } else if (manualComboBoxShort.equals("Path to File Location")) {
-                myManualQueryLabel.setVisible(true);
-                myFilePathFilterText.setVisible(true);
-                myManualQueryButton.setVisible(true);
+                changeManualLabelAndButton("File Pathway: ", "Browse Directories");
+                myPathOrDateText.setVisible(true);
             } else if (manualComboBoxShort.equals("File Name")){
-                myManualQueryLabel.setVisible(true);
-                myManualQueryLabel.setText("File Name to Search: ");
+                changeManualLabelAndButton("File Name to Search: ", "Search");
                 myFileNameText.setVisible(true);
-                myManualQueryButton.setVisible(true);
-                myManualQueryButton.setText("Search");
             } else if (manualComboBoxShort.equals("Type of Activity")){
-                myManualQueryLabel.setVisible(true);
-                myManualQueryLabel.setText("Type of Activity to choose: ");
+                changeManualLabelAndButton("Type of Activity to choose: ", null);
                 myEventActivityDropdown.setVisible(true);
             } else if (manualComboBoxShort.equals("Date and Time")){
-                System.out.println("Hi");
+                changeManualLabelAndButton("Choose Date and Time: ", "Open Calendar");
+                myPathOrDateText.setVisible(true);
             }
             queryFrameFixSize();
         } else if (source.equals(myManualQueryButton) && myManualQueryLabel.getText().equals("File Pathway: ")) {
-            browseDirectory(myFilePathFilterText);
-            if (!myFilePathFilterText.getText().isEmpty()) {
-                queryResults = FileEventDAO.manualQueryResults("file_path", myFilePathFilterText.getText());
+            browseDirectory(myPathOrDateText);
+            if (!myPathOrDateText.getText().isEmpty()) {
+                queryResults = FileEventDAO.manualQueryResults("file_path", myPathOrDateText.getText());
             }
         } else if (source.equals(myManualQueryButton) && myManualQueryLabel.getText().equals("File Name to Search: ")){
             if(!myFileNameText.getText().equals("")){
                 queryResults = FileEventDAO.manualQueryResults("file_name", myFileNameText.getText());
             }
-        } else if (source.equals(myEventActivityDropdown)){
+        } else if (source.equals(myManualQueryButton) && myManualQueryLabel.getText().equals("Choose Date and Time: ")){
+            String selectedDateTime = dateAndTimePicker();
+            myPathOrDateText.setText(selectedDateTime);
+            if (!selectedDateTime.isEmpty()) {
+                queryResults = FileEventDAO.manualQueryResults("event_date", selectedDateTime);
+            }
+        }  else if (source.equals(myEventActivityDropdown)){
             myQueryTable.clearTable();
             if (!myEventActivityDropdown.getSelectedItem().toString().equals("Choose Activity Type")){
                 queryResults = FileEventDAO.manualQueryResults("event_type", myEventActivityDropdown.getSelectedItem().toString());
@@ -604,12 +608,34 @@ public class FWGUI implements ActionListener {
         }
     }
 
+    private String dateAndTimePicker() {
+        JSpinner spinner = new JSpinner(new SpinnerDateModel());
+        JSpinner.DateEditor editor = new JSpinner.DateEditor(spinner, "yyyy-MM-dd HH:mm");
+        spinner.setEditor(editor);
+    
+        int option = JOptionPane.showConfirmDialog(null, spinner, "Select Date and Time", JOptionPane.OK_CANCEL_OPTION);
+        myQueryTable.clearTable();
+        if (option == JOptionPane.OK_OPTION) {
+            return editor.getFormat().format(spinner.getValue()); // Return selected date-time as a String
+        } 
+        return ""; // Return empty string if canceled
+    }
+
+    private void changeManualLabelAndButton(String theLabel, String theButton){
+        myManualQueryLabel.setVisible(true);
+        myManualQueryLabel.setText(theLabel);
+        if(theButton != null){
+            myManualQueryButton.setVisible(true);
+            myManualQueryButton.setText(theButton);
+        }
+    }
+
     private void resetQueryFrame() {
         myQueryTable.clearTable();
         myQueryCheckBoxPanel.setVisible(false);
         myManualQueryButton.setVisible(false);
-        myFilePathFilterText.setVisible(false);
-        myFilePathFilterText.setText("");
+        myPathOrDateText.setVisible(false);
+        myPathOrDateText.setText("");
         myFileNameText.setVisible(false);
         myFileNameText.setText("");
         myManualQueryLabel.setVisible(false);
@@ -676,7 +702,7 @@ public class FWGUI implements ActionListener {
 
         myFileNameText = myQueryPanel.getFileNameText();
 
-        myFilePathFilterText = myQueryPanel.getFileExtensionText();
+        myPathOrDateText = myQueryPanel.getFileExtensionText();
 
         myManualQueryLabel = myQueryPanel.getFileExtensionLabel();
     }
