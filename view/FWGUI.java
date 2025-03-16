@@ -94,6 +94,8 @@ public class FWGUI implements ActionListener {
     // Array for holding all the checkbox options
     private JCheckBox[] myExtensionCheckBox;
 
+    private JPanel mySecondPanel;
+
     private static FWGUI myInstance;
 
     private static String myCustomExtensionString = "Custom extension";
@@ -108,6 +110,7 @@ public class FWGUI implements ActionListener {
         // Create the main panel and event table
         myMainPanel = new FWPanel();
         myQueryPanel = new FWPanel();
+        mySecondPanel = myMainPanel.getSecondPanel();
         myEventTable = new FWEventTable();
         myQueryTable = new FWEventTable();
         myIsMonitoring = false;
@@ -121,7 +124,10 @@ public class FWGUI implements ActionListener {
         // Set up the exit listener
         setUpExitListener();
 
+
+
         myFrame.add(myMainPanel, BorderLayout.NORTH);
+        
         myFrame.setVisible(true);
     }
 
@@ -346,14 +352,19 @@ public class FWGUI implements ActionListener {
      */
     private void setUpFileViewer() {
 
-        // Create a JSplitPane to divide the space between the main panel and the event
-        // table
+        // Create a JSplitPane to divide the space between the main panel and the event table
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myMainPanel, myEventTable);
+        JSplitPane outerSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, splitPane, mySecondPanel);
+        
         splitPane.setResizeWeight(splitPaneResizeWeight);
         splitPane.setDividerSize(0);
+        outerSplitPane.setResizeWeight(1); //Give maximum space to event table (1)
+        outerSplitPane.setDividerSize(0);
 
-        // Add the JSplitPane to the frame
-        myFrame.add(splitPane, BorderLayout.CENTER);
+        
+
+        // Add the outer JSplitPane to the frame
+        myFrame.add(outerSplitPane, BorderLayout.CENTER);
     }
 
     /**
@@ -574,7 +585,7 @@ public class FWGUI implements ActionListener {
         } else if (source.equals(myDatabaseResetButton)) {
             int choice = JOptionPane.showConfirmDialog(
                     myQueryPanel,
-                    "This will remove all data from the database,resetting it. Are you sure you want to continue?",
+                    "This will remove all data from the database, resetting it. Are you sure you want to continue?",
                     "Reset Database",
                     JOptionPane.YES_NO_OPTION);
             if (choice == JOptionPane.YES_OPTION) {

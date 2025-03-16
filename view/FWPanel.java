@@ -17,6 +17,7 @@ public class FWPanel extends JPanel {
     private GridBagConstraints myGBC;
     // Main panel for the layout.
     private JPanel myMainPanel;
+    private JPanel mySecondPanel;
     // Labels for filtering queries.
     private JLabel myManualQueryLabel;
 
@@ -36,7 +37,7 @@ public class FWPanel extends JPanel {
         setUpExtensionBox();
         setUpDirectoryBox();
         setUpDirectoryButtons();
-        setUpDatabaseBox();
+        mySecondPanel = setUpDatabaseBox();
 
         add(myMainPanel, BorderLayout.CENTER);
     }
@@ -191,27 +192,39 @@ public class FWPanel extends JPanel {
     }
 
     /**
-     * Sets up the database box for the panel.
+     * Sets up the database box for the panel. Returns a JPanel containing only the lower buttons
+     *  (write to db, query, reset)
      */
-    private void setUpDatabaseBox() {
+    private JPanel setUpDatabaseBox() {
         myWriteDbButton = createModernButton("Write to database");
         myQueryButton = createModernButton("Query");
         myQueryButton.setEnabled(false);
         myResetButton = createModernButton("Reset");
-        adjustGridBagConstraints(0, 6, 1, 1);
-        myGBC.fill = GridBagConstraints.HORIZONTAL; // Reset fill
+        // adjustGridBagConstraints(0, 6, 1, 1);
+        // myGBC.fill = GridBagConstraints.HORIZONTAL; // Reset fill
 
         // Create a panel to hold the write to database and query buttons so they are
         // equal size.
         JPanel buttonSet2 = new JPanel(new GridLayout(1, 2, 5, 0));
         buttonSet2.add(myWriteDbButton);
         buttonSet2.add(myQueryButton);
-        myGBC.fill = GridBagConstraints.HORIZONTAL;
-        myGBC.gridwidth = GridBagConstraints.REMAINDER; // Make the buttons take up entire row
-        myMainPanel.add(buttonSet2, myGBC);
+        // Create a panel to hold the buttonSet2 and the reset button
+        JPanel databasePanel = new JPanel(new GridBagLayout());
+        //databasePanel.
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0; // Force all horizontal room to be used as space for button
+        
+        databasePanel.add(buttonSet2, gbc);
 
-        adjustGridBagConstraints(0, 7);
-        myMainPanel.add(myResetButton, myGBC);
+        gbc.gridy = 1;
+        gbc.gridwidth = GridBagConstraints.REMAINDER; // Make the buttons take up entire row
+        databasePanel.add(myResetButton, gbc);
+
+        return databasePanel;
     }
 
     /**
@@ -369,6 +382,14 @@ public class FWPanel extends JPanel {
      */
     public JButton getCSVButton() {
         return myExportCSVButton;
+    }
+
+    /**
+     * Gets the Panel that contains the write, query, and reset buttons
+     * @return The Panel that contains the write, query, and reset buttons.
+     */
+    public JPanel getSecondPanel() {
+        return mySecondPanel;
     }
 
     /**
