@@ -205,9 +205,9 @@ public class FWGUI implements ActionListener {
         closeItem.addActionListener(this);
         myMenuBar.add(fileMenu);
 
-        JMenuItem exportCsvItem = new JMenuItem("Export Query Results to CSV");
-        fileMenu.add(exportCsvItem);
-        exportCsvItem.addActionListener(this);
+        // JMenuItem exportCsvItem = new JMenuItem("Export Query Results to CSV");
+        // fileMenu.add(exportCsvItem);
+        // exportCsvItem.addActionListener(this);
 
     }
 
@@ -523,10 +523,6 @@ public class FWGUI implements ActionListener {
             resetQueryFrame();
             myManualQueryComboBox.setVisible(false);
             queryFrameFixSize();
-            // Erasing the selected checkboxes as a precaution
-            for (JCheckBox checkBox : myExtensionCheckBox) {
-                checkBox.setSelected(false);
-            }
             if (myAutomaticQueryComboBox.getSelectedItem().equals("Query 1 - All events from today")) {
                 queryResults = FileEventDAO.fileEventsFromToday();
             } else if (myAutomaticQueryComboBox.getSelectedItem()
@@ -651,6 +647,10 @@ public class FWGUI implements ActionListener {
         myFileNameText.setText("");
         myManualQueryLabel.setVisible(false);
         myEventActivityDropdown.setVisible(false);
+        // Erasing the selected checkboxes as a precaution
+        for (JCheckBox checkBox : myExtensionCheckBox) {
+            checkBox.setSelected(false);
+        }
     }
 
     private void queryFrameFixSize() {
