@@ -135,6 +135,10 @@ public class DirectoryWatchService {
      * Stops the watch service and closes it.
      */
     public void stop() {
+        if (myRunning == false) {
+            return;
+        }
+
         myRunning = false;
 
         try { // Close the watch service and key if they are not null
