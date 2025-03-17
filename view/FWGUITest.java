@@ -46,7 +46,7 @@ public class FWGUITest {
     @Test
     public void testActionPerformed_StartMonitoring() {
         JButton startButton = fwgui.getMainPanel().getStartButton();
-        JTextField directoryField = fwgui.getMainPanel().getDirectoryField();
+        JTextField directoryField = fwgui.getMainPanel().getMyDirectoryField();
         directoryField.setText("C:\\"); // Set a valid directory for the test
         startButton.setEnabled(true); 
 
@@ -61,7 +61,7 @@ public class FWGUITest {
     @Test
     public void testActionPerformed_StopMonitoring() {
         JButton startButton = fwgui.getMainPanel().getStartButton();
-        JTextField directoryField = fwgui.getMainPanel().getDirectoryField();
+        JTextField directoryField = fwgui.getMainPanel().getMyDirectoryField();
         JButton stopButton = fwgui.getMainPanel().getStopButton();
         directoryField.setText("C:\\"); // Set a valid directory for the test
         startButton.setEnabled(true); 

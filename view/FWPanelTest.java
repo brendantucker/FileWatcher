@@ -33,7 +33,7 @@ public class FWPanelTest {
 
     @Test
     public void testHasDirectoryField() {
-        JTextField directoryField = panel.getDirectoryField();
+        JTextField directoryField = panel.getMyDirectoryField();
         assertNotNull(directoryField);
         assertEquals("", directoryField.getText()); // Should start empty
     }

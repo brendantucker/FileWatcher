@@ -61,7 +61,7 @@ public class DirectoryWatchServiceTest {
     public void testFileEventInsertion() throws IOException, InterruptedException {
         
         JButton startButton = myGUI.getMainPanel().getStartButton();
-        JTextField directoryField = myGUI.getMainPanel().getDirectoryField();
+        JTextField directoryField = myGUI.getMainPanel().getMyDirectoryField();
         directoryField.setText(testDirectory.toString()); // Set a valid directory for the test. NOTE: This is not the actual directory being watched.
         startButton.setEnabled(true); 
 
@@ -88,7 +88,7 @@ public class DirectoryWatchServiceTest {
     @Test
     public void testAddFolder() throws IOException, InterruptedException {
         JButton startButton = myGUI.getMainPanel().getStartButton();
-        JTextField directoryField = myGUI.getMainPanel().getDirectoryField();
+        JTextField directoryField = myGUI.getMainPanel().getMyDirectoryField();
         directoryField.setText(testDirectory.toString()); // Set a valid directory for the test. NOTE: This is not the actual directory being watched.
         startButton.setEnabled(true); 
 
@@ -132,7 +132,7 @@ public class DirectoryWatchServiceTest {
     public void testFileDeletion() throws IOException, InterruptedException {
         
         JButton startButton = myGUI.getMainPanel().getStartButton();
-        JTextField directoryField = myGUI.getMainPanel().getDirectoryField();
+        JTextField directoryField = myGUI.getMainPanel().getMyDirectoryField();
         directoryField.setText(testDirectory.toString()); // Set a valid directory for the test. NOTE: This is not the actual directory being watched.
         startButton.setEnabled(true); 
 
