@@ -2,6 +2,8 @@
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class FWFrame extends JFrame {
 
@@ -22,6 +24,13 @@ public class FWFrame extends JFrame {
     private static final double HORIZONTAL_SCALE = 0.3;
 
     public JFrame frameOutline() {
+        
+        // try {
+        //     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        // } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+        //     e.printStackTrace();
+        // }
+
         // Setting up the frame and adjusting it to be 70% of the screens dimensions.
         final JFrame fileFrame = new JFrame("TCSS 360 - File Watcher");
         fileFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

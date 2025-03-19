@@ -826,6 +826,7 @@ public class FWGUI implements ActionListener {
         } catch (IOException | NullPointerException e) {
             JOptionPane.showMessageDialog(null, "\"" + myDirectoryField.getText() + "\" is not a valid directory",
                     "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
+            myIsMonitoring = false;
             return;
         }
         runningTime = 0;
