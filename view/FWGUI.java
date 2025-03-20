@@ -742,6 +742,11 @@ public class FWGUI implements ActionListener {
                     return; // Stop execution if connection fails
                 }
                 setDatabaseConnected(true);
+                myDatabaseConnectionLabel.setText("Database connected.");
+                // disable menu item to connect to database
+                myConnectDbItem.setEnabled(false);
+                myDisconnectDbItem.setEnabled(true);
+                
             } else {
                 return; // Stop execution if the user chooses "No"
             }
