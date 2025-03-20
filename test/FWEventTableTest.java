@@ -52,7 +52,7 @@ public class FWEventTableTest {
         eventTable.addEvent(event1);
         eventTable.addEvent(event2);
 
-        eventTable.extensionTableFilter("All Extensions");
+        eventTable.filterByExtension("All Extensions");
 
         assertEquals(2, eventTable.getData().size());  // No filter applied, all items should be present
     }
@@ -65,7 +65,7 @@ public class FWEventTableTest {
         eventTable.addEvent(event1);
         eventTable.addEvent(event2);
 
-        eventTable.extensionTableFilter(".pdf");
+        eventTable.filterByExtension(".pdf");
 
         List<FileEvent> filteredData = eventTable.getData();
         assertEquals(2, filteredData.size()); // The internal list still contains both
