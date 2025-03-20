@@ -13,6 +13,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import javax.swing.Box;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -39,66 +40,68 @@ import java.awt.event.WindowEvent;
  * This class is the main GUI for the FileWatcher application. It creates the
  * main frame and sets up the menu bar, buttons, and event table.
  */
-public class FWGUI implements ActionListener {
-    // Frame to hold all of the GUI portions, and the query popup.
-    private JFrame myFrame;
-    // Menu bar for the GUI.
+public final class FWGUI implements ActionListener {
+    // Main frame for the entire window.
+    private final JFrame myFrame;
+    // Menu bar for the primary window.
     private JMenuBar myMenuBar;
-    // Timer variable to keep track of the time the user has been monitoring files.
+    // Timer to be updated as the user watches a directory.
     private int runningTime = 0;
-    // Timer to keep track of the time the user has been monitoring files.
+    // Timer to update the time label.
     private Timer myTimer;
-    // Label to display the time the user has been monitoring files.
+    // Label to display the time & the manual query information.
     private JLabel myTimeLabel, myManualQueryLabel;
-    // Menu item to start monitoring files.
+    // Start button in menu.
     private JMenuItem myMenuStart;
-    // Menu item to stop monitoring files.
+    // Stop button in menu.
     private JMenuItem myMenuStop;
-    // The weight of the split pane.
-    private double splitPaneResizeWeight = 0.2;
-    // Table that houses all the logged events.
-    private FWEventTable myEventTable;
-    // Table that will house all the results from query window.
-    private FWEventTable myQueryTable;
-    // The types of extensions for users to monitor.
+    // Constant to set the split pane resize weight.
+    private final double SPLIT_PANE_RESIZE_WEIGHT = 0.2;
+    // Event table to display file events.
+    private final FWEventTable myEventTable;
+    // Event table to display the file events in the query window.
+    private final FWEventTable myQueryTable;
+    // Extension types combobox for querying.
     private JComboBox<String> myExtensionComboBox;
-    // The different queries to be ran in query window.
+    // Different dropdowns in the query window.
     private JComboBox<String> myAutomaticQueryComboBox, myManualQueryComboBox, myEventActivityDropdown;
-    // Text fields for the directory, database, and extensions.
+    // Directory field in the main window for monitoring directories, extension
+    // field for extensions.
+    // PathOrDate and FileName are in query window for displaying information.
     private JTextField myDirectoryField, myExtensionField, myPathOrDateText, myFileNameText;
-    // Buttons for the GUI.
+    // All the buttons to be used throughout both of the windows.
     private JButton myDirectoryStartButton, myDirectoryStopButton, myWriteDbButton, myDirectoryBrowseButton,
             myResetDirectoryButton, myQueryButton, myDatabaseResetButton, myExportCSVButton, myManualQueryButton;
-    // Buttons for the image icons.
+    // Buttons that have an image associated with them.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
-    // The main panel for the GUI.
-    private FWPanel myMainPanel;
-    // Panel for the query window
-    private FWPanel myQueryPanel;
-    // Boolean value for if the service is being watched and recorded.
+    // The main panel of the GUI.
+    private final FWPanel myMainPanel;
+    // The panel of the query window popup.
+    private final FWPanel myQueryPanel;
+    // Boolean value for displaying if the program is monitoring.
     private boolean myIsMonitoring;
-    // The directory watch service to monitor the directory and files.
+    // Directory watch service to monitor directories.
     private DirectoryWatchService myDirectoryWatchService;
-    // Boolean value for if the database is active.
+    // Boolean values for if the database is active and if filtering is turned on.
     private boolean myDatabaseActive, myFilteringOn;
-    // Label to display whether or not the database is connected.
+    // Displaying if the database is connected.
     private JLabel myDatabaseConnectionLabel;
-    // Debug buttons created to make fake data for quicker testing.
+    // Debug menu options for adding items.
     private JMenuItem add10Item, add100Item, myAdd1OfEachItem;
-    // Connect and disconnect from the database buttons.
+    // Connecting and disconnecting from the database JMenuItems.
     private JMenuItem myConnectDbItem, myDisconnectDbItem;
-    // Checkboxes for querying the database for specific extensions.
+    // Array of checkboxes for the query window.
     private JPanel myQueryCheckBoxPanel;
-    // Frame for the query panel pop up window.
+    // Query window popup frame.
     private FWFrame myQueryFrame;
-    // Array for holding all the checkbox options
+    // JCheckBox array for the query window.
     private JCheckBox[] myExtensionCheckBox;
-
-    private JPanel mySecondPanel;
-
-    private static FWGUI myInstance;
-
-    private static String myCustomExtensionString = "Custom extension";
+    // Secondary panel inside the query window for displaying information.
+    final private JPanel mySecondQueryPanel;
+    // Instance of the GUI.
+    private static FWGUI myFWGUIInstance;
+    // Constant string for the custom extension.
+    private static final String CUSTOM_EXTENSION_STRING = "Custom extension";
 
     /*
      * Constructor for the GUI. This will create the GUI and set up the menu bar.
@@ -107,12 +110,13 @@ public class FWGUI implements ActionListener {
         myFrame = new FWFrame().frameOutline();
         myFrame.setLayout(new BorderLayout());
 
-        // Create the main panel and event table
+        // Create the main panel and query panel information.
         myMainPanel = new FWPanel();
         myQueryPanel = new FWPanel();
-        mySecondPanel = myMainPanel.getSecondPanel();
+        mySecondQueryPanel = myMainPanel.getQueryPanel();
         myEventTable = new FWEventTable();
         myQueryTable = new FWEventTable();
+        // Default monitoring is false.
         myIsMonitoring = false;
         // Methods to help break up the constructor and make it easier to read.
         setUpButtons();
@@ -124,20 +128,22 @@ public class FWGUI implements ActionListener {
         // Set up the exit listener
         setUpExitListener();
 
-
-
         myFrame.add(myMainPanel, BorderLayout.NORTH);
-        
+
         myFrame.setVisible(true);
     }
 
-    private void setUpButtons() {
+    /**
+     * Sets up all the buttons that will be used in the program.
+     */
+    private final void setUpButtons() {
         myExtensionComboBox = myMainPanel.getExtensionBox();
+        // Adding action listener into the extension combobox.
         myExtensionComboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 Object theDropdowObject = myExtensionComboBox.getSelectedItem();
-                if (theDropdowObject.equals(myCustomExtensionString)) {
+                if (theDropdowObject.equals(CUSTOM_EXTENSION_STRING)) {
                     myExtensionComboBox.setEditable(true);
                 } else {
                     myExtensionComboBox.setEditable(false);
@@ -145,15 +151,14 @@ public class FWGUI implements ActionListener {
             }
         });
         myExtensionComboBox.addActionListener(this);
-
+        // Cleaned up duplicated and repeated lines.
         myDirectoryStartButton = addButtonActionListener(myMainPanel.getStartButton());
         myDirectoryStopButton = addButtonActionListener(myMainPanel.getStopButton());
         myDirectoryBrowseButton = addButtonActionListener(myMainPanel.getBrowseButton());
         myResetDirectoryButton = addButtonActionListener(myMainPanel.getResetButton());
         myQueryButton = addButtonActionListener(myMainPanel.getQueryButton());
-
         myWriteDbButton = addButtonActionListener(myMainPanel.getMyWriteDBButton());
-        myWriteDbButton.setEnabled(false); // 🔹 Ensure "Write to Database" starts disabled
+        myWriteDbButton.setEnabled(false);
 
         myImgStartButton = addButtonActionListener(myMainPanel.getMyImgStarButton());
         myImgStopButton = addButtonActionListener(myMainPanel.getMyImgStopButton());
@@ -165,7 +170,7 @@ public class FWGUI implements ActionListener {
      * Helper method for the setUpButtons method. This will add an action listener
      * to the button passed in and return the button.
      */
-    private JButton addButtonActionListener(JButton theButton) {
+    private final JButton addButtonActionListener(JButton theButton) {
         theButton.addActionListener(this);
         return theButton;
     }
@@ -174,7 +179,7 @@ public class FWGUI implements ActionListener {
      * This method will create the menu bar for the GUI. Cleaned up original version
      * to make it more readable.
      */
-    private void createMenuBar() {
+    private final void createMenuBar() {
         myMenuBar = new JMenuBar();
         createFileMenu();
         createWatcherMenu();
@@ -188,14 +193,14 @@ public class FWGUI implements ActionListener {
     /**
      * Creates the first drop down menu choice for the GUI.
      */
-    private void createFileMenu() {
-        JMenu fileMenu = new JMenu("File");
+    private final void createFileMenu() {
+        final JMenu fileMenu = new JMenu("File");
         myTimeLabel = new JLabel("Time not started.");
         myDatabaseConnectionLabel = new JLabel("Database not connected.");
         myMenuStart = new JMenuItem("Start");
         myMenuStop = new JMenuItem("Stop");
-        JMenuItem queryItem = new JMenuItem("Query Database(file extension)");
-        JMenuItem closeItem = new JMenuItem("Close");
+        final JMenuItem queryItem = new JMenuItem("Query Database(file extension)");
+        final JMenuItem closeItem = new JMenuItem("Close");
         myMenuStart.setEnabled(false);
         myMenuStop.setEnabled(false);
         fileMenu.add(myMenuStart);
@@ -204,18 +209,13 @@ public class FWGUI implements ActionListener {
         fileMenu.add(closeItem);
         closeItem.addActionListener(this);
         myMenuBar.add(fileMenu);
-
-        // JMenuItem exportCsvItem = new JMenuItem("Export Query Results to CSV");
-        // fileMenu.add(exportCsvItem);
-        // exportCsvItem.addActionListener(this);
-
     }
 
     /**
      * Creates the second drop down menu choice for the GUI.
      */
-    private void createWatcherMenu() {
-        JMenu watcherMenu = new JMenu("Debug");
+    private final void createWatcherMenu() {
+        final JMenu watcherMenu = new JMenu("Debug");
         add10Item = new JMenuItem("Add 10 Events");
         add10Item.addActionListener(this);
         watcherMenu.add(add10Item);
@@ -232,8 +232,8 @@ public class FWGUI implements ActionListener {
     /**
      * Creates the third drop down menu choice for the GUI.
      */
-    private void createDatabaseMenu() {
-        JMenu databaseMenu = new JMenu("Database");
+    private final void createDatabaseMenu() {
+        final JMenu databaseMenu = new JMenu("Database");
 
         myConnectDbItem = new JMenuItem("Connect to Database");
         myDisconnectDbItem = new JMenuItem("Disconnect Database");
@@ -250,9 +250,9 @@ public class FWGUI implements ActionListener {
     /**
      * Creates the fourth drop down menu choice for the GUI.
      */
-    private void createAboutMenu() {
-        JMenu aboutMenu = new JMenu("About");
-        JMenuItem aboutHelpItem = new JMenuItem("About");
+    private final void createAboutMenu() {
+        final JMenu aboutMenu = new JMenu("About");
+        final JMenuItem aboutHelpItem = new JMenuItem("About");
         aboutHelpItem.addActionListener(this);
         aboutMenu.add(aboutHelpItem);
         myMenuBar.add(aboutMenu);
@@ -262,7 +262,7 @@ public class FWGUI implements ActionListener {
      * Creates the image buttons for the GUI and pushes them all the way to the end
      * of the menu bar.
      */
-    private void createImgButtons() {
+    private final void createImgButtons() {
         myMenuBar.add(Box.createHorizontalGlue());
         myMenuBar.add(myImgStartButton);
         myMenuBar.add(myImgStopButton);
@@ -270,9 +270,9 @@ public class FWGUI implements ActionListener {
         myMenuBar.add(myImgClearButton);
     }
 
-    private void createEmailMenu() {
-        JMenu emailMenu = new JMenu("Email");
-        JMenuItem sendEmailItem = new JMenuItem("Send File via Email");
+    private final void createEmailMenu() {
+        final JMenu emailMenu = new JMenu("Email");
+        final JMenuItem sendEmailItem = new JMenuItem("Send File via Email");
         sendEmailItem.addActionListener(this);
         emailMenu.add(sendEmailItem);
         myMenuBar.add(emailMenu);
@@ -283,7 +283,7 @@ public class FWGUI implements ActionListener {
      * This method will keep track of the time that the user has been monitoring
      * files.
      */
-    private void timeAndDbLabel() {
+    private final void timeAndDbLabel() {
         myTimer = new Timer(1000, (ActionEvent e) -> {
             runningTime++;
             timerLabelExtended();
@@ -291,12 +291,12 @@ public class FWGUI implements ActionListener {
         myMenuStart.addActionListener(this);
         myMenuStop.addActionListener(this);
         // Create a panel for the time label
-        JPanel bottomGuiPanel = new JPanel(new BorderLayout());
+        final JPanel bottomGuiPanel = new JPanel(new BorderLayout());
 
-        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         leftPanel.add(myDatabaseConnectionLabel);
 
-        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        final JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         rightPanel.add(myTimeLabel);
 
         bottomGuiPanel.add(leftPanel, BorderLayout.WEST);
@@ -308,21 +308,21 @@ public class FWGUI implements ActionListener {
      * This method will extend the timer label to show the time in days, hours,
      * minutes, and seconds.
      */
-    private void timerLabelExtended() {
-        int days = runningTime / 86400;
-        int hours = (runningTime % 86400) / 3600;
-        int minutes = (runningTime % 3600) / 60;
-        int seconds = runningTime % 60;
-        String timeFormatted = String.format("Time Running: %02d Days: %02d Hours: %02d Minutes: %02d Seconds", days,
-                hours, minutes, seconds);
+    private final void timerLabelExtended() {
+        final int days = runningTime / 86400;
+        final int hours = (runningTime % 86400) / 3600;
+        final int minutes = (runningTime % 3600) / 60;
+        final int seconds = runningTime % 60;
+        final String timeFormatted = String.format("Time Running: %02d Days: %02d Hours: %02d Minutes: %02d Seconds",
+                days, hours, minutes, seconds);
         myTimeLabel.setText(timeFormatted);
     }
 
     /**
      * Adds document listeners for the directory, database, and extension fields.
      */
-    private void setUpDocumentListeners() {
-        DocumentListener theListener = new DocumentListener() {
+    private final void setUpDocumentListeners() {
+        final DocumentListener theListener = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 checkFields();
@@ -350,18 +350,17 @@ public class FWGUI implements ActionListener {
     /**
      * This method will set up the file viewer for the GUI.
      */
-    private void setUpFileViewer() {
+    private final void setUpFileViewer() {
 
-        // Create a JSplitPane to divide the space between the main panel and the event table
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myMainPanel, myEventTable);
-        JSplitPane outerSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, splitPane, mySecondPanel);
-        
-        splitPane.setResizeWeight(splitPaneResizeWeight);
+        // Create a JSplitPane to divide the space between the main panel and the event
+        // table
+        final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myMainPanel, myEventTable);
+        final JSplitPane outerSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, splitPane, mySecondQueryPanel);
+
+        splitPane.setResizeWeight(SPLIT_PANE_RESIZE_WEIGHT);
         splitPane.setDividerSize(0);
-        outerSplitPane.setResizeWeight(1); //Give maximum space to event table (1)
+        outerSplitPane.setResizeWeight(1); // Give maximum space to event table (1)
         outerSplitPane.setDividerSize(0);
-
-        
 
         // Add the outer JSplitPane to the frame
         myFrame.add(outerSplitPane, BorderLayout.CENTER);
@@ -370,7 +369,7 @@ public class FWGUI implements ActionListener {
     /**
      * Sets up the exit listener for the GUI.
      */
-    private void setUpExitListener() {
+    private final void setUpExitListener() {
         myFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         myFrame.addWindowListener(new WindowAdapter() {
             @Override
@@ -380,11 +379,15 @@ public class FWGUI implements ActionListener {
         });
     }
 
-    private void handleExit() {
-        List<FileEvent> unsavedEvents = myEventTable.getData();
+    /**
+     * Method for handling the exiting of the program and ensuring that if the user
+     * has unsaved events, they are prompted to save them before exiting.
+     */
+    private final void handleExit() {
+        final List<FileEvent> unsavedEvents = myEventTable.getData();
 
         if (!unsavedEvents.isEmpty()) {
-            int choice = JOptionPane.showConfirmDialog(
+            final int choice = JOptionPane.showConfirmDialog(
                     myFrame,
                     "You have unsaved file events. Would you like to save them to the database before exiting?",
                     "Unsaved Data",
@@ -432,9 +435,9 @@ public class FWGUI implements ActionListener {
      * items, different actions will be taken depending on the menu item clicked.
      */
     @Override
-    public void actionPerformed(final ActionEvent theEvent) {
-        Object source = theEvent.getSource();
-        String command = theEvent.getActionCommand();
+    public final void actionPerformed(final ActionEvent theEvent) {
+        final Object source = theEvent.getSource();
+        final String command = theEvent.getActionCommand();
         // Table was necessary to expand its scope in order to be used.
         FWEventTable queryResults = new FWEventTable();
 
@@ -481,7 +484,7 @@ public class FWGUI implements ActionListener {
         }
         // Extension Selection
         else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
-                && !myExtensionComboBox.getSelectedItem().equals(myCustomExtensionString)) {
+                && !myExtensionComboBox.getSelectedItem().equals(CUSTOM_EXTENSION_STRING)) {
             checkFields();
             myFilteringOn = true;
             if (myExtensionComboBox.getSelectedItem().equals("All extensions")) {
@@ -491,7 +494,7 @@ public class FWGUI implements ActionListener {
         }
         // Send File via Email
         else if (command.equals("Send File via Email")) {
-            String recipient = JOptionPane.showInputDialog(myFrame, "Enter recipient email:", "Send Email",
+            final String recipient = JOptionPane.showInputDialog(myFrame, "Enter recipient email:", "Send Email",
                     JOptionPane.QUESTION_MESSAGE);
             if (recipient != null && !recipient.isEmpty()) {
                 JFileChooser fileChooser = new JFileChooser();
@@ -516,10 +519,12 @@ public class FWGUI implements ActionListener {
         } // Write to Database
         else if (source.equals(myWriteDbButton) || source.equals(myImgDBButton)) {
             writeToDatabaseHelper();
-        } else if (source.equals(myQueryButton)) {
-            guiWindow();
+        } // Query window popup
+        else if (source.equals(myQueryButton)) {
+            queryWindow();
             myQueryTable.clearTable();
-        } else if (source.equals(myAutomaticQueryComboBox)) {
+        } // User is using pre-designed queries.
+        else if (source.equals(myAutomaticQueryComboBox)) {
             resetQueryFrame();
             myManualQueryComboBox.setVisible(false);
             queryFrameFixSize();
@@ -536,50 +541,58 @@ public class FWGUI implements ActionListener {
                 queryFrameFixSize();
                 myQueryFrame.pack();
             }
-        } else if (source.equals(myManualQueryComboBox)) {
+        } // User wants to filter for specific things on their own.
+        else if (source.equals(myManualQueryComboBox)) {
             myQueryTable.clearTable();
             resetQueryFrame();
-            Object manualComboBoxShort = myManualQueryComboBox.getSelectedItem();
-            if (manualComboBoxShort.equals("File Extension")) {
+            final Object shortenedManualCombo = myManualQueryComboBox.getSelectedItem();
+            if (shortenedManualCombo.equals("File Extension")) {
                 myQueryCheckBoxPanel.setVisible(true);
                 myQueryFrame.pack(); // Resizes the frame to fit the components
                 myQueryFrame.queryFrameSize(.8, .3);
-            } else if (manualComboBoxShort.equals("Path to File Location")) {
+            } else if (shortenedManualCombo.equals("Path to File Location")) {
                 changeManualLabelAndButton("File Pathway: ", "Browse Directories");
                 myPathOrDateText.setVisible(true);
-            } else if (manualComboBoxShort.equals("File Name")){
+            } else if (shortenedManualCombo.equals("File Name")) {
                 changeManualLabelAndButton("File Name to Search: ", "Search");
                 myFileNameText.setVisible(true);
-            } else if (manualComboBoxShort.equals("Type of Activity")){
+            } else if (shortenedManualCombo.equals("Type of Activity")) {
                 changeManualLabelAndButton("Type of Activity to choose: ", null);
                 myEventActivityDropdown.setVisible(true);
-            } else if (manualComboBoxShort.equals("Date and Time")){
+            } else if (shortenedManualCombo.equals("Date and Time")) {
                 changeManualLabelAndButton("Choose Date and Time: ", "Open Calendar");
                 myPathOrDateText.setVisible(true);
             }
             queryFrameFixSize();
-        } else if (source.equals(myManualQueryButton) && myManualQueryLabel.getText().equals("File Pathway: ")) {
+        } // Manual querying based on the file pathway.
+        else if (source.equals(myManualQueryButton) && myManualQueryLabel.getText().equals("File Pathway: ")) {
             browseDirectory(myPathOrDateText);
             if (!myPathOrDateText.getText().isEmpty()) {
                 queryResults = FileEventDAO.manualQueryResults("file_path", myPathOrDateText.getText());
             }
-        } else if (source.equals(myManualQueryButton) && myManualQueryLabel.getText().equals("File Name to Search: ")){
-            if(!myFileNameText.getText().equals("")){
+        } // Manual querying based on the file name.
+        else if (source.equals(myManualQueryButton) && myManualQueryLabel.getText().equals("File Name to Search: ")) {
+            if (!myFileNameText.getText().equals("")) {
                 queryResults = FileEventDAO.manualQueryResults("file_name", myFileNameText.getText());
             }
-        } else if (source.equals(myManualQueryButton) && myManualQueryLabel.getText().equals("Choose Date and Time: ")){
-            String selectedDateTime = dateAndTimePicker();
+        } // If manual query was pushed and the user wants to choose a date and time.
+        else if (source.equals(myManualQueryButton)
+                && myManualQueryLabel.getText().equals("Choose Date and Time: ")) {
+            final String selectedDateTime = dateAndTimePicker();
             myPathOrDateText.setText(selectedDateTime);
             if (!selectedDateTime.isEmpty()) {
                 queryResults = FileEventDAO.manualQueryResults("event_date", selectedDateTime);
             }
-        }  else if (source.equals(myEventActivityDropdown)){
+        } // User changing the activity, so clear out table.
+        else if (source.equals(myEventActivityDropdown)) {
             myQueryTable.clearTable();
-            if (!myEventActivityDropdown.getSelectedItem().toString().equals("Choose Activity Type")){
-                queryResults = FileEventDAO.manualQueryResults("event_type", myEventActivityDropdown.getSelectedItem().toString());
+            if (!myEventActivityDropdown.getSelectedItem().toString().equals("Choose Activity Type")) {
+                queryResults = FileEventDAO.manualQueryResults("event_type",
+                        myEventActivityDropdown.getSelectedItem().toString());
             }
-        } else if (source.equals(myDatabaseResetButton)) {
-            int choice = JOptionPane.showConfirmDialog(
+        } // Resetting database along with warning.
+        else if (source.equals(myDatabaseResetButton)) {
+            final int choice = JOptionPane.showConfirmDialog(
                     myQueryPanel,
                     "This will remove all data from the database, resetting it. Are you sure you want to continue?",
                     "Reset Database",
@@ -588,24 +601,27 @@ public class FWGUI implements ActionListener {
                 FileEventDAO.resetEntireDatabase();
                 myQueryTable.clearTable();
             }
-        } else if (source.equals(add10Item)) {
+        } // Adding 10 items debug menu.
+        else if (source.equals(add10Item)) {
             // Add 10 events to the event table for testing
             for (int i = 0; i < 10; i++) {
                 myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
                         "TESTEVENT", ".test", createDateString(), createTimeString()));
             }
-        } else if (source.equals(add100Item)) {
+        } // Adding 100 items debug menu.
+        else if (source.equals(add100Item)) {
             // Add 10 events to the event table for testing
             for (int i = 0; i < 100; i++) {
                 myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
                         "TESTEVENT", ".test", createDateString(), createTimeString()));
             }
-        } else if (source.equals(myAdd1OfEachItem)) {
+        } // Adding one of each item debug menu.
+        else if (source.equals(myAdd1OfEachItem)) {
             runDummyInsertion();
-        }
+        } // If filtering is enabled then update the table.
         if (myFilteringOn) {
-            myEventTable.extensionTableFilter('.' + myExtensionComboBox.getSelectedItem().toString());
-        }
+            myEventTable.filterByExtension('.' + myExtensionComboBox.getSelectedItem().toString());
+        } // If the query returns more than 0 results, then update the table.
         if (queryResults.getData().size() != 0) {
             for (FileEvent event : queryResults.getData()) {
                 myQueryTable.addEvent(event);
@@ -615,29 +631,45 @@ public class FWGUI implements ActionListener {
         }
     }
 
-    private String dateAndTimePicker() {
-        JSpinner spinner = new JSpinner(new SpinnerDateModel());
-        JSpinner.DateEditor editor = new JSpinner.DateEditor(spinner, "yyyy-MM-dd HH:mm");
+    /**
+     * Helper method for displaying the date and time popup.
+     * 
+     * @return String representation of the selected date and time.
+     */
+    private final String dateAndTimePicker() {
+        final JSpinner spinner = new JSpinner(new SpinnerDateModel());
+        final JSpinner.DateEditor editor = new JSpinner.DateEditor(spinner, "yyyy-MM-dd HH:mm");
         spinner.setEditor(editor);
-    
-        int option = JOptionPane.showConfirmDialog(null, spinner, "Select Date and Time", JOptionPane.OK_CANCEL_OPTION);
+
+        final int option = JOptionPane.showConfirmDialog(null, spinner, "Select Date and Time",
+                JOptionPane.OK_CANCEL_OPTION);
         myQueryTable.clearTable();
         if (option == JOptionPane.OK_OPTION) {
             return editor.getFormat().format(spinner.getValue()); // Return selected date-time as a String
-        } 
+        }
         return ""; // Return empty string if canceled
     }
 
-    private void changeManualLabelAndButton(String theLabel, String theButton){
+    /**
+     * Helper method for displaying the manual query information.
+     * 
+     * @param theLabel  The label to display.
+     * @param theButton The button to display.
+     */
+    private final void changeManualLabelAndButton(final String theLabel, final String theButton) {
         myManualQueryLabel.setVisible(true);
         myManualQueryLabel.setText(theLabel);
-        if(theButton != null){
+        if (theButton != null) {
             myManualQueryButton.setVisible(true);
             myManualQueryButton.setText(theButton);
         }
     }
 
-    private void resetQueryFrame() {
+    /**
+     * Resetting the query frame back to all the options for when it was first
+     * opened up.
+     */
+    private final void resetQueryFrame() {
         myQueryTable.clearTable();
         myQueryCheckBoxPanel.setVisible(false);
         myManualQueryButton.setVisible(false);
@@ -653,12 +685,18 @@ public class FWGUI implements ActionListener {
         }
     }
 
-    private void queryFrameFixSize() {
+    /**
+     * Helper method to repaint and revalidate the query frame.
+     */
+    private final void queryFrameFixSize() {
         myQueryFrame.revalidate();
         myQueryFrame.repaint();
     }
 
-    private void guiWindow() {
+    /**
+     * Query popup window and all the things that go into making it visually appear.
+     */
+    private final void queryWindow() {
         myQueryFrame = new FWFrame();
         myQueryFrame.queryFrameSize(.8, .3);
         myQueryFrame.setLocationRelativeTo(null);
@@ -666,23 +704,24 @@ public class FWGUI implements ActionListener {
         myQueryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         myQueryFrame.setLayout(new BorderLayout());
 
-        JPanel queryGUI = myQueryPanel.FWQueryPanel();
+        final JPanel queryGUI = myQueryPanel.FWQueryPanel();
         myQueryFrame.add(queryGUI, BorderLayout.NORTH);
 
         myQueryCheckBoxPanel = setUpQueryCheckBoxes();
 
         myQueryCheckBoxPanel.setVisible(false);
 
-        JSplitPane middleQueryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myQueryCheckBoxPanel, myQueryTable);
-        middleQueryPane.setResizeWeight(splitPaneResizeWeight);
+        final JSplitPane middleQueryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myQueryCheckBoxPanel,
+                myQueryTable);
+        middleQueryPane.setResizeWeight(SPLIT_PANE_RESIZE_WEIGHT);
         middleQueryPane.setDividerSize(2);
 
         // Create Export Button
         myExportCSVButton = myQueryPanel.getCSVButton();
         myExportCSVButton.addActionListener(this);
 
-        JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, middleQueryPane);
-        queryPane.setResizeWeight(splitPaneResizeWeight);
+        final JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, middleQueryPane);
+        queryPane.setResizeWeight(SPLIT_PANE_RESIZE_WEIGHT);
         queryPane.setDividerSize(0);
 
         // Add the JSplitPane to the frame
@@ -695,7 +734,11 @@ public class FWGUI implements ActionListener {
         myQueryFrame.setVisible(true);
     }
 
-    private void setUpQueryFiltering() {
+    /**
+     * Helper method to add action listeners to all buttons and comboboxes and set
+     * them up.
+     */
+    private final void setUpQueryFiltering() {
         myAutomaticQueryComboBox = myQueryPanel.getQueryPopupSelection();
         myAutomaticQueryComboBox.addActionListener(this);
 
@@ -715,10 +758,13 @@ public class FWGUI implements ActionListener {
 
         myPathOrDateText = myQueryPanel.getFileExtensionText();
 
-        myManualQueryLabel = myQueryPanel.getFileExtensionLabel();
+        myManualQueryLabel = myQueryPanel.getMyManualQueryLabel();
     }
 
-    private void writeToDatabaseHelper() {
+    /**
+     * Helper method for writing the information to the database.
+     */
+    private final void writeToDatabaseHelper() {
         if (DatabaseConnection.getMyConnection() == null) {
             int choice = JOptionPane.showConfirmDialog(
                     myFrame,
@@ -732,7 +778,7 @@ public class FWGUI implements ActionListener {
             }
 
             if (choice == JOptionPane.YES_OPTION) {
-                boolean success = DatabaseConnection.connect();
+                final boolean success = DatabaseConnection.connect();
                 if (!success) {
                     JOptionPane.showMessageDialog(
                             myFrame,
@@ -746,7 +792,7 @@ public class FWGUI implements ActionListener {
                 // disable menu item to connect to database
                 myConnectDbItem.setEnabled(false);
                 myDisconnectDbItem.setEnabled(true);
-                
+
             } else {
                 return; // Stop execution if the user chooses "No"
             }
@@ -761,11 +807,17 @@ public class FWGUI implements ActionListener {
                 "Database Write", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private JPanel setUpQueryCheckBoxes() {
-        JPanel queryCheckboxesPanel = new JPanel();
-        String[] extensions = { "test", "docx", "pdf", "txt", "png", "jpg", "jpeg", "gif", "mp3", "mp4", "wav", "avi",
+    /**
+     * Setting up all the query window checkboxes for the user to use.
+     * 
+     * @return The JPanel with the updated queryboxes set up.
+     */
+    private final JPanel setUpQueryCheckBoxes() {
+        final JPanel queryCheckboxesPanel = new JPanel();
+        final String[] extensions = { "test", "docx", "pdf", "txt", "png", "jpg", "jpeg", "gif", "mp3", "mp4", "wav",
+                "avi",
                 "mov", "csv" };
-        List<String> extensionList = new ArrayList<>();
+        final List<String> extensionList = new ArrayList<>();
 
         myExtensionCheckBox = new JCheckBox[extensions.length];
         for (int i = 0; i < extensions.length; i++) {
@@ -774,8 +826,8 @@ public class FWGUI implements ActionListener {
             myExtensionCheckBox[i].addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
-                    JCheckBox curCheckBox = (JCheckBox) e.getSource();
-                    String curExtension = curCheckBox.getText();
+                    final JCheckBox curCheckBox = (JCheckBox) e.getSource();
+                    final String curExtension = curCheckBox.getText();
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         if (!extensionList.contains(curExtension)) {
                             extensionList.add(curExtension);
@@ -783,9 +835,9 @@ public class FWGUI implements ActionListener {
                     } else {
                         extensionList.remove(curExtension);
                     }
-                    FWEventTable tempQueryResults = FileEventDAO.querySpecificExtensions(extensionList);
+                    final FWEventTable tempQueryResults = FileEventDAO.querySpecificExtensions(extensionList);
                     myQueryTable.clearTable();
-                    for (FileEvent event : tempQueryResults.getData()) {
+                    for (final FileEvent event : tempQueryResults.getData()) {
                         myQueryTable.addEvent(event);
                     }
                     myQueryTable.updateTable();
@@ -802,7 +854,7 @@ public class FWGUI implements ActionListener {
      * 
      * @return String representation of the current date
      */
-    private String createDateString() {
+    private final String createDateString() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return now.format(formatter);
@@ -813,7 +865,7 @@ public class FWGUI implements ActionListener {
      * 
      * @return String representation of the current time.
      */
-    private String createTimeString() {
+    private final String createTimeString() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         return now.format(formatter);
@@ -823,7 +875,7 @@ public class FWGUI implements ActionListener {
      * Method for if the user has hit the start button and all the correct fields
      * are filled.
      */
-    private void startMonitoring() {
+    private final void startMonitoring() {
         myIsMonitoring = true;
         try {
             myDirectoryWatchService = new DirectoryWatchService(myDirectoryField.getText(), this);
@@ -837,24 +889,21 @@ public class FWGUI implements ActionListener {
         runningTime = 0;
         myTimeLabel.setText("Time not started.");
         myTimer.start();
-        buttonReverse(false);
-        // Disable ability to modify directory and extension fields while monitoring
+        reverseButtonState(false);
         // Disable ability to modify directory and extension fields while monitoring
         myDirectoryField.setEditable(false);
         myExtensionField.setEditable(false);
         myExtensionComboBox.setEditable(false);
-
     }
 
     /**
      * Method for if the user has hit the stop button.
      */
-    private void stopMonitoring() {
+    private final void stopMonitoring() {
         myTimer.stop();
         myIsMonitoring = false;
-        buttonReverse(true);
+        reverseButtonState(true);
         myDirectoryWatchService.stop();
-        // Enable ability to modify directory and extension fields while not monitoring
         // Enable ability to modify directory and extension fields while not monitoring
         myDirectoryField.setEditable(true);
         myExtensionField.setEditable(true);
@@ -864,7 +913,7 @@ public class FWGUI implements ActionListener {
     /**
      * Method to show the about dialog box.
      */
-    private void showAboutDialog() {
+    private final void showAboutDialog() {
         JOptionPane.showMessageDialog(myFrame,
                 "Program Usage: This application watches file system changes.\n" +
                         "Version: 1.0\n" +
@@ -877,12 +926,12 @@ public class FWGUI implements ActionListener {
      * Method to browse the directory and set the text field to the directory
      * chosen.
      */
-    private void browseDirectory(JTextField theField) {
-        JFileChooser direcChooser = new JFileChooser();
+    private final void browseDirectory(JTextField theField) {
+        final JFileChooser direcChooser = new JFileChooser();
         direcChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         direcChooser.setAcceptAllFileFilterUsed(false);
 
-        int directoryValue = direcChooser.showOpenDialog(null);
+        final int directoryValue = direcChooser.showOpenDialog(null);
         if (directoryValue == JFileChooser.APPROVE_OPTION) {
             theField.setText(direcChooser.getSelectedFile().getAbsolutePath());
         }
@@ -891,7 +940,7 @@ public class FWGUI implements ActionListener {
     /**
      * Method to reset the timer and set the label to "Time Not Started."
      */
-    private void resetTimer() {
+    private final void resetTimer() {
         if (myTimer != null) {
             myTimer.stop();
         }
@@ -902,7 +951,7 @@ public class FWGUI implements ActionListener {
     /**
      * Method to clear all the fields in the GUI and reset the buttons.
      */
-    private void clearFields() {
+    private final void clearFields() {
         myDirectoryField.setText("");
         myExtensionComboBox.setSelectedItem("All extensions");
         resetTimer();
@@ -915,8 +964,11 @@ public class FWGUI implements ActionListener {
         checkFields();
     }
 
-    /* Helper method - Flips state of start and stop buttons */
-    private void buttonReverse(boolean theValue) {
+    /**
+     * Helper method to reverse the state of the buttons.
+     * @param theValue The value to set the buttons to.
+     */
+    private final void reverseButtonState(boolean theValue) {
         myMenuStart.setEnabled(theValue);
         myDirectoryStartButton.setEnabled(theValue);
         myImgStartButton.setEnabled(theValue);
@@ -925,95 +977,72 @@ public class FWGUI implements ActionListener {
         myImgStopButton.setEnabled(!theValue);
     }
 
-    private void runDummyInsertion() {
-        String dummyDate = LocalDate.now().toString();
-        String dummyDatePlus3 = LocalDate.now().plusDays(3).toString();
-        String dummyDatePlus10 = LocalDate.now().plusDays(10).toString();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        String dummyTime = LocalTime.now().format(formatter).toString();
-        String dummyTimePlus6 = LocalTime.now().plusHours(6).format(formatter).toString();
-        String dummyTimeMinus6 = LocalTime.now().plusHours(-6).format(formatter).toString();
-        addDummyData("Dummy DUMB", "C:\\Users\\test\\subfolder\\subfolder", "TRASH", ".dumb", dummyDate, dummyTime);
-        addDummyData("Dummy TEST", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".test", dummyDate,
-                dummyTimePlus6);
-        addDummyData("Dummy DOCX", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".docx", dummyDatePlus3,
-                dummyTime);
-        addDummyData("Dummy PDF", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".pdf", dummyDate,
-                dummyTimePlus6);
-        addDummyData("Dummy TXT", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".txt", dummyDatePlus10,
-                dummyTime);
-        addDummyData("Dummy PNG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".png", dummyDatePlus10,
-                dummyTimePlus6);
-        addDummyData("Dummy JPG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpg", dummyDatePlus3,
-                dummyTimeMinus6);
-        addDummyData("Dummy JPEG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpeg", dummyDatePlus3,
-                dummyTime);
-        addDummyData("Dummy GIF", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".gif", dummyDatePlus10,
-                dummyTime);
-        addDummyData("Dummy MP3", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mp3", dummyDatePlus10,
-                dummyTimePlus6);
-        addDummyData("Dummy MP4", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".mp4", dummyDate,
-                dummyTimePlus6);
-        addDummyData("Dummy WAV", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".wav", dummyDatePlus3,
-                dummyTimeMinus6);
-        addDummyData("Dummy AVI", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".avi", dummyDate,
-                dummyTimeMinus6);
-        addDummyData("Dummy MOV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mov", dummyDatePlus3,
-                dummyTimeMinus6);
-        addDummyData("Dummy CSV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".csv", dummyDatePlus10,
-                dummyTime);
-    }
+    /**
+     * Helper method for inserting one of each event or "dummy" data to the table.
+     */
+    private final void runDummyInsertion() {
+        final String dummyDate = LocalDate.now().toString();
+        final String dummyDatePlus3 = LocalDate.now().plusDays(3).toString();
+        final String dummyDatePlus10 = LocalDate.now().plusDays(10).toString();
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        final String dummyTime = LocalTime.now().format(formatter).toString();
+        final String dummyTimePlus6 = LocalTime.now().plusHours(6).format(formatter).toString();
+        final String dummyTimeMinus6 = LocalTime.now().plusHours(-6).format(formatter).toString();
 
-    private void addDummyData(String theFileName, String theFilePath, String theEventType, String theExtension,
-            String theDate, String theTime) {
-        // Adding one of every item into the menu to help show off the filtering
-        // functions.
-        myEventTable.addEvent(new FileEvent(theFileName, theFilePath, theEventType, theExtension, theDate, theTime));
+        final List<FileEvent> dummyDataList = Arrays.asList(
+                new FileEvent("Dummy DUMB", "C:\\Users\\test\\subfolder\\subfolder", "TRASH", ".dumb", dummyDate,
+                        dummyTime),
+                new FileEvent("Dummy TEST", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".test", dummyDate,
+                        dummyTimePlus6),
+                new FileEvent("Dummy DOCX", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".docx", dummyDatePlus3,
+                        dummyTime),
+                new FileEvent("Dummy PDF", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".pdf", dummyDate,
+                        dummyTimePlus6),
+                new FileEvent("Dummy TXT", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".txt", dummyDatePlus10,
+                        dummyTime),
+                new FileEvent("Dummy PNG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".png", dummyDatePlus10,
+                        dummyTimePlus6),
+                new FileEvent("Dummy JPG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpg", dummyDatePlus3,
+                        dummyTimeMinus6),
+                new FileEvent("Dummy JPEG", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".jpeg", dummyDatePlus3,
+                        dummyTime),
+                new FileEvent("Dummy GIF", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".gif", dummyDatePlus10,
+                        dummyTime),
+                new FileEvent("Dummy MP3", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mp3", dummyDatePlus10,
+                        dummyTimePlus6),
+                new FileEvent("Dummy MP4", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".mp4", dummyDate,
+                        dummyTimePlus6),
+                new FileEvent("Dummy WAV", "C:\\Users\\test\\subfolder\\subfolder", "CREATED", ".wav", dummyDatePlus3,
+                        dummyTimeMinus6),
+                new FileEvent("Dummy AVI", "C:\\Users\\test\\subfolder\\subfolder", "DELETED", ".avi", dummyDate,
+                        dummyTimeMinus6),
+                new FileEvent("Dummy MOV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".mov", dummyDatePlus3,
+                        dummyTimeMinus6),
+                new FileEvent("Dummy CSV", "C:\\Users\\test\\subfolder\\subfolder", "MODIFIED", ".csv", dummyDatePlus10,
+                        dummyTime));
+
+        // Loop through the list and add each event to the table
+        for (final FileEvent theEvent : dummyDataList) {
+            addDummyData(theEvent);
+        }
     }
 
     /**
-     * Returns true if GUI is monitoring a directory. Used by DirectoryWatchService
-     * to check if it should continue running.
-     * 
-     * @return true if monitoring, false otherwise
+     * Helper method for the dummy insertion to clean up the code.
+     * @param theFileEvent The file event to add to the table.
      */
-    public boolean isMonitoring() {
-        return myIsMonitoring;
-    }
-
-    /**
-     * Sets the database connection status in the GUI.
-     * 
-     * @param theValue true if connected, false otherwise
-     */
-    public void setDatabaseConnected(boolean theValue) {
-        myWriteDbButton.setEnabled(theValue);
-        myQueryButton.setEnabled(theValue);
-    }
-
-    /**
-     * Returns the event table for the GUI.
-     * 
-     * @return The event table for the GUI
-     */
-    public FWEventTable getEventTable() {
-        return myEventTable;
-    }
-
-    /**
-     * Returns the instance of the GUI.
-     * 
-     * @return The instance of the GUI
-     */
-    public static FWGUI getMyInstance() {
-        return myInstance;
+    private final void addDummyData(final FileEvent theFileEvent) {
+        // Adding the event to the event table
+        myEventTable.addEvent(
+                new FileEvent(theFileEvent.getFileName(), theFileEvent.getFilePath(), theFileEvent.getEventType(),
+                        theFileEvent.getExtension(), theFileEvent.getEventDate(), theFileEvent.getEventTime()));
     }
 
     /**
      * Checks if the required fields are filled out correctly and enables/disables
      * Start buttons accordingly.
      */
-    private void checkFields() {
+    private final void checkFields() {
         // Prevent the pressing of the stop buttons if DirectoryWatchService isnt
         // monitoring
         if (!myIsMonitoring) {
@@ -1021,12 +1050,12 @@ public class FWGUI implements ActionListener {
             myDirectoryStopButton.setEnabled(false);
             myImgStopButton.setEnabled(false);
         }
-        boolean hasDirectory = !myDirectoryField.getText().trim().isEmpty();
-        boolean hasExtension = !myExtensionField.getText().trim().isEmpty()
-                && !myExtensionField.getText().equals(myCustomExtensionString);
-        boolean hasDatabase = myDatabaseActive;
+        final boolean hasDirectory = !myDirectoryField.getText().trim().isEmpty();
+        final boolean hasExtension = !myExtensionField.getText().trim().isEmpty()
+                && !myExtensionField.getText().equals(CUSTOM_EXTENSION_STRING);
+        final boolean hasDatabase = myDatabaseActive;
 
-        boolean enableStart = (hasDirectory && hasExtension) || hasDatabase;
+        final boolean enableStart = (hasDirectory && hasExtension) || hasDatabase;
 
         myDirectoryStartButton.setEnabled(enableStart);
         myMenuStart.setEnabled(enableStart);
@@ -1046,8 +1075,11 @@ public class FWGUI implements ActionListener {
         }
     }
 
-    private void exportQueryResultsToCSV() {
-        List<FileEvent> events = myQueryTable.getData();
+    /**
+     * Exports the query results to a CSV file.
+     */
+    private final void exportQueryResultsToCSV() {
+        final List<FileEvent> events = myQueryTable.getData();
 
         if (events.isEmpty()) {
             JOptionPane.showMessageDialog(myQueryFrame, "No query results available for export. Run a query first.",
@@ -1055,11 +1087,11 @@ public class FWGUI implements ActionListener {
             return;
         }
 
-        JFileChooser fileChooser = new JFileChooser();
+        final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Save CSV File");
         fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("CSV Files", "csv"));
 
-        int userSelection = fileChooser.showSaveDialog(myFrame);
+        final int userSelection = fileChooser.showSaveDialog(myFrame);
         if (userSelection != JFileChooser.APPROVE_OPTION) {
             return;
         }
@@ -1069,7 +1101,7 @@ public class FWGUI implements ActionListener {
             filePath += ".csv";
         }
 
-        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
+        try (final PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
             writer.println("File Watcher Query Results");
             writer.println(
                     "Export Date: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
@@ -1093,35 +1125,63 @@ public class FWGUI implements ActionListener {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Returns true if GUI is monitoring a directory. Used by DirectoryWatchService
+     * to check if it should continue running.
+     * @return true if monitoring, false otherwise
+     */
+    public final boolean isMonitoring() {
+        return myIsMonitoring;
+    }
+
+    /**
+     * Sets the database connection status in the GUI.
+     * @param theValue true if connected, false otherwise
+     */
+    public final void setDatabaseConnected(final boolean theValue) {
+        myWriteDbButton.setEnabled(theValue);
+        myQueryButton.setEnabled(theValue);
+    }
+
+    /**
+     * Returns the event table for the GUI.
+     * @return The event table for the GUI
+     */
+    public final FWEventTable getEventTable() {
+        return myEventTable;
+    }
+
+    /**
+     * Returns the instance of the GUI.
+     * @return The instance of the GUI
+     */
+    public static final FWGUI getMyFWGUIInstance() {
+        return myFWGUIInstance;
+    }
+
     /**
      * Returns the main panel for the GUI.
-     * 
      * @return The main panel for the GUI
      */
-    public FWPanel getMainPanel() {
+    public final FWPanel getMainPanel() {
         return myMainPanel;
     }
-    
+
     /**
      * Returns the frame for the GUI.
-     * 
      * @return The frame for the GUI
      */
-    public JFrame getFrame() {
+    public final JFrame getFrame() {
         return myFrame;
     }
-    
+
     /**
-     * Returns the start button for the directory.
-     * 
-     * @return The start button for the directory
+     * Returns the stop button for the directory.
+     * @return The stop button for the directory
      */
-    public JButton getStopButton() {
+    public final JButton getStopButton() {
         return myDirectoryStopButton;
     }
-
-
-    
-    
 
 }

@@ -8,7 +8,7 @@ import java.util.List;
  * Data Access Object (DAO) class to interact
  * with the database and perform CRUD operations.
  */
-public class FileEventDAO {
+public final class FileEventDAO {
     /**
      * Inserts a single file event into the database.
      * @param theEvent The file event to insert.
@@ -67,7 +67,8 @@ public class FileEventDAO {
                 pstmt.addBatch(); // Add to batch execution
             }
             // Execute the batch update and store the number of rows inserted.
-            System.out.println("Inserted " + pstmt.executeBatch() + " events into the database.");
+            final int[] rowsInserted = pstmt.executeBatch();
+            System.out.println("Inserted " + rowsInserted.length + " events into the database.");
         } catch (final SQLException e) {
             e.printStackTrace();
             System.out.println("Error inserting file events.");

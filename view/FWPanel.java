@@ -1,29 +1,33 @@
 import java.awt.*;
 import javax.swing.*;
 
-public class FWPanel extends JPanel {
-    // Combo box for selecting the extension to monitor.
+/**
+ * This class represents the panel that will be used in the File Watcher GUI.
+ */
+public final class FWPanel extends JPanel {
+    // The extensions that can be monitored.
     private JComboBox<String> myExtensionDropdown;
-    // Text field for the directory to monitor.
+    // The text fields that will be used in the GUI, myPathOrDate and myFileName are in the query window.
     private JTextField myDirectoryField, myPathOrDateText, myFileNameText;
-    // Combo box for the query window to select the queries.
+    // The dropdowns that will be used in the GUI.
     private JComboBox<String> myQuerySelectionDropdown, myManualQueryComboBox, myEventActivityDropdown;
-    // Buttons for starting, stopping, and browsing for a directory to monitor.
+    // The various buttons that will be used in both of the GUI's.
     private JButton myWriteDbButton, myQueryButton, myDatabaseResetButton, myResetButton, myBrowseButton, myStartButton,
             myStopButton, myExportCSVButton, myManualQueryButton;
-    // Buttons for the image icons.
+    // The buttons that have images associated with them.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
-    // GridBagConstraint for the layout.
-    private GridBagConstraints myGBC;
-    // Main panel for the layout.
-    private JPanel myMainPanel;
-    private JPanel mySecondPanel;
-    // Labels for filtering queries.
+    // The GridBagConstraint that will be used for a clean layout.
+    private final GridBagConstraints myGBC;
+    // The main panel, that is the primary panel being used.
+    private final JPanel myMainPanel;
+    // The query panel that appears after hitting the query button.
+    private final JPanel myQueryPanel;
+    // The label that will show data associated with what the user is querying.
     private JLabel myManualQueryLabel;
 
     /**
-     * Constructor for the FWPanel. This will create the panel and set up the
-     * layout.
+     * Constructor for the FWPanel class. This will set up the panel for the File
+     * Watcher GUI.
      */
     public FWPanel() {
         setLayout(new BorderLayout());
@@ -37,12 +41,16 @@ public class FWPanel extends JPanel {
         setUpExtensionBox();
         setUpDirectoryBox();
         setUpDirectoryButtons();
-        mySecondPanel = setUpDatabaseBox();
+        myQueryPanel = setUpDatabaseBox();
 
         add(myMainPanel, BorderLayout.CENTER);
     }
 
-    public JPanel FWQueryPanel() {
+    /**
+     * Creates the query panel popup for the GUI.
+     * @return The query panel popup for the GUI.
+     */
+    public final JPanel FWQueryPanel() {
         JPanel queryPanel = new JPanel(new GridBagLayout());
         GridBagConstraints queryGBC = new GridBagConstraints();
         queryGBC.insets = new Insets(5, 5, 5, 5);
@@ -83,7 +91,10 @@ public class FWPanel extends JPanel {
         return queryPanel;
     }
 
-    private void setUpQueryFilterOptions(){
+    /**
+     * Sets up the visual portions of the query popup window.
+     */
+    private final void setUpQueryFilterOptions(){
         myQuerySelectionDropdown = new JComboBox<>(
                 new String[] { "Choose query", "Manually query", "Query 1 - All events from today",
                         "Query 2 - Top 5 frequently modified file types",
@@ -110,7 +121,14 @@ public class FWPanel extends JPanel {
         myManualQueryButton.setVisible(false);
     }
 
-    private void queryPanelGBC(GridBagConstraints theGBC, int theX, int theY, double theWeightx) {
+    /**
+     * Helper method for adjusting the GridBag
+     * @param theGBC The GridBagConstraint to be adjusted.
+     * @param theX The X value to be adjusted for the gridbag.
+     * @param theY The Y value to be adjusted for the gridbag.
+     * @param theWeightx The weightx value to be adjusted for the gridbag.
+     */
+    private final void queryPanelGBC(final GridBagConstraints theGBC, final int theX, final int theY, final double theWeightx) {
         theGBC.fill = GridBagConstraints.HORIZONTAL;
         theGBC.gridx = theX;
         theGBC.gridy = theY;
@@ -120,11 +138,11 @@ public class FWPanel extends JPanel {
     /**
      * Creates the buttons for the image icons.
      */
-    private void createButtonBar() {
+    private final void createButtonBar() {
         ImageIcon startImageIcon = new ImageIcon("files/startWatching.png");
-        ImageIcon stopImageIcon = new ImageIcon("files/stopWatching.png");
-        ImageIcon dbImageIcon = new ImageIcon("files/startDB.png");
-        ImageIcon clearImageIcon = new ImageIcon("files/clearData.png");
+        final ImageIcon stopImageIcon = new ImageIcon("files/stopWatching.png");
+        final ImageIcon dbImageIcon = new ImageIcon("files/startDB.png");
+        final ImageIcon clearImageIcon = new ImageIcon("files/clearData.png");
 
         // Force fixing the scaling as for some reason it was larger than its siblings.
         startImageIcon = new ImageIcon(startImageIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH));
@@ -139,8 +157,8 @@ public class FWPanel extends JPanel {
     /**
      * Sets up the extension box for the panel.
      */
-    private void setUpExtensionBox() {
-        JLabel monitorLabel = new JLabel("Monitor by extension");
+    private final void setUpExtensionBox() {
+        final JLabel monitorLabel = new JLabel("Monitor by extension");
         adjustGridBagConstraints(0, 1, GridBagConstraints.RELATIVE, 0.0);
         myMainPanel.add(monitorLabel, myGBC);
 
@@ -154,8 +172,8 @@ public class FWPanel extends JPanel {
     /**
      * Sets up the directory box for the panel.
      */
-    private void setUpDirectoryBox() {
-        JLabel directoryLabel = new JLabel("Directory to monitor");
+    private final void setUpDirectoryBox() {
+        final JLabel directoryLabel = new JLabel("Directory to monitor");
         adjustGridBagConstraints(0, 2, GridBagConstraints.RELATIVE, 0.0);
         myMainPanel.add(directoryLabel, myGBC);
 
@@ -168,20 +186,19 @@ public class FWPanel extends JPanel {
     /**
      * Sets up the directory buttons for the panel.
      */
-    private void setUpDirectoryButtons() {
+    private final void setUpDirectoryButtons() {
         myStartButton = createModernButton("Start");
         myStopButton = createModernButton("Stop");
         myBrowseButton = createModernButton("Browse");
-        // Disabling both buttons for until the user has a directory and extension to
-        // monitor.
-
+        
         // Create a panel to hold the browse, start, and stop buttons so they are equal
         // size.
-        JPanel buttonSet1 = new JPanel(new GridLayout(1, 3, 5, 0));
+        final JPanel buttonSet1 = new JPanel(new GridLayout(1, 3, 5, 0));
         buttonSet1.add(myBrowseButton);
         buttonSet1.add(myStartButton);
         buttonSet1.add(myStopButton);
-
+        // Disabling both buttons for until the user has a directory and extension to
+        // monitor.
         myStopButton.setEnabled(false);
         myStartButton.setEnabled(false);
 
@@ -193,9 +210,9 @@ public class FWPanel extends JPanel {
 
     /**
      * Sets up the database box for the panel. Returns a JPanel containing only the lower buttons
-     *  (write to db, query, reset)
+     * (write to db, query, reset)
      */
-    private JPanel setUpDatabaseBox() {
+    private final JPanel setUpDatabaseBox() {
         myWriteDbButton = createModernButton("Write to database");
         myQueryButton = createModernButton("Query");
         myQueryButton.setEnabled(false);
@@ -205,13 +222,13 @@ public class FWPanel extends JPanel {
 
         // Create a panel to hold the write to database and query buttons so they are
         // equal size.
-        JPanel buttonSet2 = new JPanel(new GridLayout(1, 2, 5, 0));
+        final JPanel buttonSet2 = new JPanel(new GridLayout(1, 2, 5, 0));
         buttonSet2.add(myWriteDbButton);
         buttonSet2.add(myQueryButton);
         // Create a panel to hold the buttonSet2 and the reset button
-        JPanel databasePanel = new JPanel(new GridBagLayout());
+        final JPanel databasePanel = new JPanel(new GridBagLayout());
         //databasePanel.
-        GridBagConstraints gbc = new GridBagConstraints();
+        final GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
@@ -229,11 +246,10 @@ public class FWPanel extends JPanel {
 
     /**
      * Creates a "modern design" button with the given text.
-     * 
      * @param text The text being passed in that will appear on the button.
      * @return The button with the given text in the modern design.
      */
-    private JButton createModernButton(String text) {
+    private final JButton createModernButton(String text) {
         JButton button = new JButton(text);
         button.setFocusPainted(false);
         button.setBackground(new Color(50, 50, 50));
@@ -245,11 +261,10 @@ public class FWPanel extends JPanel {
     }
 
     /**
-     * Gets the file extension query label.
-     * 
-     * @return The File extension query label.
+     * Gets the query popup label that will be used in the window.
+     * @return The query popup label that will be used in the window.
      */
-    public JLabel getFileExtensionLabel() {
+    public final JLabel getMyManualQueryLabel() {
         return myManualQueryLabel;
     }
 
@@ -257,7 +272,7 @@ public class FWPanel extends JPanel {
      * Gets the event activity dropdown to be returned.
      * @return The event activity dropdown.
      */
-    public JComboBox<String> getEventActivityDropdown(){
+    public final JComboBox<String> getEventActivityDropdown(){
         return myEventActivityDropdown;
     }
 
@@ -265,7 +280,7 @@ public class FWPanel extends JPanel {
      * Gets the JTextField for the file name filter.
      * @return JTextField for file name filter.
      */
-    public JTextField getFileNameText(){
+    public final JTextField getFileNameText(){
         return myFileNameText;
     }
 
@@ -273,7 +288,7 @@ public class FWPanel extends JPanel {
      * Gets the file extension query textbox.
      * @return The file extension query textbox.
      */
-    public JTextField getFileExtensionText() {
+    public final JTextField getFileExtensionText() {
         return myPathOrDateText;
     }
 
@@ -281,106 +296,95 @@ public class FWPanel extends JPanel {
      * Gets the file extension filter button.
      * @return The file extension filter button.
      */
-    public JButton getFileExtensionFilterButton(){
+    public final JButton getFileExtensionFilterButton(){
         return myManualQueryButton;
     }
 
     /**
      * Gets the extension box.
-     * 
      * @return The extension box.
      */
-    public JComboBox<String> getExtensionBox() {
+    public final JComboBox<String> getExtensionBox() {
         return myExtensionDropdown;
     }
 
     /**
      * Gets the query extension box.
-     * 
      * @return The query extension box.
      */
-    public JComboBox<String> getQueryPopupSelection() {
+    public final JComboBox<String> getQueryPopupSelection() {
         return myQuerySelectionDropdown;
     }
 
     /**
      * Gets the manual query dropdown.
-     * 
      * @return The manual query dropdown.
      */
-    public JComboBox<String> getManualQueryComboBox() {
+    public final JComboBox<String> getManualQueryComboBox() {
         return myManualQueryComboBox;
     }
 
     /**
-     * Gets the directory box.
-     * 
-     * @return The directory box.
+     * Gets the directory textbox.
+     * @return The directory textbox.
      */
-    public JTextField getMyDirectoryField() {
+    public final JTextField getMyDirectoryField() {
         return myDirectoryField;
     }
 
     /**
      * Gets the start button on the panel.
-     * 
      * @return The start button on the panel.
      */
-    public JButton getStartButton() {
+    public final JButton getStartButton() {
         return myStartButton;
     }
 
     /**
      * Gets the stop button.
-     * 
      * @return The stop button.
      */
-    public JButton getStopButton() {
+    public final JButton getStopButton() {
         return myStopButton;
     }
 
     /**
      * Gets the directory browse button.
-     * 
      * @return The directory browsing button.
      */
-    public JButton getBrowseButton() {
+    public final JButton getBrowseButton() {
         return myBrowseButton;
     }
 
     /**
      * Gets the reset button
-     * 
      * @return The reset button.
      */
-    public JButton getResetButton() {
+    public final JButton getResetButton() {
         return myResetButton;
     }
 
     /**
      * Gets the query button.
-     * 
      * @return The query button.
      */
-    public JButton getQueryButton() {
+    public final JButton getQueryButton() {
         return myQueryButton;
     }
 
     /**
      * Gets the button that will reset the database.
-     * 
      * @return The button that will reset the database.
      */
-    public JButton getDatabaseResetButton() {
+    public final JButton getDatabaseResetButton() {
         return myDatabaseResetButton;
     }
 
     /**
      * Gets the button that will export the database query list as a CSV.
-     * 
      * @return The button that will export the database query list as a CSV.
      */
-    public JButton getCSVButton() {
+    public final JButton getCSVButton() {
         return myExportCSVButton;
     }
 
@@ -388,65 +392,48 @@ public class FWPanel extends JPanel {
      * Gets the Panel that contains the write, query, and reset buttons
      * @return The Panel that contains the write, query, and reset buttons.
      */
-    public JPanel getSecondPanel() {
-        return mySecondPanel;
+    public final JPanel getQueryPanel() {
+        return myQueryPanel;
     }
 
     /**
      * Gets the button to start the database.
-     * 
      * @return The button to start the database.
      */
-    public JButton getMyWriteDBButton() {
+    public final JButton getMyWriteDBButton() {
         return myWriteDbButton;
     }
 
     /**
-     * Gets the start button with an image
-     * 
+     * Gets the start button that has a picture.
      * @return The start button with an image.
      */
-    public JButton getMyImgStarButton() {
+    public final JButton getMyImgStarButton() {
         return myImgStartButton;
     }
 
     /**
-     * Gets the stop button with an image.
-     * 
+     * Gets the stop button that has a picture.
      * @return The stop button with an image.
      */
-    public JButton getMyImgStopButton() {
+    public final JButton getMyImgStopButton() {
         return myImgStopButton;
     }
 
     /**
-     * Gets the button to query the database with an image.
-     * 
+     * Gets the button to query the database that has a picture.
      * @return The button to query the database with an image.
      */
-    public JButton getMyImgDBButton() {
+    public final JButton getMyImgDBButton() {
         return myImgDBButton;
     }
 
     /**
-     * Gets the clear button with an image.
-     * 
+     * Gets the clear button that has a picture.
      * @return The clear button with an image.
      */
-    public JButton getMyImgClearButton() {
+    public final JButton getMyImgClearButton() {
         return myImgClearButton;
-    }
-
-    /**
-     * Helper constructor to clean up code above, adjusting gridbag with X and Y
-     * values.
-     * 
-     * @param theX The X value to be adjusted for the gridbag.
-     * @param theY The Y value to be adjusted for the gridbag.
-     */
-    private void adjustGridBagConstraints(int theX, int theY) {
-        myGBC.gridx = theX;
-        myGBC.gridy = theY;
     }
 
     /**
@@ -459,7 +446,7 @@ public class FWPanel extends JPanel {
      *                   GridBagConstraints ENUM.
      * @param theWeightx The weightx value to be adjusted for the gridbag.
      */
-    private void adjustGridBagConstraints(int theX, int theY, int theWidth, double theWeightx) {
+    private final void adjustGridBagConstraints(int theX, int theY, int theWidth, double theWeightx) {
         myGBC.gridx = theX;
         myGBC.gridy = theY;
         myGBC.gridwidth = theWidth;

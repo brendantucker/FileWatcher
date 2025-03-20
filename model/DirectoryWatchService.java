@@ -20,7 +20,7 @@ import javax.swing.JOptionPane;
  * for file creation, deletion, and modification events. When an event occurs,
  * it will add the event to the event table in the GUI.
  */
-public class DirectoryWatchService {
+public final class DirectoryWatchService {
     /** The directory to watch */
     private final Path myDirectory;
     /** The watch service to monitor the directory */

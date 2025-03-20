@@ -2,7 +2,7 @@
  * This class represents an event that occurs to a file and all necessary associated data. This will be used to track when
  *  and where an event occured to a file, as well as what type of event it was.
  */
-public class FileEvent {
+public final class FileEvent {
     /** A string representing the path to a file */
     private final String myFilePath;
     /** A string representing the name of a file */

@@ -6,7 +6,7 @@ import java.sql.Statement;
 /**
  * Class to handle the connection to the SQLite database.
  */
-public class DatabaseConnection {
+public final class DatabaseConnection {
     private static final String MY_URL = "jdbc:sqlite:filewatcher.db";
     private static Connection myConnection = null;
 
@@ -26,7 +26,7 @@ public class DatabaseConnection {
 
             // Set the GUI to show that the database is connected
             // Enable "Write to Database" button
-            FWGUI gui = FWGUI.getMyInstance();
+            FWGUI gui = FWGUI.getMyFWGUIInstance();
             if (gui != null) {
                 gui.setDatabaseConnected(true);
             }
@@ -73,7 +73,7 @@ public class DatabaseConnection {
                 myConnection.close();
                 myConnection = null; // 🔹 Ensure the connection is set to null
 
-                final FWGUI gui = FWGUI.getMyInstance();
+                final FWGUI gui = FWGUI.getMyFWGUIInstance();
                 if (gui != null) {
                     gui.setDatabaseConnected(false);
                 }

@@ -17,7 +17,7 @@ import javax.mail.internet.MimeMultipart;
 /**
  * Class to send an email with an attachment using JavaMail API.
  */
-public class EmailSender {
+public final class EmailSender {
 
     private static final String SMTP_HOST = "smtp.gmail.com"; // Change if using another provider
     private static final String SMTP_PORT = "587"; // Use 465 for SSL, 587 for TLS
