@@ -4,17 +4,17 @@
  */
 public class FileEvent {
     /** A string representing the path to a file */
-    private String myFilePath;
+    private final String myFilePath;
     /** A string representing the name of a file */
-    private String myFileName;
+    private final String myFileName;
     /** An enum representing the type of event that occured to the file */
-    private String myEventType;
+    private final String myEventType;
     /** A String representing the time that the event occured */
-    private String myEventTime;
+    private final String myEventTime;
     /** A String representing the date that the event occured */
-    private String myEventDate;
+    private final String myEventDate;
     /** A string representing the extension of the file */
-    private String myExtension;
+    private final String myExtension;
 
     /**
      * Constructor for a FileEvent.
@@ -25,10 +25,10 @@ public class FileEvent {
      * @param extension The extension of the file that the event occured to.
      * @param eventTime The time that the event occured.
      */
-    public FileEvent(String theFileName, String theFilePath, String theEventType, String theExtension,
-            String theEventDate, String theEventTime) {
+    public FileEvent(String theFileName, final String theFilePath, final String theEventType, final String theExtension,
+            final String theEventDate, final String theEventTime) {
         final int fileExtensionRemove = theFileName.indexOf('.');
-        if(fileExtensionRemove != -1){
+        if (fileExtensionRemove != -1) {
             theFileName = theFileName.substring(0, fileExtensionRemove);
         }
         myFileName = theFileName;
@@ -44,7 +44,7 @@ public class FileEvent {
      * 
      * @return The string representation of the file name.
      */
-    public String getFileName() {
+    public final String getFileName() {
         return myFileName;
     }
 
@@ -53,7 +53,7 @@ public class FileEvent {
      * 
      * @return The string representation of the file path.
      */
-    public String getFilePath() {
+    public final String getFilePath() {
         return myFilePath;
     }
 
@@ -62,7 +62,7 @@ public class FileEvent {
      * 
      * @return The EventType from EventType enum.
      */
-    public String getEventType() {
+    public final String getEventType() {
         return myEventType;
     }
 
@@ -71,7 +71,7 @@ public class FileEvent {
      * 
      * @return The LocalDateTime of the event.
      */
-    public String getEventTime() {
+    public final String getEventTime() {
         return myEventTime;
     }
 
@@ -80,7 +80,7 @@ public class FileEvent {
      * 
      * @return The extension of the affected file.
      */
-    public String getExtension() {
+    public final String getExtension() {
         return myExtension;
     }
 
@@ -89,7 +89,7 @@ public class FileEvent {
      * 
      * @return The date of the event.
      */
-    public String getEventDate() {
+    public final String getEventDate() {
         return myEventDate;
     }
 

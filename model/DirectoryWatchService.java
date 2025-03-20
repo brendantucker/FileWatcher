@@ -12,7 +12,6 @@ import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
 import javax.swing.JOptionPane;
 
 /**
@@ -21,36 +20,31 @@ import javax.swing.JOptionPane;
  * for file creation, deletion, and modification events. When an event occurs,
  * it will add the event to the event table in the GUI.
  */
-
 public class DirectoryWatchService {
-
     /** The directory to watch */
-    private Path myDirectory;
+    private final Path myDirectory;
     /** The watch service to monitor the directory */
-    private WatchService myWatchService;
+    private final WatchService myWatchService;
     /** Flag to check if watcher should be running. */
     private boolean myRunning = false;
     /** The key to the watch service */
     private WatchKey myKey;
     /** The event table to update with file events */
-    private FWEventTable myEventTable;
-    /**
-     * The GUI watch service will work on; used to check the "myIsMonitoring"
-     * variable via a getter
-     */
-    private FWGUI myGUI;
+    private final FWEventTable myEventTable;
+    /** The GUI watch service will work on; used to check the "myIsMonitoring" variable via a getter */
+    private final FWGUI myGUI;
     /** The thread that will run the watch service */
     private Thread myWatchThread;
 
     /**
      * Constructor for DirectoryWatchService.
      * 
-     * @param directory The directory to watch
-     * @param theGUI    The GUI instance it will be connected to
+     * @param theDirectory The directory to watch
+     * @param theGUI The GUI instance it will be connected to
      * @throws IOException Thrown when chosen directory is invalid
      */
-    public DirectoryWatchService(String directory, FWGUI theGUI) throws IOException {
-        myDirectory = Path.of(directory);
+    public DirectoryWatchService(String theDirectory, FWGUI theGUI) throws IOException {
+        myDirectory = Path.of(theDirectory);
         if (!Files.isDirectory(myDirectory) || myDirectory.toString() == "") { // Guard against invalid directory
             throw new IOException();
         }
@@ -71,7 +65,7 @@ public class DirectoryWatchService {
      * @throws ClosedWatchServiceException Thrown when the watch service is closed
      * @throws InterruptedException        Thrown when the thread is interrupted
      */
-    public void start() throws IOException {
+    public final void start() throws IOException {
 
         // Exit if watch service is already running
         if (myRunning) {
@@ -86,7 +80,7 @@ public class DirectoryWatchService {
         myWatchThread = new Thread(() -> {
             try {
                 registerAllFolders(myDirectory); // Add all folders in the directory to the watch service
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 myRunning = false;
                 return;
             }
@@ -109,7 +103,8 @@ public class DirectoryWatchService {
                                 invalidDirectoryError();
                             }
                         }
-                        // Filter out modify directory events -- this kind of event is created any time the contents of a directory change
+                        // Filter out modify directory events -- this kind of event is created any time
+                        // the contents of a directory change
                         if (!Files.isDirectory(eventPath) || event.kind() != StandardWatchEventKinds.ENTRY_MODIFY) {
                             myEventTable.addEvent(new FileEvent(event.context().toString(),
                                     eventPath.toString(),
@@ -120,9 +115,9 @@ public class DirectoryWatchService {
                         }
                     }
                     key.reset(); // Reset the key to receive further events
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     stop();
-                } catch (ClosedWatchServiceException e) {
+                } catch (final ClosedWatchServiceException e) {
                     stop();
                 }
             }
@@ -134,7 +129,7 @@ public class DirectoryWatchService {
     /**
      * Stops the watch service and closes it.
      */
-    public void stop() {
+    public final void stop() {
         if (myRunning == false) {
             return;
         }
@@ -161,7 +156,7 @@ public class DirectoryWatchService {
     /**
      * Displays an error message when an invalid directory is chosen.
      */
-    public void invalidDirectoryError() {
+    public final void invalidDirectoryError() {
         JOptionPane.showMessageDialog(null, "\"" + myDirectory.toString() + "\" is not a valid directory",
                 "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
     }
@@ -173,7 +168,7 @@ public class DirectoryWatchService {
      * @param theStartPath
      * @throws IOException
      */
-    private void registerAllFolders(Path theStartPath) throws IOException {
+    private final void registerAllFolders(final Path theStartPath) throws IOException {
         try {
             Files.walkFileTree(theStartPath, new SimpleFileVisitor<Path>() {
                 @Override
@@ -184,7 +179,7 @@ public class DirectoryWatchService {
                     return FileVisitResult.CONTINUE;
                 }
             });
-        } catch (IOException theException) {
+        } catch (final IOException theException) {
             // Warn user of error and stop the watch service
             JOptionPane.showMessageDialog(null, "Error registering folders: " + theException.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
@@ -199,7 +194,7 @@ public class DirectoryWatchService {
      * @param theEvent
      * @return String representation of the file extension/type
      */
-    private String getExtension(WatchEvent<?> theEvent) {
+    private final String getExtension(final WatchEvent<?> theEvent) {
 
         if (Files.isDirectory(myDirectory.resolve((Path) theEvent.context()))) {
             return "folder";
@@ -218,7 +213,7 @@ public class DirectoryWatchService {
      * 
      * @return String representation of the current date
      */
-    private String createDateString() {
+    private final String createDateString() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return now.format(formatter);
@@ -229,7 +224,7 @@ public class DirectoryWatchService {
      * 
      * @return String representation of the current time.
      */
-    private String createTimeString() {
+    private final String createTimeString() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         return now.format(formatter);
@@ -241,7 +236,7 @@ public class DirectoryWatchService {
      * @param theEvent One of the three StandardWatchEventKinds enum
      * @return Formatted event type string
      */
-    private String eventTypeFormatter(WatchEvent.Kind<?> theEvent) {
+    private final String eventTypeFormatter(final WatchEvent.Kind<?>  theEvent) {
         String eventType = theEvent.toString();
         if (eventType.equals("ENTRY_CREATE")) {
             return "CREATED";
@@ -258,7 +253,7 @@ public class DirectoryWatchService {
      * 
      * @return The directory being watched
      */
-    public boolean isRunning() {
+    public final boolean isRunning() {
         return myRunning;
     }
 

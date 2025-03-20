@@ -4,24 +4,34 @@ import javax.mail.internet.*;
 import java.io.File;
 import javax.activation.*;
 
+/**
+ * Class to send an email with an attachment using JavaMail API.
+ */
 public class EmailSender {
 
     private static final String SMTP_HOST = "smtp.gmail.com"; // Change if using another provider
-    private static final String SMTP_PORT = "587";  // Use 465 for SSL, 587 for TLS
+    private static final String SMTP_PORT = "587"; // Use 465 for SSL, 587 for TLS
     private static final String USERNAME = "tcss360w24t6@gmail.com"; // Replace with your email
-    private static final String PASSWORD = "uwdx zpfo knls zorm";  // Generate an App Password
+    private static final String PASSWORD = "uwdx zpfo knls zorm"; // Generate an App Password
 
-    public static void sendEmailWithAttachment(String recipient, String subject, String body, String filePath) {
+    /**
+     * Send an email with an attachment.
+     * @param theRecipient Email recipient
+     * @param theSubject Email subject
+     * @param theBody Email body
+     * @param theFilePath File path of the attachment
+     */
+    public final static void sendEmailWithAttachment(final String theRecipient, final String theSubject,
+            final String theBody, final String theFilePath) {
         // Set up email properties
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
         properties.put("mail.smtp.host", SMTP_HOST);
         properties.put("mail.smtp.port", SMTP_PORT);
-        //uwdx zpfo knls zorm
 
         // Authenticate using username and password
-        Session session = Session.getInstance(properties, new Authenticator() {
+        final Session session = Session.getInstance(properties, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(USERNAME, PASSWORD);
@@ -29,23 +39,32 @@ public class EmailSender {
         });
 
         try {
+            // Check if the file path is null or file doesn't exist
+            if (theFilePath == null || theFilePath.isEmpty()) {
+                throw new IllegalArgumentException("File path is null or empty.");
+            }
+
+            final File file = new File(theFilePath);
+            if (!file.exists()) {
+                throw new IllegalArgumentException("File does not exist: " + theFilePath);
+            }
+
             // Create email message
-            Message message = new MimeMessage(session);
+            final Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(USERNAME));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
-            message.setSubject(subject);
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(theRecipient));
+            message.setSubject(theSubject);
 
             // Create a multipart message
-            Multipart multipart = new MimeMultipart();
+            final Multipart multipart = new MimeMultipart();
 
             // Add email text
-            MimeBodyPart textPart = new MimeBodyPart();
-            textPart.setText(body);
+            final MimeBodyPart textPart = new MimeBodyPart();
+            textPart.setText(theBody);
             multipart.addBodyPart(textPart);
 
             // Add file attachment
-            MimeBodyPart attachmentPart = new MimeBodyPart();
-            File file = new File(filePath);
+            final MimeBodyPart attachmentPart = new MimeBodyPart();
             attachmentPart.setDataHandler(new DataHandler(new FileDataSource(file)));
             attachmentPart.setFileName(file.getName());
             multipart.addBodyPart(attachmentPart);
@@ -55,11 +74,19 @@ public class EmailSender {
 
             // Send email
             Transport.send(message);
-            System.out.println("Email sent successfully with attachment: " + filePath);
+            System.out.println("Email sent successfully with attachment: " + theFilePath);
 
-        } catch (MessagingException e) {
-            e.printStackTrace();
-            System.out.println("Failed to send email.");
+        } catch (final MessagingException e) { // Catch messaging exceptions
+            // Log the exception with a meaningful message
+            System.out.println("Failed to send email due to messaging exception: " + e.getMessage());
+            e.printStackTrace(); // Log the stack trace for further analysis
+        } catch (final IllegalArgumentException e) { // Catch illegal argument exceptions
+            // Handle invalid file path exception
+            System.out.println("Invalid file path: " + e.getMessage());
+        } catch (final Exception e) { // Catch any other unexpected exceptions
+            // Catch any other unexpected exceptions
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+            e.printStackTrace(); // Log the stack trace for debugging
         }
     }
 }
