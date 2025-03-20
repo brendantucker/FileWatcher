@@ -3,7 +3,8 @@
         "controller",
         "libs",
         "model",
-        "view"
+        "view",
+        "test"
     ],
     "java.project.referencedLibraries": [
         "libs\\activation-1.1.1.jar",
