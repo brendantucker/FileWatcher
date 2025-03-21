@@ -26,7 +26,7 @@ public final class FWPanel extends JPanel {
     private JComboBox<String> myQuerySelectionDropdown, myManualQueryComboBox, myEventActivityDropdown;
     // The various buttons that will be used in both of the GUI's.
     private JButton myWriteDbButton, myQueryButton, myDatabaseResetButton, myResetButton, myBrowseButton, myStartButton,
-            myStopButton, myExportCSVButton, myManualQueryButton;
+            myStopButton, myExportCSVButton, myManualQueryButton, myReturnWindowButton;
     // The buttons that have images associated with them.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // The GridBagConstraint that will be used for a clean layout.
@@ -80,7 +80,10 @@ public final class FWPanel extends JPanel {
         queryPanelGBC(queryGBC, 2, 0, 0.0);
         queryPanel.add(myExportCSVButton, queryGBC);
 
-        queryPanelGBC(queryGBC, 3, 0, 0.0);
+        queryPanelGBC(queryGBC,3, 0, 0.0);
+        queryPanel.add(myReturnWindowButton, queryGBC);
+
+        queryPanelGBC(queryGBC, 4, 0, 0.0);
         queryPanel.add(myDatabaseResetButton, queryGBC);
 
         queryPanelGBC(queryGBC, 0, 1, 0.0);
@@ -89,16 +92,18 @@ public final class FWPanel extends JPanel {
         queryPanelGBC(queryGBC, 1, 1, 0.0);
         queryPanel.add(myManualQueryComboBox, queryGBC);
         
-        queryPanelGBC(queryGBC, 2, 1, 0.0);
+        queryPanelGBC(queryGBC, 2, 1, 1.0);
+        queryGBC.gridwidth = 2;
         queryPanel.add(myPathOrDateText, queryGBC);
         
-        queryPanelGBC(queryGBC, 3, 1, 0.0);
+        queryPanelGBC(queryGBC, 4, 1, 0.0);
         queryPanel.add(myManualQueryButton, queryGBC);
 
         queryPanelGBC(queryGBC, 2, 1, 0.0);
         queryPanel.add(myEventActivityDropdown, queryGBC);
 
-        queryPanelGBC(queryGBC, 2, 1, 0.0);
+        queryPanelGBC(queryGBC, 2, 1, 1.0);
+        queryGBC.gridwidth = 2;
         queryPanel.add(myFileNameText,queryGBC);
 
         return queryPanel;
@@ -114,6 +119,7 @@ public final class FWPanel extends JPanel {
                         "Query 3 - Most Common Events for Each Extension", });
         myExportCSVButton = createModernButton("Export to CSV");
         myDatabaseResetButton = createModernButton("Reset Database");
+        myReturnWindowButton = createModernButton("Return to Main Window");
         myManualQueryComboBox = new JComboBox<>(
                 new String[] { "Choose file detail", "File Name", "File Extension", "Path to File Location",
                         "Type of Activity", "Between Two Dates" });
@@ -391,6 +397,14 @@ public final class FWPanel extends JPanel {
      */
     public final JButton getDatabaseResetButton() {
         return myDatabaseResetButton;
+    }
+
+    /**
+     * Gets the button that will return the user to the main window.
+     * @return The button that will return the user to the main window.
+     */
+    public final JButton getReturnWindowButton(){
+        return myReturnWindowButton;
     }
 
     /**

@@ -77,7 +77,8 @@ public final class FWGUI implements ActionListener {
     private JTextField myDirectoryField, myExtensionField, myPathOrDateText, myFileNameText;
     // All the buttons to be used throughout both of the windows.
     private JButton myDirectoryStartButton, myDirectoryStopButton, myWriteDbButton, myDirectoryBrowseButton,
-            myResetDirectoryButton, myQueryButton, myDatabaseResetButton, myExportCSVButton, myManualQueryButton;
+            myResetDirectoryButton, myQueryButton, myDatabaseResetButton, myExportCSVButton, myManualQueryButton,
+            myReturnWindowButton;
     // Buttons that have an image associated with them.
     private JButton myImgStartButton, myImgStopButton, myImgDBButton, myImgClearButton;
     // The main panel of the GUI.
@@ -531,6 +532,8 @@ public final class FWGUI implements ActionListener {
                 FileEventDAO.resetEntireDatabase();
                 myQueryTable.clearTable();
             }
+        } else if (source.equals(myReturnWindowButton)){ // Closing the query window upon button press.
+            myQueryFrame.dispose();
         } // Adding 10 items debug menu.
         else if (source.equals(add10Item)) {
             addTestEvents(10);
@@ -627,7 +630,9 @@ public final class FWGUI implements ActionListener {
     /**
      * Helper method for dis/connecting to the database and displaying that
      * information in a popup as well as text in the bottom right.
-     * @param theConnectionValue The boolean value of what you want the connection to be.
+     * 
+     * @param theConnectionValue The boolean value of what you want the connection
+     *                           to be.
      */
     private final void handleDatabaseConnection(boolean theConnectionValue) {
         final boolean success;
@@ -656,7 +661,8 @@ public final class FWGUI implements ActionListener {
     }
 
     /**
-     * Helper method for addressing what the user is filtering the main GUI table with.
+     * Helper method for addressing what the user is filtering the main GUI table
+     * with.
      */
     private final void handleExtensionSelection() {
         if (!myExtensionField.getText().isEmpty()
@@ -819,8 +825,6 @@ public final class FWGUI implements ActionListener {
 
         setUpQueryFiltering();
 
-        myQueryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
         myQueryFrame.setVisible(true);
     }
 
@@ -837,6 +841,9 @@ public final class FWGUI implements ActionListener {
 
         myDatabaseResetButton = myQueryPanel.getDatabaseResetButton();
         myDatabaseResetButton.addActionListener(this);
+
+        myReturnWindowButton = myQueryPanel.getReturnWindowButton();
+        myReturnWindowButton.addActionListener(this);
 
         myManualQueryButton = myQueryPanel.getFileExtensionFilterButton();
         myManualQueryButton.addActionListener(this);
