@@ -19,10 +19,10 @@ import javax.mail.internet.MimeMultipart;
  */
 public final class EmailSender {
 
-    private static final String SMTP_HOST = "smtp.gmail.com"; // Change if using another provider
-    private static final String SMTP_PORT = "587"; // Use 465 for SSL, 587 for TLS
-    private static final String USERNAME = "tcss360w24t6@gmail.com"; // Replace with your email
-    private static final String PASSWORD = "uwdx zpfo knls zorm"; // Generate an App Password
+    private static final String SMTP_HOST = "smtp.gmail.com";
+    private static final String SMTP_PORT = "587"; 
+    private static final String USERNAME = "tcss360w24t6@gmail.com"; 
+    private static final String PASSWORD = "uwdx zpfo knls zorm"; 
 
     /**
      * Send an email with an attachment.
@@ -87,15 +87,11 @@ public final class EmailSender {
             System.out.println("Email sent successfully with attachment: " + theFilePath);
 
         } catch (final MessagingException e) { // Catch messaging exceptions
-            // Log the exception with a meaningful message
-            System.out.println("Failed to send email due to messaging exception: " + e.getMessage());
             e.printStackTrace(); // Log the stack trace for further analysis
         } catch (final IllegalArgumentException e) { // Catch illegal argument exceptions
             // Handle invalid file path exception
-            System.out.println("Invalid file path: " + e.getMessage());
         } catch (final Exception e) { // Catch any other unexpected exceptions
             // Catch any other unexpected exceptions
-            System.out.println("An unexpected error occurred: " + e.getMessage());
             e.printStackTrace(); // Log the stack trace for debugging
         }
     }

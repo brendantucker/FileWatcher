@@ -19,7 +19,6 @@ public final class DatabaseConnection {
         try {
             Class.forName("org.sqlite.JDBC");
             myConnection = DriverManager.getConnection(MY_URL);
-            System.out.println(" Connected to SQLite database!");
 
             // Ensure the table exists
             initializeDatabase();
@@ -33,10 +32,8 @@ public final class DatabaseConnection {
 
             return true;
         } catch (final ClassNotFoundException e) {
-            System.out.println("SQLite JDBC Driver not found!");
             e.printStackTrace();
         } catch (final SQLException e) {
-            System.out.println("Failed to connect to SQLite database.");
             e.printStackTrace();
         }
         return false;
@@ -57,9 +54,7 @@ public final class DatabaseConnection {
 
         try (final Statement stmt = getMyConnection().createStatement()) {
             stmt.execute(sql);
-            System.out.println(" Database initialized. Table 'file_events' is ready.");
         } catch (final SQLException e) {
-            System.out.println(" ERROR: Failed to initialize the database.");
             e.printStackTrace();
         }
     }
@@ -95,8 +90,8 @@ public final class DatabaseConnection {
      * Sets the connection to the SQLite database.
      * @param connection Connection to the SQLite database.
      */
-    public static void setConnection(final Connection connection) {
-        myConnection = connection;
+    public static void setConnection(final Connection theConnection) {
+        myConnection = theConnection;
     }
 
 }

@@ -16,7 +16,6 @@ public final class FileEventDAO {
     public static final void insertFileEvent(final FileEvent theEvent) {
         final Connection conn = DatabaseConnection.getMyConnection();
         if (conn == null) {
-            System.out.println("Database is not connected!");
             return;
         }
         // SQL string that will insert the file event into the database.
@@ -31,14 +30,12 @@ public final class FileEventDAO {
             pstmt.setString(6, theEvent.getEventTime());
             // Execute the update and store the number of rows inserted.
             if (pstmt.executeUpdate() > 0) {
-                System.out.println(
-                        "File event inserted: " + theEvent.getFileName() + " (" + theEvent.getEventType() + ")");
+                
             } else {
-                System.out.println("File event NOT inserted.");
+                //System.out.println("File event NOT inserted.");
             }
         } catch (final SQLException e) { // Catch any SQL exceptions that occur.
             e.printStackTrace();
-            System.out.println("Error inserting file event.");
         }
     }
 
@@ -49,7 +46,6 @@ public final class FileEventDAO {
     public static final void insertFileEvents(final List<FileEvent> events) {
         final Connection conn = DatabaseConnection.getMyConnection();
         if (conn == null) {
-            System.out.println("Database is not connected!");
             return;
         }
         // SQL string that will insert the file events into the database.
@@ -67,8 +63,7 @@ public final class FileEventDAO {
                 pstmt.addBatch(); // Add to batch execution
             }
             // Execute the batch update and store the number of rows inserted.
-            final int[] rowsInserted = pstmt.executeBatch();
-            System.out.println("Inserted " + rowsInserted.length + " events into the database.");
+            //final int[] rowsInserted = pstmt.executeBatch();
         } catch (final SQLException e) {
             e.printStackTrace();
             System.out.println("Error inserting file events.");
@@ -83,7 +78,7 @@ public final class FileEventDAO {
         final FWEventTable theResultsTable = new FWEventTable();
         final Connection conn = DatabaseConnection.getMyConnection();
         if (conn == null) {
-            System.out.println("Database is not connected!");
+
         } else {
             //SQL String that will grab all events from the users local time.
             String sql = "SELECT * FROM file_events WHERE DATE(event_date) = DATE('now', 'localtime');";
@@ -117,7 +112,6 @@ public final class FileEventDAO {
         final FWEventTable theResultsTable = new FWEventTable();
         final Connection conn = DatabaseConnection.getMyConnection();
         if (conn == null) {
-            System.out.println("Database is not connected!");
         } else {
             // SQL String that will grab the top five extensions from the database.
             final String sql = "SELECT * FROM file_events WHERE file_extension in(SELECT file_extension FROM file_events " +
@@ -152,7 +146,6 @@ public final class FileEventDAO {
         final FWEventTable theResultsTable = new FWEventTable();
         final Connection conn = DatabaseConnection.getMyConnection();
         if (conn == null) {
-            System.out.println("Database is not connected!");
         } else {
             // SQL String that will grab the most common event types per extension.
             final String sql = "SELECT file_extension, event_type, COUNT(*) as event_count " +
@@ -177,7 +170,6 @@ public final class FileEventDAO {
                 }
             } catch (final SQLException e) {
                 e.printStackTrace();
-                System.out.println("Error querying most common event types per extension.");
             }
         }
         return theResultsTable;
@@ -192,7 +184,6 @@ public final class FileEventDAO {
         final FWEventTable theResultsTable = new FWEventTable();
         final Connection conn = DatabaseConnection.getMyConnection();
         if (conn == null) {
-            System.out.println("Database is not connected!");
         } else {
             // Create a StringBuilder to loop through and build the WHERE clause.
             final StringBuilder whereExtensionClause = new StringBuilder();
@@ -222,7 +213,6 @@ public final class FileEventDAO {
                 }
             } catch (final SQLException e) {
                 e.printStackTrace();
-                System.out.println("Error querying txt files.");
             }
         }
         return theResultsTable;
@@ -238,7 +228,6 @@ public final class FileEventDAO {
         final FWEventTable theResultsTable = new FWEventTable();
         final Connection conn = DatabaseConnection.getMyConnection();
         if (conn == null) {
-            System.out.println("Database is not connected!");
         } else {
             String sql = "";
             String startDate = "";
@@ -293,15 +282,13 @@ public final class FileEventDAO {
     public static final void resetEntireDatabase() {
         final Connection conn = DatabaseConnection.getMyConnection();
         if (conn == null) {
-            System.out.println("Database is not connected!");
             return;
         }
 
         final String sql = "DELETE FROM file_events";
 
         try (final PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            final int rowsDeleted = pstmt.executeUpdate();
-            System.out.println("Deleted " + rowsDeleted + " rows from the database.");
+           // final int rowsDeleted = pstmt.executeUpdate();
         } catch (final SQLException e) {
             e.printStackTrace();
             System.out.println("Error deleting rows from the database.");
