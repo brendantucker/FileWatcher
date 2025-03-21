@@ -11,6 +11,7 @@ import java.util.List;
 public final class FileEventDAO {
     /**
      * Inserts a single file event into the database.
+     * 
      * @param theEvent The file event to insert.
      */
     public static final void insertFileEvent(final FileEvent theEvent) {
@@ -30,9 +31,9 @@ public final class FileEventDAO {
             pstmt.setString(6, theEvent.getEventTime());
             // Execute the update and store the number of rows inserted.
             if (pstmt.executeUpdate() > 0) {
-                
+
             } else {
-                //System.out.println("File event NOT inserted.");
+                // System.out.println("File event NOT inserted.");
             }
         } catch (final SQLException e) { // Catch any SQL exceptions that occur.
             e.printStackTrace();
@@ -41,6 +42,7 @@ public final class FileEventDAO {
 
     /**
      * Inserts a list of file events into the database.
+     * 
      * @param events The list of file events to insert.
      */
     public static final void insertFileEvents(final List<FileEvent> events) {
@@ -63,7 +65,7 @@ public final class FileEventDAO {
                 pstmt.addBatch(); // Add to batch execution
             }
             // Execute the batch update and store the number of rows inserted.
-            //final int[] rowsInserted = pstmt.executeBatch();
+            pstmt.executeBatch();
         } catch (final SQLException e) {
             e.printStackTrace();
             System.out.println("Error inserting file events.");
@@ -72,6 +74,7 @@ public final class FileEventDAO {
 
     /**
      * Retrieves all file events from the database that occured today.
+     * 
      * @return A table of file events that occured today.
      */
     public static final FWEventTable fileEventsFromToday() {
@@ -80,7 +83,7 @@ public final class FileEventDAO {
         if (conn == null) {
 
         } else {
-            //SQL String that will grab all events from the users local time.
+            // SQL String that will grab all events from the users local time.
             String sql = "SELECT * FROM file_events WHERE DATE(event_date) = DATE('now', 'localtime');";
 
             try (final PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -106,6 +109,7 @@ public final class FileEventDAO {
 
     /**
      * Retrieves the top five extension types from the database.
+     * 
      * @return A table of the top five extension types.
      */
     public static final FWEventTable topFiveExtensions() {
@@ -114,7 +118,8 @@ public final class FileEventDAO {
         if (conn == null) {
         } else {
             // SQL String that will grab the top five extensions from the database.
-            final String sql = "SELECT * FROM file_events WHERE file_extension in(SELECT file_extension FROM file_events " +
+            final String sql = "SELECT * FROM file_events WHERE file_extension in(SELECT file_extension FROM file_events "
+                    +
                     "GROUP BY file_extension ORDER BY COUNT(*) DESC LIMIT 5);";
             // Try-with-resources block to automatically close the PreparedStatement.
             try (final PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -140,6 +145,7 @@ public final class FileEventDAO {
 
     /**
      * Retrieves the most common event types per extension from the database.
+     * 
      * @return A table of the most common event types per extension.
      */
     public static final FWEventTable mostCommonEventsPerExtension() {
@@ -149,9 +155,9 @@ public final class FileEventDAO {
         } else {
             // SQL String that will grab the most common event types per extension.
             final String sql = "SELECT file_extension, event_type, COUNT(*) as event_count " +
-                   "FROM file_events " +
-                   "GROUP BY file_extension, event_type " +
-                   "ORDER BY COUNT(event_type), file_extension ASC;";
+                    "FROM file_events " +
+                    "GROUP BY file_extension, event_type " +
+                    "ORDER BY COUNT(event_type), file_extension ASC;";
 
             // Try-with-resources block to automatically close the PreparedStatement.
             try (final PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -177,6 +183,7 @@ public final class FileEventDAO {
 
     /**
      * Retrieves information about specific extensions from the database.
+     * 
      * @param theList The list of extensions to query.
      * @return A table of file events with the specified extensions.
      */
@@ -219,7 +226,9 @@ public final class FileEventDAO {
     }
 
     /**
-     * Retrieves variety of data based on what the user manually querys in the query window.
+     * Retrieves variety of data based on what the user manually querys in the query
+     * window.
+     * 
      * @param theChoice The choice of what to query.
      * @param theFilter The filter to apply to the query.
      * @return A table of file events based on the user's query.
@@ -238,7 +247,7 @@ public final class FileEventDAO {
                 theFilter = "%" + theFilter + "%";
             } else if (theChoice.equals("event_date")) {
                 String[] dates = theFilter.split(" to");
-                if(dates.length == 2) {
+                if (dates.length == 2) {
                     startDate = dates[0].trim();
                     endDate = dates[1].trim();
                 }
@@ -259,13 +268,13 @@ public final class FileEventDAO {
                 final ResultSet resultElements = pstmt.executeQuery();
                 while (resultElements.next()) {
                     FileEvent theEvent = new FileEvent(
-                        resultElements.getString("file_name"),
-                        resultElements.getString("file_path"),
-                        resultElements.getString("event_type"),
-                        resultElements.getString("file_extension"),
-                        resultElements.getString("event_date"),
-                        resultElements.getString("event_time"));
-    
+                            resultElements.getString("file_name"),
+                            resultElements.getString("file_path"),
+                            resultElements.getString("event_type"),
+                            resultElements.getString("file_extension"),
+                            resultElements.getString("event_date"),
+                            resultElements.getString("event_time"));
+
                     theResultsTable.addEvent(theEvent);
                 }
             } catch (final SQLException e) {
@@ -288,7 +297,7 @@ public final class FileEventDAO {
         final String sql = "DELETE FROM file_events";
 
         try (final PreparedStatement pstmt = conn.prepareStatement(sql)) {
-           // final int rowsDeleted = pstmt.executeUpdate();
+            pstmt.executeUpdate();
         } catch (final SQLException e) {
             e.printStackTrace();
             System.out.println("Error deleting rows from the database.");
