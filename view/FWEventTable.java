@@ -21,7 +21,7 @@ public final class FWEventTable extends JPanel {
     /** The sorter for handling file event sorting */
     private final TableRowSorter<DefaultTableModel> mySorter;
     /** Array of default column widths for the JTable. */
-    private static int[] MY_DEFAULT_COLUMN_WIDTHS = { 110, 250, 60, 50, 90, 90 }; // Default column widths for the table
+    private static final int[] MY_DEFAULT_COLUMN_WIDTHS = { 110, 250, 60, 50, 90, 90 }; // Default column widths for the table
 
     /**
      * Constructor for the FWEventTable. This will create the table and set up the
