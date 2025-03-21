@@ -1204,14 +1204,15 @@ public final class FWGUI implements ActionListener {
             writer.println(
                     "Export Date: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             writer.println();
-            writer.println("File Name,File Path,Event Type,Extension,Event Time");
+            writer.println("File Name,File Path,Event Type,Extension,Event Date,Event Time");
 
             for (final FileEvent event : events) {
-                writer.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n",
+                writer.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n",
                         event.getFileName(),
                         event.getFilePath(),
                         event.getEventType(),
                         event.getExtension(),
+                        event.getEventDate(),
                         event.getEventTime());
             }
 
