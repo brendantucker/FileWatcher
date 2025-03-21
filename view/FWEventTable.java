@@ -21,7 +21,9 @@ public final class FWEventTable extends JPanel {
     /** The sorter for handling file event sorting */
     private final TableRowSorter<DefaultTableModel> mySorter;
     /** Array of default column widths for the JTable. */
-    private static final int[] MY_DEFAULT_COLUMN_WIDTHS = { 110, 250, 60, 50, 90, 90 }; // Default column widths for the table
+    private static final int[] MY_DEFAULT_COLUMN_WIDTHS = { 110, 250, 60, 50, 90, 90 }; 
+
+    private static final String[] MY_COLUMN_NAMES = { "File Name", "File Path", "Event Type", "Extension", "Date", "Time" };
 
     /**
      * Constructor for the FWEventTable. This will create the table and set up the
@@ -29,9 +31,9 @@ public final class FWEventTable extends JPanel {
      */
     public FWEventTable() {
         super(new BorderLayout()); // Ensure that the panel is using a BorderLayout.
-        final String[] myColumnNames = { "File Name", "File Path", "Event Type", "Extension", "Date", "Time" };
+        
 
-        myTableModel = new DefaultTableModel(myColumnNames, 0) {
+        myTableModel = new DefaultTableModel(MY_COLUMN_NAMES, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -53,7 +55,7 @@ public final class FWEventTable extends JPanel {
         scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(15, Integer.MAX_VALUE)); // Set vertical scrollbar width
 
         // Add preferred (default) widths to columns
-        for (int i = 0; i < myColumnNames.length; i++) {
+        for (int i = 0; i < MY_COLUMN_NAMES.length; i++) {
             myEventTable.getColumnModel().getColumn(i).setPreferredWidth(MY_DEFAULT_COLUMN_WIDTHS[i]);
         }
 
@@ -93,7 +95,7 @@ public final class FWEventTable extends JPanel {
      * Updates the table with information stored in the data arraylist.
      */
     public final void updateTable() {
-        for (FileEvent event : myData) {
+        for (final FileEvent event : myData) {
             myTableModel.addRow(new Object[] {
                     event.getFileName(),
                     event.getFilePath(),
@@ -117,7 +119,7 @@ public final class FWEventTable extends JPanel {
      * Filters the table by the extension of the file.
      * @param theFilter The extension to filter by.
      */
-    public final void filterByExtension(String theFilter) {
+    public final void filterByExtension(final String theFilter) {
         myTableModel.setRowCount(0);
         if (!theFilter.equals("All Extensions")) {
             for (FileEvent event : myData) {

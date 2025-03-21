@@ -379,7 +379,7 @@ public final class FWGUI implements ActionListener {
         myFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         myFrame.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent e) {
                 handleExit();
             }
         });
@@ -650,13 +650,13 @@ public final class FWGUI implements ActionListener {
         // Start Date Picker
         final JLabel startLabel = new JLabel("Start Date:");
         final JSpinner startSpinner = new JSpinner(new SpinnerDateModel());
-        JSpinner.DateEditor startEditor = new JSpinner.DateEditor(startSpinner, "yyyy-MM-dd");
+        final JSpinner.DateEditor startEditor = new JSpinner.DateEditor(startSpinner, "yyyy-MM-dd");
         startSpinner.setEditor(startEditor);
     
         // End Date Picker
         final JLabel endLabel = new JLabel("End Date:");
         final JSpinner endSpinner = new JSpinner(new SpinnerDateModel());
-        JSpinner.DateEditor endEditor = new JSpinner.DateEditor(endSpinner, "yyyy-MM-dd");
+        final JSpinner.DateEditor endEditor = new JSpinner.DateEditor(endSpinner, "yyyy-MM-dd");
         endSpinner.setEditor(endEditor);
     
         // Add components to the panel
@@ -665,12 +665,12 @@ public final class FWGUI implements ActionListener {
         panel.add(endLabel);
         panel.add(endSpinner);
     
-        int option = JOptionPane.showConfirmDialog(null, panel, "Select Date Range", JOptionPane.OK_CANCEL_OPTION);
+        final int option = JOptionPane.showConfirmDialog(null, panel, "Select Date Range", JOptionPane.OK_CANCEL_OPTION);
         myQueryTable.clearTable();
     
         if (option == JOptionPane.OK_OPTION) {
-            String startDate = startEditor.getFormat().format(startSpinner.getValue());
-            String endDate = endEditor.getFormat().format(endSpinner.getValue());
+            final String startDate = startEditor.getFormat().format(startSpinner.getValue());
+            final String endDate = endEditor.getFormat().format(endSpinner.getValue());
             return startDate + " to " + endDate; // Return selected date range as a formatted string
         }
     
@@ -707,7 +707,7 @@ public final class FWGUI implements ActionListener {
         myManualQueryLabel.setVisible(false);
         myEventActivityDropdown.setVisible(false);
         // Erasing the selected checkboxes as a precaution
-        for (JCheckBox checkBox : myExtensionCheckBox) {
+        for (final JCheckBox checkBox : myExtensionCheckBox) {
             checkBox.setSelected(false);
         }
     }
@@ -726,7 +726,7 @@ public final class FWGUI implements ActionListener {
     private final void queryWindow() {
         myQueryFrame = new FWFrame();
         myQueryFrame.queryFrameSize(.8, .3);
-        ImageIcon icon = new ImageIcon("files/appIcon.png");
+        final ImageIcon icon = new ImageIcon("files/appIcon.png");
         myQueryFrame.setIconImage(icon.getImage());
         myQueryFrame.setLocationRelativeTo(null);
         myQueryFrame.setTitle("Query Window");
@@ -795,7 +795,7 @@ public final class FWGUI implements ActionListener {
      */
     private final void writeToDatabaseHelper() {
         if (DatabaseConnection.getMyConnection() == null) {
-            int choice = JOptionPane.showConfirmDialog(
+            final int choice = JOptionPane.showConfirmDialog(
                     myFrame,
                     "Database is not connected. Would you like to connect now?",
                     "Database Not Connected",
@@ -883,8 +883,8 @@ public final class FWGUI implements ActionListener {
      * @return String representation of the current date
      */
     private final String createDateString() {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        final LocalDateTime now = LocalDateTime.now();
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return now.format(formatter);
     }
 
@@ -894,8 +894,8 @@ public final class FWGUI implements ActionListener {
      * @return String representation of the current time.
      */
     private final String createTimeString() {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        final LocalDateTime now = LocalDateTime.now();
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         return now.format(formatter);
     }
 
@@ -908,7 +908,7 @@ public final class FWGUI implements ActionListener {
         try {
             myDirectoryWatchService = new DirectoryWatchService(myDirectoryField.getText(), this);
             myDirectoryWatchService.start();
-        } catch (IOException | NullPointerException e) {
+        } catch (final IOException | NullPointerException e) {
             JOptionPane.showMessageDialog(null, "\"" + myDirectoryField.getText() + "\" is not a valid directory",
                     "Invalid Directory Error", JOptionPane.ERROR_MESSAGE);
             myIsMonitoring = false;
@@ -1136,7 +1136,7 @@ public final class FWGUI implements ActionListener {
             writer.println();
             writer.println("File Name,File Path,Event Type,Extension,Event Time");
 
-            for (FileEvent event : events) {
+            for (final FileEvent event : events) {
                 writer.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n",
                         event.getFileName(),
                         event.getFilePath(),
@@ -1147,7 +1147,7 @@ public final class FWGUI implements ActionListener {
 
             JOptionPane.showMessageDialog(myFrame, "Export successful: " + filePath, "Export Complete",
                     JOptionPane.INFORMATION_MESSAGE);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             JOptionPane.showMessageDialog(myFrame, "Error writing to file.", "Export Failed",
                     JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();

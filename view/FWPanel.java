@@ -1,5 +1,18 @@
-import java.awt.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 /**
  * This class represents the panel that will be used in the File Watcher GUI.
@@ -51,11 +64,11 @@ public final class FWPanel extends JPanel {
      * @return The query panel popup for the GUI.
      */
     public final JPanel FWQueryPanel() {
-        JPanel queryPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints queryGBC = new GridBagConstraints();
+        final JPanel queryPanel = new JPanel(new GridBagLayout());
+        final GridBagConstraints queryGBC = new GridBagConstraints();
         queryGBC.insets = new Insets(5, 5, 5, 5);
 
-        JLabel queryLabel = new JLabel("Query to Select: ");
+        final JLabel queryLabel = new JLabel("Query to Select: ");
         queryPanelGBC(queryGBC, 0, 0, 0.0);
         queryPanel.add(queryLabel, queryGBC);
 
@@ -250,7 +263,7 @@ public final class FWPanel extends JPanel {
      * @return The button with the given text in the modern design.
      */
     private final JButton createModernButton(String text) {
-        JButton button = new JButton(text);
+        final JButton button = new JButton(text);
         button.setFocusPainted(false);
         button.setBackground(new Color(50, 50, 50));
         button.setForeground(Color.WHITE);

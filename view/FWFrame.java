@@ -31,8 +31,8 @@ public final class FWFrame extends JFrame {
     public final JFrame frameOutline() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
+        } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+            System.out.println("Failed to set look and feel. Reverting to default swing look.");
         }
 
         // Setting up the frame and adjusting it to be 70% of the screens dimensions.
@@ -40,7 +40,7 @@ public final class FWFrame extends JFrame {
         fileFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Set the icon for the frame.
-        ImageIcon icon = new ImageIcon("files/appIcon.png");
+        final ImageIcon icon = new ImageIcon("files/appIcon.png");
         fileFrame.setIconImage(icon.getImage());
 
         fileFrame.setSize((int) (SCREEN_WIDTH * HORIZONTAL_SCALE), (int) (SCREEN_HEIGHT * VERTICAL_SCALE));

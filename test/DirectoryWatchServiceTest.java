@@ -2,12 +2,14 @@ import static org.junit.Assert.*;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import org.junit.*;
 
@@ -19,9 +21,11 @@ public class DirectoryWatchServiceTest {
     private static Path testDirectory;
 
     @Before
-    public void setup() throws IOException{
+    public void setup() throws IOException, InvocationTargetException, InterruptedException{
         testDirectory = Files.createTempDirectory("testDir");
-        myGUI = new FWGUI();
+        SwingUtilities.invokeAndWait(() -> { 
+            myGUI = new FWGUI();
+        }); // Ensures GUI components are created on the Event Dispatch Thread (EDT);
         myWatchService = new DirectoryWatchService(testDirectory.toString(), myGUI);
     }
 
@@ -72,7 +76,7 @@ public class DirectoryWatchServiceTest {
         Path testFile = Files.createFile(testDirectory.resolve("testFile.txt"));
 
         // Wait for the watch service to process the event in separate thread
-        Thread.sleep(2000);
+        Thread.sleep(1000);
         FileEvent fileEvent = myGUI.getEventTable().getData().get(0);
         // Verify that the event was added to the event table
         assertEquals(1, myGUI.getEventTable().getData().size());
@@ -96,13 +100,10 @@ public class DirectoryWatchServiceTest {
 
         // Create a new folder in the test directory
         Path testFolder = Files.createDirectory(testDirectory.resolve("NewTestDir"));
+        Thread.sleep(500);
         Path testFile = Files.createFile(testFolder.resolve("testFile.txt"));
         // Increased time to lower test failing chances.
-        Thread.sleep(5000);
-
-        for (FileEvent e : myGUI.getEventTable().getData()) {
-            System.out.println(e.getFileName());
-        }
+        Thread.sleep(500);
 
         assertNotNull(Files.getFileStore(testFile));
         assertEquals(2, myGUI.getEventTable().getData().size());

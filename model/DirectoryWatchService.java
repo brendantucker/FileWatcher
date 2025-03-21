@@ -44,7 +44,7 @@ public final class DirectoryWatchService {
      * @param theGUI The GUI instance it will be connected to
      * @throws IOException Thrown when chosen directory is invalid
      */
-    public DirectoryWatchService(String theDirectory, FWGUI theGUI) throws IOException {
+    public DirectoryWatchService(final String theDirectory, final FWGUI theGUI) throws IOException {
         myDirectory = Path.of(theDirectory);
         if (!Files.isDirectory(myDirectory) || myDirectory.toString() == "") { // Guard against invalid directory
             throw new IOException();
@@ -74,7 +74,7 @@ public final class DirectoryWatchService {
         }
         myRunning = true;
 
-        /* Run the file watching service in a separate thread to avoid blocking the GUI, this is an extra precaution
+        /* Run the file watching service in a separate thread to avoid blocking the GUI, this is
         in addition to using the take method of myWatchService to block until an event is available.*/
         myWatchThread = new Thread(() -> {
             try {
@@ -87,15 +87,15 @@ public final class DirectoryWatchService {
             // Loop to watch for events until stop() is called
             while (myRunning && myGUI.isMonitoring()) {
                 try {
-                    WatchKey key = myWatchService.take(); // Forces the thread to wait until new events occur
+                    final WatchKey key = myWatchService.take(); // Forces the thread to wait until new events occur
                     for (WatchEvent<?> event : key.pollEvents()) {
-                        Path eventPath = ((Path) key.watchable()).resolve((Path) event.context());
+                        final Path eventPath = ((Path) key.watchable()).resolve((Path) event.context());
                         if (Files.isDirectory(eventPath)) { // Register the new folder with WatchService if it is a directory
                             try {
                                 eventPath.register(myWatchService, StandardWatchEventKinds.ENTRY_CREATE,
                                         StandardWatchEventKinds.ENTRY_DELETE,
                                         StandardWatchEventKinds.ENTRY_MODIFY);
-                            } catch (IOException e) {
+                            } catch (final IOException e) {
                                 invalidDirectoryError();
                             }
                         }
@@ -146,7 +146,7 @@ public final class DirectoryWatchService {
             myWatchThread.interrupt(); // Stop the thread watching for file events
             try {
                 myWatchThread.join(); // Wait for myWatchThread to finish shutting down
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt(); // Restore the interrupted status
             }
         }
@@ -188,7 +188,7 @@ public final class DirectoryWatchService {
             }
     
             @Override
-            public FileVisitResult visitFileFailed(final Path file, final IOException theException) throws IOException {
+            public FileVisitResult visitFileFailed(final Path file, final IOException theException) {
                 if (theException instanceof AccessDeniedException) {
                     //System.err.println("Access denied to file: " + file);
                     return FileVisitResult.CONTINUE; // Skip the file
@@ -212,8 +212,8 @@ public final class DirectoryWatchService {
             return "folder";
         }
 
-        String fileName = theEvent.context().toString();
-        int lastIndexOfDot = fileName.lastIndexOf('.');
+        final String fileName = theEvent.context().toString();
+        final int lastIndexOfDot = fileName.lastIndexOf('.');
         if (lastIndexOfDot == -1) {
             return "none"; // No extension found or folder
         }
@@ -226,8 +226,8 @@ public final class DirectoryWatchService {
      * @return String representation of the current date
      */
     private final String createDateString() {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        final LocalDateTime now = LocalDateTime.now();
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return now.format(formatter);
     }
 
@@ -237,8 +237,8 @@ public final class DirectoryWatchService {
      * @return String representation of the current time.
      */
     private final String createTimeString() {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        final LocalDateTime now = LocalDateTime.now();
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         return now.format(formatter);
     }
 
@@ -249,7 +249,7 @@ public final class DirectoryWatchService {
      * @return Formatted event type string
      */
     private final String eventTypeFormatter(final WatchEvent.Kind<?>  theEvent) {
-        String eventType = theEvent.toString();
+        final String eventType = theEvent.toString();
         if (eventType.equals("ENTRY_CREATE")) {
             return "CREATED";
         } else if (eventType.equals("ENTRY_DELETE")) {
