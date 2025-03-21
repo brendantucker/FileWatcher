@@ -59,8 +59,6 @@ public final class FWGUI implements ActionListener {
     private JMenuItem myMenuStart;
     // Stop button in menu.
     private JMenuItem myMenuStop;
-    // Constant to set the split pane resize weight.
-    private final double SPLIT_PANE_RESIZE_WEIGHT = 0.2;
     // Event table to display file events.
     private final FWEventTable myEventTable;
     // Event table to display the file events in the query window.
@@ -104,13 +102,16 @@ public final class FWGUI implements ActionListener {
     // JCheckBox array for the query window.
     private JCheckBox[] myExtensionCheckBox;
     // Secondary panel inside the query window for displaying information.
-    final private JPanel mySecondQueryPanel;
+    private final JPanel mySecondQueryPanel;
+    // Query option for the file menu dropdown.
+    private JMenuItem myFileQueryItem;
     // Instance of the GUI.
     private static FWGUI myFWGUIInstance;
     // Constant string for the custom extension.
-    private static final String CUSTOM_EXTENSION_STRING = "Custom extension";
-    // Query option for the file menu dropdown.
-    private JMenuItem myFileQueryItem;
+    private static final String MY_CUSTOM_EXTENSION_STRING = "Custom extension";
+    // Constant to set the split pane resize weight.
+    private final double MY_SPLIT_PANE_RESIZE_WEIGHT = 0.2;
+
 
     /*
      * Constructor for the GUI. This will create the GUI and set up the menu bar.
@@ -154,7 +155,7 @@ public final class FWGUI implements ActionListener {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 Object theDropdowObject = myExtensionComboBox.getSelectedItem();
-                if (theDropdowObject.equals(CUSTOM_EXTENSION_STRING)) {
+                if (theDropdowObject.equals(MY_CUSTOM_EXTENSION_STRING)) {
                     myExtensionComboBox.setEditable(true);
                 } else {
                     myExtensionComboBox.setEditable(false);
@@ -374,7 +375,7 @@ public final class FWGUI implements ActionListener {
         final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myMainPanel, myEventTable);
         final JSplitPane outerSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, splitPane, mySecondQueryPanel);
 
-        splitPane.setResizeWeight(SPLIT_PANE_RESIZE_WEIGHT);
+        splitPane.setResizeWeight(MY_SPLIT_PANE_RESIZE_WEIGHT);
         splitPane.setDividerSize(0);
         outerSplitPane.setResizeWeight(1); // Give maximum space to event table (1)
         outerSplitPane.setDividerSize(0);
@@ -666,7 +667,7 @@ public final class FWGUI implements ActionListener {
      */
     private final void handleExtensionSelection() {
         if (!myExtensionField.getText().isEmpty()
-                && !myExtensionComboBox.getSelectedItem().equals(CUSTOM_EXTENSION_STRING)) {
+                && !myExtensionComboBox.getSelectedItem().equals(MY_CUSTOM_EXTENSION_STRING)) {
             checkFields();
             myFilteringOn = true;
             if (myExtensionComboBox.getSelectedItem().equals("All extensions")) {
@@ -809,7 +810,7 @@ public final class FWGUI implements ActionListener {
 
         final JSplitPane middleQueryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myQueryCheckBoxPanel,
                 myQueryTable);
-        middleQueryPane.setResizeWeight(SPLIT_PANE_RESIZE_WEIGHT);
+        middleQueryPane.setResizeWeight(MY_SPLIT_PANE_RESIZE_WEIGHT);
         middleQueryPane.setDividerSize(2);
 
         // Create Export Button
@@ -817,7 +818,7 @@ public final class FWGUI implements ActionListener {
         myExportCSVButton.addActionListener(this);
 
         final JSplitPane queryPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryGUI, middleQueryPane);
-        queryPane.setResizeWeight(SPLIT_PANE_RESIZE_WEIGHT);
+        queryPane.setResizeWeight(MY_SPLIT_PANE_RESIZE_WEIGHT);
         queryPane.setDividerSize(0);
 
         // Add the JSplitPane to the frame
@@ -1157,7 +1158,7 @@ public final class FWGUI implements ActionListener {
         }
         final boolean hasDirectory = !myDirectoryField.getText().trim().isEmpty();
         final boolean hasExtension = !myExtensionField.getText().trim().isEmpty()
-                && !myExtensionField.getText().equals(CUSTOM_EXTENSION_STRING);
+                && !myExtensionField.getText().equals(MY_CUSTOM_EXTENSION_STRING);
         final boolean hasDatabase = myDatabaseActive;
 
         final boolean enableStart = (hasDirectory && hasExtension) || hasDatabase;
