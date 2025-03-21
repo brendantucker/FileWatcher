@@ -108,6 +108,8 @@ public final class FWGUI implements ActionListener {
     private static FWGUI myFWGUIInstance;
     // Constant string for the custom extension.
     private static final String CUSTOM_EXTENSION_STRING = "Custom extension";
+    // Query option for the file menu dropdown.
+    private JMenuItem myFileQueryItem;
 
     /*
      * Constructor for the GUI. This will create the GUI and set up the menu bar.
@@ -211,13 +213,15 @@ public final class FWGUI implements ActionListener {
         myDatabaseConnectionLabel = new JLabel("Database not connected.");
         myMenuStart = new JMenuItem("Start");
         myMenuStop = new JMenuItem("Stop");
-        final JMenuItem queryItem = new JMenuItem("Query Database(file extension)");
+        myFileQueryItem = new JMenuItem("Query Database(file extension)");
+        myFileQueryItem.setEnabled(false);
+        myFileQueryItem.addActionListener(this);
         final JMenuItem closeItem = new JMenuItem("Close");
         myMenuStart.setEnabled(false);
         myMenuStop.setEnabled(false);
         fileMenu.add(myMenuStart);
         fileMenu.add(myMenuStop);
-        fileMenu.add(queryItem);
+        fileMenu.add(myFileQueryItem);
         fileMenu.add(closeItem);
         closeItem.addActionListener(this);
         myMenuBar.add(fileMenu);
@@ -497,7 +501,7 @@ public final class FWGUI implements ActionListener {
         else if (source.equals(myWriteDbButton) || source.equals(myImgDBButton)) {
             writeToDatabaseHelper();
         } // Query window popup
-        else if (source.equals(myQueryButton)) {
+        else if (source.equals(myQueryButton) || source.equals(myFileQueryItem)) {
             queryWindow();
             myQueryTable.clearTable();
         } // User is using pre-designed queries.
@@ -1238,6 +1242,7 @@ public final class FWGUI implements ActionListener {
     public final void setDatabaseConnected(final boolean theValue) {
         myWriteDbButton.setEnabled(theValue);
         myQueryButton.setEnabled(theValue);
+        myFileQueryItem.setEnabled(theValue);
     }
 
     /**
