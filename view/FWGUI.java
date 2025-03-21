@@ -215,7 +215,7 @@ public final class FWGUI implements ActionListener {
         myDatabaseConnectionLabel = new JLabel("Database not connected.");
         myMenuStart = new JMenuItem("Start");
         myMenuStop = new JMenuItem("Stop");
-        myFileQueryItem = new JMenuItem("Query Database(file extension)");
+        myFileQueryItem = new JMenuItem("Query Database");
         myFileQueryItem.setEnabled(false);
         myFileQueryItem.addActionListener(this);
         final JMenuItem closeItem = new JMenuItem("Close");
