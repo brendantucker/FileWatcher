@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -138,6 +139,8 @@ public final class FWGUI implements ActionListener {
      */
     private final void setUpButtons() {
         myExtensionComboBox = myMainPanel.getExtensionBox();
+        myExtensionComboBox.setPreferredSize(new Dimension(200, myExtensionComboBox.getPreferredSize().height));
+        
         // Adding action listener into the extension combobox.
         myExtensionComboBox.addItemListener(new ItemListener() {
             @Override

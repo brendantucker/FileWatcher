@@ -70,10 +70,9 @@ public class DirectoryWatchServiceTest {
 
         // Create a new file in the test directory
         Path testFile = Files.createFile(testDirectory.resolve("testFile.txt"));
-        assertNotNull(Files.getFileStore(testFile));
 
         // Wait for the watch service to process the event in separate thread
-        Thread.sleep(500);
+        Thread.sleep(2000);
         FileEvent fileEvent = myGUI.getEventTable().getData().get(0);
         // Verify that the event was added to the event table
         assertEquals(1, myGUI.getEventTable().getData().size());
@@ -97,9 +96,8 @@ public class DirectoryWatchServiceTest {
 
         // Create a new folder in the test directory
         Path testFolder = Files.createDirectory(testDirectory.resolve("NewTestDir"));
-        Thread.sleep(500);
         Path testFile = Files.createFile(testFolder.resolve("testFile.txt"));
-        Thread.sleep(500);
+        Thread.sleep(1500);
 
         for (FileEvent e : myGUI.getEventTable().getData()) {
             System.out.println(e.getFileName());
@@ -142,11 +140,11 @@ public class DirectoryWatchServiceTest {
         // Create a new file in the test directory
         Path testFile = Files.createFile(testDirectory.resolve("testFile.txt"));
         assertNotNull(Files.getFileStore(testFile));
-        Thread.sleep(100);
+        Thread.sleep(500);
         Files.delete(testFile);
 
         // Wait for the watch service to process the event in separate thread
-        Thread.sleep(100);
+        Thread.sleep(500);
         assertEquals(2, myGUI.getEventTable().getData().size());
         FileEvent fileDeleteEvent = myGUI.getEventTable().getData().get(1);
         

@@ -4,6 +4,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.ArrayList;
 
 /**
@@ -20,8 +21,7 @@ public final class FWEventTable extends JPanel {
     /** The sorter for handling file event sorting */
     private final TableRowSorter<DefaultTableModel> mySorter;
     /** Array of default column widths for the JTable. */
-    private final int[] MY_DEFAULT_COLUMN_WIDTHS = { 100, 250, 50, 25, 100, 100 }; // Default column widths for the
-                                                                                   // table.
+    private static int[] MY_DEFAULT_COLUMN_WIDTHS = { 110, 250, 60, 50, 90, 90 }; // Default column widths for the table
 
     /**
      * Constructor for the FWEventTable. This will create the table and set up the
@@ -50,7 +50,7 @@ public final class FWEventTable extends JPanel {
 
         // Create a scroll pane for the table
         final JScrollPane scrollPane = new JScrollPane(myEventTable);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(15, Integer.MAX_VALUE)); // Set vertical scrollbar width
 
         // Add preferred (default) widths to columns
         for (int i = 0; i < myColumnNames.length; i++) {

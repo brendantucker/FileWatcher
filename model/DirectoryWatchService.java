@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -73,13 +74,11 @@ public final class DirectoryWatchService {
         }
         myRunning = true;
 
-        // Run the file watching service in a separate thread to avoid blocking the GUI,
-        // this is an extra precaution
-        // in addition to using the take method of myWatchService to block until an
-        // event is available.
+        /* Run the file watching service in a separate thread to avoid blocking the GUI, this is an extra precaution
+        in addition to using the take method of myWatchService to block until an event is available.*/
         myWatchThread = new Thread(() -> {
             try {
-                registerAllFolders(myDirectory); // Add all folders in the directory to the watch service
+                registerAllFolders(myDirectory); // Add all subfolders in the directory to the watch service
             } catch (final IOException e) {
                 myRunning = false;
                 return;
@@ -90,11 +89,8 @@ public final class DirectoryWatchService {
                 try {
                     WatchKey key = myWatchService.take(); // Forces the thread to wait until new events occur
                     for (WatchEvent<?> event : key.pollEvents()) {
-                        // Note: Resolve method combines base path (key.watchable) with relative path
-                        // (event.context) to form full path to event
                         Path eventPath = ((Path) key.watchable()).resolve((Path) event.context());
-                        if (Files.isDirectory(eventPath)) { // Register the new folder with WatchService if it is a
-                                                            // directory
+                        if (Files.isDirectory(eventPath)) { // Register the new folder with WatchService if it is a directory
                             try {
                                 eventPath.register(myWatchService, StandardWatchEventKinds.ENTRY_CREATE,
                                         StandardWatchEventKinds.ENTRY_DELETE,
@@ -103,8 +99,7 @@ public final class DirectoryWatchService {
                                 invalidDirectoryError();
                             }
                         }
-                        // Filter out modify directory events -- this kind of event is created any time
-                        // the contents of a directory change
+                        // Filter out modify directory events -- this kind of event is created any time the contents of a directory change
                         if (!Files.isDirectory(eventPath) || event.kind() != StandardWatchEventKinds.ENTRY_MODIFY) {
                             myEventTable.addEvent(new FileEvent(event.context().toString(),
                                     eventPath.toString(),
@@ -143,12 +138,17 @@ public final class DirectoryWatchService {
             if (myWatchService != null) {
                 myWatchService.close();
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             JOptionPane.showMessageDialog(null, "I/O Error: Could not close watch service!", "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
         if (myWatchThread != null) {
             myWatchThread.interrupt(); // Stop the thread watching for file events
+            try {
+                myWatchThread.join(); // Wait for myWatchThread to finish shutting down
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // Restore the interrupted status
+            }
         }
         myWatchThread = null;
     }
@@ -165,26 +165,38 @@ public final class DirectoryWatchService {
      * Helper method which registers all subfolders in the directory with the watch
      * service.
      * 
-     * @param theStartPath
+     * @param theStartPath The starting path to register folders from
      * @throws IOException
      */
     private final void registerAllFolders(final Path theStartPath) throws IOException {
-        try {
-            Files.walkFileTree(theStartPath, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult preVisitDirectory(Path theDir, BasicFileAttributes theAttrs) throws IOException {
+        Files.walkFileTree(theStartPath, new SimpleFileVisitor<Path>() {
+            @Override
+            // Contains logic for registering visited directories with the watch service. Catches exceptions for access denied and IO exceptions.
+            public FileVisitResult preVisitDirectory(Path theDir, BasicFileAttributes theAttrs) throws IOException {
+                try {
                     theDir.register(myWatchService, StandardWatchEventKinds.ENTRY_CREATE,
                             StandardWatchEventKinds.ENTRY_DELETE,
                             StandardWatchEventKinds.ENTRY_MODIFY);
-                    return FileVisitResult.CONTINUE;
+                } catch (final AccessDeniedException e) {
+                    // System.err.println("Access denied to directory: " + theDir);
+                    return FileVisitResult.SKIP_SUBTREE; // Skip the directory
+                } catch (final IOException e) {
+                    // System.err.println("Error registering directory: " + theDir + " - " + e.getMessage());
+                    return FileVisitResult.SKIP_SUBTREE; // Skip the directory
                 }
-            });
-        } catch (final IOException theException) {
-            // Warn user of error and stop the watch service
-            JOptionPane.showMessageDialog(null, "Error registering folders: " + theException.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            stop();
-        }
+                return FileVisitResult.CONTINUE;
+            }
+    
+            @Override
+            public FileVisitResult visitFileFailed(final Path file, final IOException theException) throws IOException {
+                if (theException instanceof AccessDeniedException) {
+                    //System.err.println("Access denied to file: " + file);
+                    return FileVisitResult.CONTINUE; // Skip the file
+                }
+                //System.err.println("Error visiting file: " + file + " - " + theException.getMessage());
+                return FileVisitResult.CONTINUE; // Skip the file
+            }
+        });
     }
 
     /**

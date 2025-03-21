@@ -1,7 +1,10 @@
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  * This class is used to create the frame for the File Watcher GUI.
@@ -26,11 +29,20 @@ public final class FWFrame extends JFrame {
      * @return The frame for the main window.
      */
     public final JFrame frameOutline() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
+
         // Setting up the frame and adjusting it to be 70% of the screens dimensions.
         final JFrame fileFrame = new JFrame("TCSS 360 - File Watcher");
         fileFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // fileFrame.setSize((int) (SCREEN_WIDTH * SCALE), (int) (SCREEN_HEIGHT *
-        // SCALE));
+
+        // Set the icon for the frame.
+        ImageIcon icon = new ImageIcon("files/appIcon.png");
+        fileFrame.setIconImage(icon.getImage());
+
         fileFrame.setSize((int) (SCREEN_WIDTH * HORIZONTAL_SCALE), (int) (SCREEN_HEIGHT * VERTICAL_SCALE));
 
         // Centering the frame on program start.
