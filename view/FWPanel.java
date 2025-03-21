@@ -51,6 +51,12 @@ public final class FWPanel extends JPanel {
      * @return The query panel popup for the GUI.
      */
     public final JPanel FWQueryPanel() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
+        
         JPanel queryPanel = new JPanel(new GridBagLayout());
         GridBagConstraints queryGBC = new GridBagConstraints();
         queryGBC.insets = new Insets(5, 5, 5, 5);
