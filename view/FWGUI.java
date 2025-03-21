@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import javax.swing.Box;
+import javax.swing.ImageIcon;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -724,6 +726,8 @@ public final class FWGUI implements ActionListener {
     private final void queryWindow() {
         myQueryFrame = new FWFrame();
         myQueryFrame.queryFrameSize(.8, .3);
+        ImageIcon icon = new ImageIcon("files/appIcon.png");
+        myQueryFrame.setIconImage(icon.getImage());
         myQueryFrame.setLocationRelativeTo(null);
         myQueryFrame.setTitle("Query Window");
         myQueryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
