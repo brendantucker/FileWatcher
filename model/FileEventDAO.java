@@ -145,6 +145,45 @@ public final class FileEventDAO {
     }
 
     /**
+     * Retrieves the most common event types per extension from the database.
+     * @return A table of the most common event types per extension.
+     */
+    public static final FWEventTable mostCommonEventsPerExtension() {
+        final FWEventTable theResultsTable = new FWEventTable();
+        final Connection conn = DatabaseConnection.getMyConnection();
+        if (conn == null) {
+            System.out.println("Database is not connected!");
+        } else {
+            // SQL String that will grab the most common event types per extension.
+            final String sql = "SELECT file_extension, event_type, COUNT(*) as event_count " +
+                   "FROM file_events " +
+                   "GROUP BY file_extension, event_type " +
+                   "ORDER BY COUNT(event_type), file_extension ASC;";
+
+            // Try-with-resources block to automatically close the PreparedStatement.
+            try (final PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                final ResultSet resultElements = pstmt.executeQuery();
+                // Loop through the results and add them to the table.
+                while (resultElements.next()) {
+                    FileEvent theEvent = new FileEvent(
+                            "", // file_name is not necessary for this query
+                            resultElements.getString("event_count"), // file_path is not necessary for this query
+                            resultElements.getString("event_type"),
+                            resultElements.getString("file_extension"),
+                            "", // event_date not necessary
+                            ""); // event_time not necessary
+
+                    theResultsTable.addEvent(theEvent);
+                }
+            } catch (final SQLException e) {
+                e.printStackTrace();
+                System.out.println("Error querying most common event types per extension.");
+            }
+        }
+        return theResultsTable;
+    }
+
+    /**
      * Retrieves information about specific extensions from the database.
      * @param theList The list of extensions to query.
      * @return A table of file events with the specified extensions.
@@ -190,45 +229,6 @@ public final class FileEventDAO {
     }
 
     /**
-     * Retrieves the most common event types per extension from the database.
-     * @return A table of the most common event types per extension.
-     */
-    public static final FWEventTable mostCommonEventsPerExtension() {
-        final FWEventTable theResultsTable = new FWEventTable();
-        final Connection conn = DatabaseConnection.getMyConnection();
-        if (conn == null) {
-            System.out.println("Database is not connected!");
-        } else {
-            // SQL String that will grab the most common event types per extension.
-            final String sql = "SELECT file_extension, event_type, COUNT(*) as event_count " +
-                    "FROM file_events " +
-                    "GROUP BY file_extension, event_type " +
-                    "ORDER BY event_count DESC;";
-
-            // Try-with-resources block to automatically close the PreparedStatement.
-            try (final PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                final ResultSet resultElements = pstmt.executeQuery();
-                // Loop through the results and add them to the table.
-                while (resultElements.next()) {
-                    FileEvent theEvent = new FileEvent(
-                            "", // file_name is not necessary for this query
-                            "", // file_path is not necessary for this query
-                            resultElements.getString("event_type"),
-                            resultElements.getString("file_extension"),
-                            "", // event_date not necessary
-                            ""); // event_time not necessary
-
-                    theResultsTable.addEvent(theEvent);
-                }
-            } catch (final SQLException e) {
-                e.printStackTrace();
-                System.out.println("Error querying most common event types per extension.");
-            }
-        }
-        return theResultsTable;
-    }
-
-    /**
      * Retrieves variety of data based on what the user manually querys in the query window.
      * @param theChoice The choice of what to query.
      * @param theFilter The filter to apply to the query.
@@ -241,16 +241,19 @@ public final class FileEventDAO {
             System.out.println("Database is not connected!");
         } else {
             String sql = "";
-            String theDate = "";
-            String theTime = "";
+            String startDate = "";
+            String endDate = "";
             // Build the SQL query based on the user's choice.
             if (theChoice.equals("file_name")) {
                 sql = "SELECT * FROM file_events WHERE " + theChoice + " LIKE ?";
                 theFilter = "%" + theFilter + "%";
             } else if (theChoice.equals("event_date")) {
-                theDate = theFilter.substring(0, 10);
-                theTime = theFilter.substring(11);
-                sql = "SELECT * FROM file_events WHERE event_date <= ? AND event_time <= ?";
+                String[] dates = theFilter.split(" to");
+                if(dates.length == 2) {
+                    startDate = dates[0].trim();
+                    endDate = dates[1].trim();
+                }
+                sql = "SELECT * FROM file_events WHERE event_date BETWEEN ? AND ?";
             } else {
                 sql = "SELECT * FROM file_events WHERE " + theChoice + " = ?";
             }
@@ -258,8 +261,8 @@ public final class FileEventDAO {
             try (final PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 // For the "event_date" case, set both date and time as parameters
                 if (theChoice.equals("event_date")) {
-                    pstmt.setString(1, theDate);
-                    pstmt.setString(2, theTime);
+                    pstmt.setString(1, startDate);
+                    pstmt.setString(2, endDate);
                 } else {
                     pstmt.setString(1, theFilter);
                 }

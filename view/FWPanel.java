@@ -71,10 +71,10 @@ public final class FWPanel extends JPanel {
         queryPanel.add(myDatabaseResetButton, queryGBC);
 
         queryPanelGBC(queryGBC, 0, 1, 0.0);
-        queryPanel.add(myManualQueryComboBox, queryGBC);
-        
-        queryPanelGBC(queryGBC, 1, 1, 0.0);
         queryPanel.add(myManualQueryLabel, queryGBC);
+
+        queryPanelGBC(queryGBC, 1, 1, 0.0);
+        queryPanel.add(myManualQueryComboBox, queryGBC);
         
         queryPanelGBC(queryGBC, 2, 1, 0.0);
         queryPanel.add(myPathOrDateText, queryGBC);
@@ -103,7 +103,7 @@ public final class FWPanel extends JPanel {
         myDatabaseResetButton = createModernButton("Reset Database");
         myManualQueryComboBox = new JComboBox<>(
                 new String[] { "Choose file detail", "File Name", "File Extension", "Path to File Location",
-                        "Type of Activity", "Date and Time" });
+                        "Type of Activity", "Between Two Dates" });
         myManualQueryComboBox.setVisible(false);
 
         myEventActivityDropdown = new JComboBox<>(new String[] {"Choose Activity Type","CREATED", "DELETED", "MODIFIED"});

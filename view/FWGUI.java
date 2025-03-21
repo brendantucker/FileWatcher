@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -540,16 +541,19 @@ public final class FWGUI implements ActionListener {
                     .equals("Query 3 - Most Common Events for Each Extension")) {
                 queryResults = FileEventDAO.mostCommonEventsPerExtension();
             } else if (myAutomaticQueryComboBox.getSelectedItem().equals("Manually query")) {
+                changeManualLabelAndButton("Choose Way to Query Database: ", null);
                 myManualQueryComboBox.setVisible(true);
                 queryFrameFixSize();
                 myQueryFrame.pack();
             }
         } // User wants to filter for specific things on their own.
         else if (source.equals(myManualQueryComboBox)) {
+            
             myQueryTable.clearTable();
             resetQueryFrame();
             final Object shortenedManualCombo = myManualQueryComboBox.getSelectedItem();
             if (shortenedManualCombo.equals("File Extension")) {
+                changeManualLabelAndButton("File Extensions to View: ", null);
                 myQueryCheckBoxPanel.setVisible(true);
                 myQueryFrame.pack(); // Resizes the frame to fit the components
                 myQueryFrame.queryFrameSize(.8, .3);
@@ -562,8 +566,8 @@ public final class FWGUI implements ActionListener {
             } else if (shortenedManualCombo.equals("Type of Activity")) {
                 changeManualLabelAndButton("Type of Activity to choose: ", null);
                 myEventActivityDropdown.setVisible(true);
-            } else if (shortenedManualCombo.equals("Date and Time")) {
-                changeManualLabelAndButton("Choose Date and Time: ", "Open Calendar");
+            } else if (shortenedManualCombo.equals("Between Two Dates")) {
+                changeManualLabelAndButton("Choose Dates: ", "Open Calendar");
                 myPathOrDateText.setVisible(true);
             }
             queryFrameFixSize();
@@ -580,8 +584,8 @@ public final class FWGUI implements ActionListener {
             }
         } // If manual query was pushed and the user wants to choose a date and time.
         else if (source.equals(myManualQueryButton)
-                && myManualQueryLabel.getText().equals("Choose Date and Time: ")) {
-            final String selectedDateTime = dateAndTimePicker();
+                && myManualQueryLabel.getText().equals("Choose Dates: ")) {
+            final String selectedDateTime = dateRangePicker();
             myPathOrDateText.setText(selectedDateTime);
             if (!selectedDateTime.isEmpty()) {
                 queryResults = FileEventDAO.manualQueryResults("event_date", selectedDateTime);
@@ -629,7 +633,6 @@ public final class FWGUI implements ActionListener {
             for (FileEvent event : queryResults.getData()) {
                 myQueryTable.addEvent(event);
             }
-            myQueryTable.updateTable();
             queryFrameFixSize();
         }
     }
@@ -639,17 +642,36 @@ public final class FWGUI implements ActionListener {
      * 
      * @return String representation of the selected date and time.
      */
-    private final String dateAndTimePicker() {
-        final JSpinner spinner = new JSpinner(new SpinnerDateModel());
-        final JSpinner.DateEditor editor = new JSpinner.DateEditor(spinner, "yyyy-MM-dd HH:mm");
-        spinner.setEditor(editor);
-
-        final int option = JOptionPane.showConfirmDialog(null, spinner, "Select Date and Time",
-                JOptionPane.OK_CANCEL_OPTION);
+    private final String dateRangePicker() {
+        final JPanel panel = new JPanel(new GridLayout(2, 2));
+    
+        // Start Date Picker
+        final JLabel startLabel = new JLabel("Start Date:");
+        final JSpinner startSpinner = new JSpinner(new SpinnerDateModel());
+        JSpinner.DateEditor startEditor = new JSpinner.DateEditor(startSpinner, "yyyy-MM-dd");
+        startSpinner.setEditor(startEditor);
+    
+        // End Date Picker
+        final JLabel endLabel = new JLabel("End Date:");
+        final JSpinner endSpinner = new JSpinner(new SpinnerDateModel());
+        JSpinner.DateEditor endEditor = new JSpinner.DateEditor(endSpinner, "yyyy-MM-dd");
+        endSpinner.setEditor(endEditor);
+    
+        // Add components to the panel
+        panel.add(startLabel);
+        panel.add(startSpinner);
+        panel.add(endLabel);
+        panel.add(endSpinner);
+    
+        int option = JOptionPane.showConfirmDialog(null, panel, "Select Date Range", JOptionPane.OK_CANCEL_OPTION);
         myQueryTable.clearTable();
+    
         if (option == JOptionPane.OK_OPTION) {
-            return editor.getFormat().format(spinner.getValue()); // Return selected date-time as a String
+            String startDate = startEditor.getFormat().format(startSpinner.getValue());
+            String endDate = endEditor.getFormat().format(endSpinner.getValue());
+            return startDate + " to " + endDate; // Return selected date range as a formatted string
         }
+    
         return ""; // Return empty string if canceled
     }
 
@@ -843,7 +865,6 @@ public final class FWGUI implements ActionListener {
                     for (final FileEvent event : tempQueryResults.getData()) {
                         myQueryTable.addEvent(event);
                     }
-                    myQueryTable.updateTable();
                     queryFrameFixSize();
                 }
             });
