@@ -726,7 +726,7 @@ public final class FWGUI implements ActionListener {
     private final void queryWindow() {
         myQueryFrame = new FWFrame();
         myQueryFrame.queryFrameSize(.8, .3);
-        final ImageIcon icon = new ImageIcon(getClass().getResource("/appIcon.png"));
+        final ImageIcon icon = new ImageIcon("files/appIcon.png");
         myQueryFrame.setIconImage(icon.getImage());
         myQueryFrame.setLocationRelativeTo(null);
         myQueryFrame.setTitle("Query Window");
