@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -61,7 +62,7 @@ public class FileEventDAOTest {
 
     @Test
     public void testFileEventsFromToday() {
-        FileEvent event = new FileEvent("today.txt", "/path/today", "CREATED", ".txt", "2025-03-12", "10:00:00");
+        FileEvent event = new FileEvent("today.txt", "/path/today", "CREATED", ".txt", LocalDate.now().toString(), "10:00:00");
         FileEventDAO.insertFileEvent(event);
 
         FWEventTable result = FileEventDAO.fileEventsFromToday();

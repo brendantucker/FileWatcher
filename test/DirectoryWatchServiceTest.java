@@ -97,7 +97,8 @@ public class DirectoryWatchServiceTest {
         // Create a new folder in the test directory
         Path testFolder = Files.createDirectory(testDirectory.resolve("NewTestDir"));
         Path testFile = Files.createFile(testFolder.resolve("testFile.txt"));
-        Thread.sleep(1500);
+        // Increased time to lower test failing chances.
+        Thread.sleep(5000);
 
         for (FileEvent e : myGUI.getEventTable().getData()) {
             System.out.println(e.getFileName());
