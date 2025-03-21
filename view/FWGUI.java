@@ -65,6 +65,8 @@ public final class FWGUI implements ActionListener {
     private final FWEventTable myEventTable;
     // Event table to display the file events in the query window.
     private final FWEventTable myQueryTable;
+    // Event table for querying the database, used as storage
+    private FWEventTable myQueryResults;
     // Extension types combobox for querying.
     private JComboBox<String> myExtensionComboBox;
     // Different dropdowns in the query window.
@@ -143,7 +145,7 @@ public final class FWGUI implements ActionListener {
     private final void setUpButtons() {
         myExtensionComboBox = myMainPanel.getExtensionBox();
         myExtensionComboBox.setPreferredSize(new Dimension(200, myExtensionComboBox.getPreferredSize().height));
-        
+
         // Adding action listener into the extension combobox.
         myExtensionComboBox.addItemListener(new ItemListener() {
             @Override
@@ -445,7 +447,7 @@ public final class FWGUI implements ActionListener {
         final Object source = theEvent.getSource();
         final String command = theEvent.getActionCommand();
         // Table was necessary to expand its scope in order to be used.
-        FWEventTable queryResults = new FWEventTable();
+        myQueryResults = new FWEventTable();
 
         // Start Monitoring
         if (source.equals(myMenuStart) || source.equals(myDirectoryStartButton) || source.equals(myImgStartButton)) {
@@ -465,54 +467,19 @@ public final class FWGUI implements ActionListener {
         }
         // Connect to Database
         else if (command.equals("Connect to Database")) {
-            boolean success = DatabaseConnection.connect();
-            if (success) {
-                myConnectDbItem.setEnabled(false);
-                myDisconnectDbItem.setEnabled(true);
-                setDatabaseConnected(true);
-                JOptionPane.showMessageDialog(myFrame, "Connected to the database successfully!",
-                        "Database Connection", JOptionPane.INFORMATION_MESSAGE);
-                myDatabaseConnectionLabel.setText("Database connected.");
-            } else {
-                JOptionPane.showMessageDialog(myFrame, "Failed to connect to the database.",
-                        "Database Connection Error", JOptionPane.ERROR_MESSAGE);
-            }
+            handleDatabaseConnection(true);
         }
         // Disconnect from Database
         else if (command.equals("Disconnect Database")) {
-            myConnectDbItem.setEnabled(true);
-            myDisconnectDbItem.setEnabled(false);
-            DatabaseConnection.disconnect();
-            setDatabaseConnected(false);
-            JOptionPane.showMessageDialog(myFrame, "Disconnected from the database.",
-                    "Database Disconnection", JOptionPane.INFORMATION_MESSAGE);
-            myDatabaseConnectionLabel.setText("Database not connected.");
+            handleDatabaseConnection(false);
         }
         // Extension Selection
-        else if (source.equals(myExtensionComboBox) && !myExtensionField.getText().isEmpty()
-                && !myExtensionComboBox.getSelectedItem().equals(CUSTOM_EXTENSION_STRING)) {
-            checkFields();
-            myFilteringOn = true;
-            if (myExtensionComboBox.getSelectedItem().equals("All extensions")) {
-                myEventTable.updateTable();
-                myFilteringOn = false;
-            }
+        else if (source.equals(myExtensionComboBox)) {
+            handleExtensionSelection();
         }
         // Send File via Email
         else if (command.equals("Send File via Email")) {
-            final String recipient = JOptionPane.showInputDialog(myFrame, "Enter recipient email:", "Send Email",
-                    JOptionPane.QUESTION_MESSAGE);
-            if (recipient != null && !recipient.isEmpty()) {
-                JFileChooser fileChooser = new JFileChooser();
-                int returnValue = fileChooser.showOpenDialog(null);
-                if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-                    EmailSender.sendEmailWithAttachment(recipient, "File Watcher Report",
-                            "Please find the attached file.", filePath);
-                    JOptionPane.showMessageDialog(myFrame, "Email Sent Successfully!", "Success",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
+            sendFileViaEmail();
         } // Browse Directory
         else if (source.equals(myDirectoryBrowseButton)) {
             browseDirectory(myDirectoryField);
@@ -531,72 +498,18 @@ public final class FWGUI implements ActionListener {
             myQueryTable.clearTable();
         } // User is using pre-designed queries.
         else if (source.equals(myAutomaticQueryComboBox)) {
-            resetQueryFrame();
-            myManualQueryComboBox.setVisible(false);
-            queryFrameFixSize();
-            if (myAutomaticQueryComboBox.getSelectedItem().equals("Query 1 - All events from today")) {
-                queryResults = FileEventDAO.fileEventsFromToday();
-            } else if (myAutomaticQueryComboBox.getSelectedItem()
-                    .equals("Query 2 - Top 5 frequently modified file types")) {
-                queryResults = FileEventDAO.topFiveExtensions();
-            } else if (myAutomaticQueryComboBox.getSelectedItem()
-                    .equals("Query 3 - Most Common Events for Each Extension")) {
-                queryResults = FileEventDAO.mostCommonEventsPerExtension();
-            } else if (myAutomaticQueryComboBox.getSelectedItem().equals("Manually query")) {
-                changeManualLabelAndButton("Choose Way to Query Database: ", null);
-                myManualQueryComboBox.setVisible(true);
-                queryFrameFixSize();
-                myQueryFrame.pack();
-            }
+            handleAutomaticQueryComboBox();
         } // User wants to filter for specific things on their own.
         else if (source.equals(myManualQueryComboBox)) {
-            
-            myQueryTable.clearTable();
-            resetQueryFrame();
-            final Object shortenedManualCombo = myManualQueryComboBox.getSelectedItem();
-            if (shortenedManualCombo.equals("File Extension")) {
-                changeManualLabelAndButton("File Extensions to View: ", null);
-                myQueryCheckBoxPanel.setVisible(true);
-                myQueryFrame.pack(); // Resizes the frame to fit the components
-                myQueryFrame.queryFrameSize(.8, .3);
-            } else if (shortenedManualCombo.equals("Path to File Location")) {
-                changeManualLabelAndButton("File Pathway: ", "Browse Directories");
-                myPathOrDateText.setVisible(true);
-            } else if (shortenedManualCombo.equals("File Name")) {
-                changeManualLabelAndButton("File Name to Search: ", "Search");
-                myFileNameText.setVisible(true);
-            } else if (shortenedManualCombo.equals("Type of Activity")) {
-                changeManualLabelAndButton("Type of Activity to choose: ", null);
-                myEventActivityDropdown.setVisible(true);
-            } else if (shortenedManualCombo.equals("Between Two Dates")) {
-                changeManualLabelAndButton("Choose Dates: ", "Open Calendar");
-                myPathOrDateText.setVisible(true);
-            }
-            queryFrameFixSize();
-        } // Manual querying based on the file pathway.
-        else if (source.equals(myManualQueryButton) && myManualQueryLabel.getText().equals("File Pathway: ")) {
-            browseDirectory(myPathOrDateText);
-            if (!myPathOrDateText.getText().isEmpty()) {
-                queryResults = FileEventDAO.manualQueryResults("file_path", myPathOrDateText.getText());
-            }
-        } // Manual querying based on the file name.
-        else if (source.equals(myManualQueryButton) && myManualQueryLabel.getText().equals("File Name to Search: ")) {
-            if (!myFileNameText.getText().equals("")) {
-                queryResults = FileEventDAO.manualQueryResults("file_name", myFileNameText.getText());
-            }
-        } // If manual query was pushed and the user wants to choose a date and time.
-        else if (source.equals(myManualQueryButton)
-                && myManualQueryLabel.getText().equals("Choose Dates: ")) {
-            final String selectedDateTime = dateRangePicker();
-            myPathOrDateText.setText(selectedDateTime);
-            if (!selectedDateTime.isEmpty()) {
-                queryResults = FileEventDAO.manualQueryResults("event_date", selectedDateTime);
-            }
+            handleManualQueryComboBox();
+        } // If the user chooses a manual query option, this will run through the choices.
+        else if (source.equals(myManualQueryButton)) {
+            manualQueryHelper();
         } // User changing the activity, so clear out table.
         else if (source.equals(myEventActivityDropdown)) {
             myQueryTable.clearTable();
             if (!myEventActivityDropdown.getSelectedItem().toString().equals("Choose Activity Type")) {
-                queryResults = FileEventDAO.manualQueryResults("event_type",
+                myQueryResults = FileEventDAO.manualQueryResults("event_type",
                         myEventActivityDropdown.getSelectedItem().toString());
             }
         } // Resetting database along with warning.
@@ -612,18 +525,10 @@ public final class FWGUI implements ActionListener {
             }
         } // Adding 10 items debug menu.
         else if (source.equals(add10Item)) {
-            // Add 10 events to the event table for testing
-            for (int i = 0; i < 10; i++) {
-                myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
-                        "TESTEVENT", ".test", createDateString(), createTimeString()));
-            }
+            addTestEvents(10);
         } // Adding 100 items debug menu.
         else if (source.equals(add100Item)) {
-            // Add 10 events to the event table for testing
-            for (int i = 0; i < 100; i++) {
-                myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
-                        "TESTEVENT", ".test", createDateString(), createTimeString()));
-            }
+            addTestEvents(100);
         } // Adding one of each item debug menu.
         else if (source.equals(myAdd1OfEachItem)) {
             runDummyInsertion();
@@ -631,12 +536,159 @@ public final class FWGUI implements ActionListener {
         if (myFilteringOn) {
             myEventTable.filterByExtension('.' + myExtensionComboBox.getSelectedItem().toString());
         } // If the query returns more than 0 results, then update the table.
-        if (queryResults.getData().size() != 0) {
-            for (FileEvent event : queryResults.getData()) {
+        if (myQueryResults.getData().size() != 0) {
+            for (FileEvent event : myQueryResults.getData()) {
                 myQueryTable.addEvent(event);
             }
             queryFrameFixSize();
         }
+    }
+
+    /**
+     * Helper method for the manual query portion of the query window popup
+     * depending on the users choice it will display and use different data.
+     */
+    private final void manualQueryHelper() {
+        if (myManualQueryLabel.getText().equals("File Pathway: ")) {
+            browseDirectory(myPathOrDateText);
+            if (!myPathOrDateText.getText().isEmpty()) {
+                // Removing old data to prevent duplication.
+                myQueryTable.clearTable();
+                myQueryResults = FileEventDAO.manualQueryResults("file_path", myPathOrDateText.getText());
+            }
+        } else if (myManualQueryLabel.getText().equals("File Name to Search: ")) {
+            if (!myFileNameText.getText().equals("")) {
+                // Removing old data to prevent duplication.
+                myQueryTable.clearTable();
+                myQueryResults = FileEventDAO.manualQueryResults("file_name", myFileNameText.getText());
+            }
+        } else if (myManualQueryLabel.getText().equals("Choose Dates: ")) {
+            final String selectedDateTime = dateRangePicker();
+            myPathOrDateText.setText(selectedDateTime);
+            if (!selectedDateTime.isEmpty()) {
+                // Removing old data to prevent duplication.
+                myQueryTable.clearTable();
+                myQueryResults = FileEventDAO.manualQueryResults("event_date", selectedDateTime);
+            }
+        }
+    }
+
+    /**
+     * Helper method for the "automatic" predefined queries and displaying them.
+     */
+    private final void handleAutomaticQueryComboBox() {
+        resetQueryFrame();
+        myManualQueryComboBox.setVisible(false);
+        queryFrameFixSize();
+        if (myAutomaticQueryComboBox.getSelectedItem().equals("Query 1 - All events from today")) {
+            myQueryResults = FileEventDAO.fileEventsFromToday();
+        } else if (myAutomaticQueryComboBox.getSelectedItem()
+                .equals("Query 2 - Top 5 frequently modified file types")) {
+            myQueryResults = FileEventDAO.topFiveExtensions();
+        } else if (myAutomaticQueryComboBox.getSelectedItem()
+                .equals("Query 3 - Most Common Events for Each Extension")) {
+            myQueryResults = FileEventDAO.mostCommonEventsPerExtension();
+        } else if (myAutomaticQueryComboBox.getSelectedItem().equals("Manually query")) {
+            changeManualLabelAndButton("Choose Way to Query Database: ", null);
+            myManualQueryComboBox.setVisible(true);
+            queryFrameFixSize();
+            myQueryFrame.pack();
+        }
+    }
+
+    /**
+     * Helper method for sending files via email, this will prompt the user to enter
+     * an email and then select a file to send.
+     */
+    private final void sendFileViaEmail() {
+        final String recipient = JOptionPane.showInputDialog(myFrame, "Enter recipient email:", "Send Email",
+                JOptionPane.QUESTION_MESSAGE);
+        if (recipient != null && !recipient.isEmpty()) {
+            JFileChooser fileChooser = new JFileChooser();
+            int returnValue = fileChooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+                EmailSender.sendEmailWithAttachment(recipient, "File Watcher Report",
+                        "Please find the attached file.", filePath);
+                JOptionPane.showMessageDialog(myFrame, "Email Sent Successfully!", "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
+
+    /**
+     * Helper method for dis/connecting to the database and displaying that
+     * information in a popup as well as text in the bottom right.
+     * @param theConnectionValue The boolean value of what you want the connection to be.
+     */
+    private final void handleDatabaseConnection(boolean theConnectionValue) {
+        final boolean success;
+        if (theConnectionValue) {
+            success = DatabaseConnection.connect();
+            if (success) {
+                myConnectDbItem.setEnabled(false);
+                myDisconnectDbItem.setEnabled(true);
+                setDatabaseConnected(true);
+                JOptionPane.showMessageDialog(myFrame, "Connected to the database successfully!",
+                        "Database Connection", JOptionPane.INFORMATION_MESSAGE);
+                myDatabaseConnectionLabel.setText("Database connected.");
+            } else {
+                JOptionPane.showMessageDialog(myFrame, "Failed to connect to the database.",
+                        "Database Connection Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            myConnectDbItem.setEnabled(true);
+            myDisconnectDbItem.setEnabled(false);
+            DatabaseConnection.disconnect();
+            setDatabaseConnected(false);
+            JOptionPane.showMessageDialog(myFrame, "Disconnected from the database.",
+                    "Database Disconnection", JOptionPane.INFORMATION_MESSAGE);
+            myDatabaseConnectionLabel.setText("Database not connected.");
+        }
+    }
+
+    /**
+     * Helper method for addressing what the user is filtering the main GUI table with.
+     */
+    private final void handleExtensionSelection() {
+        if (!myExtensionField.getText().isEmpty()
+                && !myExtensionComboBox.getSelectedItem().equals(CUSTOM_EXTENSION_STRING)) {
+            checkFields();
+            myFilteringOn = true;
+            if (myExtensionComboBox.getSelectedItem().equals("All extensions")) {
+                myEventTable.updateTable();
+                myFilteringOn = false;
+            }
+        }
+    }
+
+    /**
+     * Helper method for updating the query window labels and buttons based on the
+     * user's selection.
+     */
+    private final void handleManualQueryComboBox() {
+        myQueryTable.clearTable();
+        resetQueryFrame();
+        final Object shortenedManualCombo = myManualQueryComboBox.getSelectedItem();
+        if (shortenedManualCombo.equals("File Extension")) {
+            changeManualLabelAndButton("File Extensions to View: ", null);
+            myQueryCheckBoxPanel.setVisible(true);
+            myQueryFrame.pack(); // Resizes the frame to fit the components
+            myQueryFrame.queryFrameSize(.8, .3);
+        } else if (shortenedManualCombo.equals("Path to File Location")) {
+            changeManualLabelAndButton("File Pathway: ", "Browse Directories");
+            myPathOrDateText.setVisible(true);
+        } else if (shortenedManualCombo.equals("File Name")) {
+            changeManualLabelAndButton("File Name to Search: ", "Search");
+            myFileNameText.setVisible(true);
+        } else if (shortenedManualCombo.equals("Type of Activity")) {
+            changeManualLabelAndButton("Type of Activity to choose: ", null);
+            myEventActivityDropdown.setVisible(true);
+        } else if (shortenedManualCombo.equals("Between Two Dates")) {
+            changeManualLabelAndButton("Choose Dates: ", "Open Calendar");
+            myPathOrDateText.setVisible(true);
+        }
+        queryFrameFixSize();
     }
 
     /**
@@ -646,34 +698,35 @@ public final class FWGUI implements ActionListener {
      */
     private final String dateRangePicker() {
         final JPanel panel = new JPanel(new GridLayout(2, 2));
-    
+
         // Start Date Picker
         final JLabel startLabel = new JLabel("Start Date:");
         final JSpinner startSpinner = new JSpinner(new SpinnerDateModel());
         final JSpinner.DateEditor startEditor = new JSpinner.DateEditor(startSpinner, "yyyy-MM-dd");
         startSpinner.setEditor(startEditor);
-    
+
         // End Date Picker
         final JLabel endLabel = new JLabel("End Date:");
         final JSpinner endSpinner = new JSpinner(new SpinnerDateModel());
         final JSpinner.DateEditor endEditor = new JSpinner.DateEditor(endSpinner, "yyyy-MM-dd");
         endSpinner.setEditor(endEditor);
-    
+
         // Add components to the panel
         panel.add(startLabel);
         panel.add(startSpinner);
         panel.add(endLabel);
         panel.add(endSpinner);
-    
-        final int option = JOptionPane.showConfirmDialog(null, panel, "Select Date Range", JOptionPane.OK_CANCEL_OPTION);
+
+        final int option = JOptionPane.showConfirmDialog(null, panel, "Select Date Range",
+                JOptionPane.OK_CANCEL_OPTION);
         myQueryTable.clearTable();
-    
+
         if (option == JOptionPane.OK_OPTION) {
             final String startDate = startEditor.getFormat().format(startSpinner.getValue());
             final String endDate = endEditor.getFormat().format(endSpinner.getValue());
             return startDate + " to " + endDate; // Return selected date range as a formatted string
         }
-    
+
         return ""; // Return empty string if canceled
     }
 
@@ -726,7 +779,7 @@ public final class FWGUI implements ActionListener {
     private final void queryWindow() {
         myQueryFrame = new FWFrame();
         myQueryFrame.queryFrameSize(.8, .3);
-        final ImageIcon icon = new ImageIcon("files/appIcon.png");
+        final ImageIcon icon = new ImageIcon(getClass().getResource("/appIcon.png"));
         myQueryFrame.setIconImage(icon.getImage());
         myQueryFrame.setLocationRelativeTo(null);
         myQueryFrame.setTitle("Query Window");
@@ -994,6 +1047,7 @@ public final class FWGUI implements ActionListener {
 
     /**
      * Helper method to reverse the state of the buttons.
+     * 
      * @param theValue The value to set the buttons to.
      */
     private final void reverseButtonState(boolean theValue) {
@@ -1003,6 +1057,13 @@ public final class FWGUI implements ActionListener {
         myMenuStop.setEnabled(!theValue);
         myDirectoryStopButton.setEnabled(!theValue);
         myImgStopButton.setEnabled(!theValue);
+    }
+
+    private final void addTestEvents(int theAmount) {
+        for (int i = 0; i < theAmount; i++) {
+            myEventTable.addEvent(new FileEvent("DebugTestFile.test", "C:\\Users\\test\\subfolder\\subfolder",
+                    "TESTEVENT", ".test", createDateString(), createTimeString()));
+        }
     }
 
     /**
@@ -1057,6 +1118,7 @@ public final class FWGUI implements ActionListener {
 
     /**
      * Helper method for the dummy insertion to clean up the code.
+     * 
      * @param theFileEvent The file event to add to the table.
      */
     private final void addDummyData(final FileEvent theFileEvent) {
@@ -1157,6 +1219,7 @@ public final class FWGUI implements ActionListener {
     /**
      * Returns true if GUI is monitoring a directory. Used by DirectoryWatchService
      * to check if it should continue running.
+     * 
      * @return true if monitoring, false otherwise
      */
     public final boolean isMonitoring() {
@@ -1165,6 +1228,7 @@ public final class FWGUI implements ActionListener {
 
     /**
      * Sets the database connection status in the GUI.
+     * 
      * @param theValue true if connected, false otherwise
      */
     public final void setDatabaseConnected(final boolean theValue) {
@@ -1174,6 +1238,7 @@ public final class FWGUI implements ActionListener {
 
     /**
      * Returns the event table for the GUI.
+     * 
      * @return The event table for the GUI
      */
     public final FWEventTable getEventTable() {
@@ -1182,6 +1247,7 @@ public final class FWGUI implements ActionListener {
 
     /**
      * Returns the instance of the GUI.
+     * 
      * @return The instance of the GUI
      */
     public static final FWGUI getMyFWGUIInstance() {
@@ -1190,6 +1256,7 @@ public final class FWGUI implements ActionListener {
 
     /**
      * Returns the main panel for the GUI.
+     * 
      * @return The main panel for the GUI
      */
     public final FWPanel getMainPanel() {
@@ -1198,6 +1265,7 @@ public final class FWGUI implements ActionListener {
 
     /**
      * Returns the frame for the GUI.
+     * 
      * @return The frame for the GUI
      */
     public final JFrame getFrame() {
@@ -1206,6 +1274,7 @@ public final class FWGUI implements ActionListener {
 
     /**
      * Returns the stop button for the directory.
+     * 
      * @return The stop button for the directory
      */
     public final JButton getStopButton() {
