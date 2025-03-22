@@ -179,7 +179,7 @@ public final class FWGUI implements ActionListener {
         myImgDBButton = addButtonActionListener(myMainPanel.getMyImgDBButton());
         myImgDBButton.setToolTipText("Write to Database");
         myImgClearButton = addButtonActionListener(myMainPanel.getMyImgClearButton());
-        myImgClearButton.setToolTipText("Clear Table");
+        myImgClearButton.setToolTipText("Reset");
     }
 
     /**
