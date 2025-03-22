@@ -1049,15 +1049,16 @@ public final class FWGUI implements ActionListener {
      * Method to clear all the fields in the GUI and reset the buttons.
      */
     private final void clearFields() {
+        myEventTable.clearTable();
         myDirectoryField.setText("");
         myExtensionComboBox.setSelectedItem("All extensions");
         resetTimer();
         DatabaseConnection.disconnect();
         myDatabaseActive = false;
+        handleDatabaseConnection(false);
         if (myDirectoryWatchService != null)
             myDirectoryWatchService.stop();
         myIsMonitoring = false;
-        myEventTable.clearTable();
         checkFields();
     }
 
