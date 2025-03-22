@@ -3,43 +3,44 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class DatabaseConnection {
-    private static final String myURL = "jdbc:sqlite:filewatcher.db";
+/**
+ * Class to handle the connection to the SQLite database.
+ */
+public final class DatabaseConnection {
+    private static final String MY_URL = "jdbc:sqlite:filewatcher.db";
     private static Connection myConnection = null;
+
     /**
      * Connects to the SQLite database.
-     * @return
+     * 
+     * @return true if the connection is successful, false otherwise.
      */
     public static boolean connect() {
         try {
             Class.forName("org.sqlite.JDBC");
-            myConnection = DriverManager.getConnection(myURL);
-            System.out.println(" Connected to SQLite database!");
+            myConnection = DriverManager.getConnection(MY_URL);
 
             // Ensure the table exists
             initializeDatabase();
 
             // Set the GUI to show that the database is connected
             // Enable "Write to Database" button
-            FWGUI gui = FWGUI.getMyInstance();
+            FWGUI gui = FWGUI.getMyFWGUIInstance();
             if (gui != null) {
                 gui.setDatabaseConnected(true);
             }
 
-
             return true;
-        } catch (ClassNotFoundException e) {
-            System.out.println("SQLite JDBC Driver not found!");
+        } catch (final ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (SQLException e) {
-            System.out.println("Failed to connect to SQLite database.");
+        } catch (final SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
 
     /**
-     * Initializes the database by creating the necessary table if it doesn't exist.
+     * Initializes the SQLite database and creates the table if it does not exist.
      */
     private static void initializeDatabase() {
         String sql = "CREATE TABLE IF NOT EXISTS file_events (" +
@@ -51,11 +52,9 @@ public class DatabaseConnection {
                 "event_date TEXT NOT NULL, " +
                 "event_time TEXT NOT NULL);";
 
-        try (Statement stmt = getMyConnection().createStatement()) {
+        try (final Statement stmt = getMyConnection().createStatement()) {
             stmt.execute(sql);
-            System.out.println(" Database initialized. Table 'file_events' is ready.");
-        } catch (SQLException e) {
-            System.out.println(" ERROR: Failed to initialize the database.");
+        } catch (final SQLException e) {
             e.printStackTrace();
         }
     }
@@ -68,29 +67,31 @@ public class DatabaseConnection {
             if (myConnection != null && !myConnection.isClosed()) {
                 myConnection.close();
                 myConnection = null; // 🔹 Ensure the connection is set to null
-                
-                FWGUI gui = FWGUI.getMyInstance();
+
+                final FWGUI gui = FWGUI.getMyFWGUIInstance();
                 if (gui != null) {
                     gui.setDatabaseConnected(false);
                 }
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             e.printStackTrace();
         }
     }
-    
 
     /**
-     * Returns the current database connection.
-     *
-     * @return the current database connection
+     * Returns the connection to the SQLite database.
+     * @return Connection to the SQLite database.
      */
-    public static Connection getMyConnection() {
+    public static final Connection getMyConnection() {
         return myConnection;
     }
 
-    public static void setConnection(Connection connection) {
-        myConnection = connection;
+    /**
+     * Sets the connection to the SQLite database.
+     * @param connection Connection to the SQLite database.
+     */
+    public static void setConnection(final Connection theConnection) {
+        myConnection = theConnection;
     }
-    
+
 }
