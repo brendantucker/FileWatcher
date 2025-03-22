@@ -640,6 +640,7 @@ public final class FWGUI implements ActionListener {
         if (theConnectionValue) {
             success = DatabaseConnection.connect();
             if (success) {
+                myDatabaseActive = true;
                 myConnectDbItem.setEnabled(false);
                 myDisconnectDbItem.setEnabled(true);
                 setDatabaseConnected(true);
@@ -651,6 +652,7 @@ public final class FWGUI implements ActionListener {
                         "Database Connection Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
+            myDatabaseActive = false;
             myConnectDbItem.setEnabled(true);
             myDisconnectDbItem.setEnabled(false);
             DatabaseConnection.disconnect();
@@ -1054,8 +1056,10 @@ public final class FWGUI implements ActionListener {
         myExtensionComboBox.setSelectedItem("All extensions");
         resetTimer();
         DatabaseConnection.disconnect();
+        if(myDatabaseActive){
+            handleDatabaseConnection(false);
+        }
         myDatabaseActive = false;
-        handleDatabaseConnection(false);
         if (myDirectoryWatchService != null)
             myDirectoryWatchService.stop();
         myIsMonitoring = false;
