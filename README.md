@@ -1,2 +1,4 @@
-# TCSS360-FileWatcher
-TCSS360 Project that is a file watching system that will record and changes that happen in a directory / repository that is set to be monitored.
+# TCSS360 Project - FileWatcher
+File Watcher is a directory monitoring service that will record any creation/deletion/modifications that happen in a user-selected directory. Events can be sorted, filtered, and inserted into an SQLite database stored on the local machine. 
+
+This project was created collaboratively by Brendan Tucker, Manjinder Ghuman, and Ryder Deback
