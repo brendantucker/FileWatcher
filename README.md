@@ -3,5 +3,4 @@ File Watcher is a directory monitoring service that will record any creation/del
 
 This project was created collaboratively by Brendan Tucker, Manjinder Ghuman, and Ryder Deback
 
-[1.0 .exe Download](https://github.com/brendantucker/FileWatcher/blob/main/File%20Watcher.exe) <br />
-[1.0 Windows Installer Download](https://github.com/brendantucker/FileWatcher/blob/main/FileWatcherSetup.exe)
+[1.0 .exe Download](https://github.com/brendantucker/FileWatcher/blob/main/File%20Watcher.exe)
